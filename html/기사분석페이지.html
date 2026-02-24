@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>심층 이슈 분석 - 프리미엄 리포트</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f27f0d",
+                        "primary-dark": "#d96a00",
+                        "progressive": "#2563eb",
+                        "conservative": "#dc2626",
+                        "neutral-gray": "#94a3b8",
+                        "premium-bg": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans KR", "sans-serif"]
+                    },
+                    boxShadow: {
+                        'premium': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'floating': '0 20px 50px -12px rgba(242, 127, 13, 0.3)',
+                        'card-soft': '0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.03)',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer components {
+            .material-symbols-outlined {
+                font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+                line-height: 1;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            @keyframes shine-sweep {
+                0% { left: -100%; opacity: 0; }
+                50% { opacity: 0.4; }
+                100% { left: 200%; opacity: 0; }
+            }
+            /* 최종 액션 UI: 하단 고정 독 (Sticky Dock) */
+            .action-dock {
+                @apply fixed bottom-0 left-0 right-0 z-[120] bg-white/80 backdrop-blur-xl border-t border-slate-200 px-8 py-4 flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.05)] transition-all duration-500;
+            }
+            body {
+                @apply bg-[#ffffff] text-slate-900 font-display antialiased;
+            }
+            .report-section-title {
+                @apply flex items-center gap-2 text-slate-900 text-[18px] font-bold mb-5 tracking-tight pb-3 border-b-2;
+            }
+            .notion-toggle {
+                @apply bg-white border border-slate-100 rounded-xl mt-4 overflow-hidden;
+            }
+            .notion-toggle-header {
+                @apply w-full flex items-center gap-2 px-4 py-2.5 text-left cursor-pointer hover:bg-slate-50 transition-colors text-[12px] font-bold text-slate-500;
+            }
+            .notion-toggle-content {
+                @apply hidden p-3 pt-0 bg-white;
+            }
+            .notion-toggle[open] .notion-toggle-content {
+                @apply block;
+            }
+            .notion-toggle[open] .toggle-icon {
+                @apply rotate-90;
+            }
+            .highlight-chip {
+                @apply inline-flex items-center px-3 py-1 rounded-full bg-primary/5 text-primary text-[12px] font-bold border border-primary/20;
+            }
+            .source-link {
+                @apply flex items-center gap-2 p-2.5 bg-slate-50 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 transition-all text-slate-600 hover:text-primary mb-1 last:mb-0;
+            }
+            .reliability-bar {
+                @apply h-1.5 rounded-full overflow-hidden flex bg-slate-200;
+            }
+            .reliability-segment {
+                @apply h-full transition-all duration-500;
+            }
+            .bullet-point {
+                @apply flex items-start gap-3 text-[14px] text-slate-600 leading-relaxed;
+            }
+            .bullet-dot {
+                @apply mt-2 size-1.5 rounded-full bg-primary/40 shrink-0;
+            }
+            .text-highlight-conservative { @apply bg-conservative/10 text-conservative px-1 rounded font-bold; }
+            .text-highlight-progressive { @apply bg-progressive/10 text-progressive px-1 rounded font-bold; }
+            .text-highlight-neutral { @apply bg-slate-100 text-slate-700 px-1 rounded font-bold; }
+            .opinion-card {
+                @apply bg-white border border-slate-100 rounded-[32px] p-8 flex flex-col items-center text-center h-full shadow-card-soft hover:shadow-premium transition-all duration-300;
+            }
+            .media-badge {
+                @apply px-6 py-2 rounded-2xl font-bold text-[18px] mb-6 inline-flex items-center justify-center w-full mx-auto text-center;
+            }
+            .inner-analysis-box {
+                @apply w-full p-5 rounded-2xl mt-6 border text-left;
+            }
+            .timeline-item {
+                @apply relative pl-6 pb-6 last:pb-0 border-l border-slate-100;
+            }
+            .timeline-dot {
+                @apply absolute left-[-4.5px] top-1.5 size-2 rounded-full bg-slate-300;
+            }
+            .timeline-dot-active {
+                @apply absolute left-[-6px] top-1.5 size-3 rounded-full bg-primary ring-4 ring-primary/10;
+            }
+        }
+    </style>
+    <style>
+        @keyframes nav-scan-sweep {
+            0% { transform: translateX(-100%); opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { transform: translateX(33.4%); opacity: 0; }
+        }
+        .analysis-global-loader {
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            height: 5px !important;
+            width: 300% !important;
+            z-index: 1000 !important;
+            pointer-events: none !important;
+            opacity: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(to right, 
+                transparent 0%, 
+                rgba(242, 127, 13, 0.05) 10%, 
+                rgba(242, 127, 13, 1) 50%, 
+                rgba(242, 127, 13, 0.05) 90%, 
+                transparent 100%) !important;
+            animation: nav-scan-sweep 6s cubic-bezier(0.45, 0, 0.55, 1) 0s forwards !important;
+            filter: blur(0.5px) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<header class="h-16 flex items-center justify-between border-b border-slate-100 px-4 md:px-8 py-4 bg-white shrink-0 sticky top-0 z-[100] relative overflow-hidden">
+<div onclick="location.href='메인페이지.html'" class="flex items-center gap-3 w-1/4 cursor-pointer">
+<div class="size-8 md:size-9 bg-primary/10 text-primary flex items-center justify-center rounded-xl shadow-sm">
+<span class="material-symbols-outlined text-xl md:text-2xl font-bold">center_focus_strong</span>
+</div>
+<div>
+<h1 class="text-slate-900 text-base md:text-lg font-bold leading-tight tracking-tight">foc-us</h1>
+</div>
+</div>
+<nav class="hidden lg:flex flex-1 justify-center items-center">
+<div class="relative flex items-center gap-6 xl:gap-12">
+<div class="absolute h-0.5 bg-slate-100 top-1/2 left-0 right-0 -z-10"></div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='메인페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">1</span>
+<span class="text-sm font-medium text-slate-400">주제 선택</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='기사분석페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-primary text-white text-xs font-bold">2</span>
+<span class="text-sm font-bold text-primary">심층 분석</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='초안작성페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">3</span>
+<span class="text-sm font-medium text-slate-400">초안 작성</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='최종기사검토페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">4</span>
+<span class="text-sm font-medium text-slate-400">최종 검토</span>
+</div>
+</div>
+</nav>
+<div class="analysis-global-loader"></div>
+<div class="flex items-center justify-end gap-3 md:gap-6 w-1/4">
+<div onclick="location.href='마이페이지.html'" class="flex items-center gap-2 md:gap-3 cursor-pointer group">
+<div class="text-right hidden sm:block">
+<p class="text-[11px] md:text-xs font-bold text-slate-700 group-hover:text-primary transition-colors">김수현 기자</p>
+<p class="text-[9px] md:text-[10px] text-slate-400">정치부</p>
+</div>
+<div class="size-8 md:size-9 rounded-full bg-slate-100 border border-slate-200 overflow-hidden group-hover:border-primary transition-all">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAr0aqMf7xAbVeARzyxw_CRgr8ZJJDEKuBYUFJaU1LxnpgeHhK6pdsU93DgxLcvZ2ob9TDigZfEWdIMOD7XTJB995rjhwF3e8voXmDfi3td1zns6gWtxapziDHZsD5znrx1oNkFOFnbhL0mlm7fH35RPWkq8indxcfJ8WgXbCF6Y38CCHute4PZsrpxPlPsrolYx7cRZTB-vbYoQi7_MPvn5jJDBqf6cdIJtG9ShqFZ9CeT_fieiLeXi4Im0aSIWxptfymZOppuvTM"/>
+</div>
+</div>
+</div>
+</header>
+<div class="bg-white border-b border-slate-50 px-4 md:px-8 py-3 sticky top-[64px] z-[90]">
+<div class="flex items-center gap-2 text-[12px] font-medium text-slate-400">
+<span class="material-symbols-outlined text-[16px]">home</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span>심층 분석</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-slate-800 font-bold">민주당-혁신당 합당 논란</span>
+</div>
+</div>
+<main class="flex-1 w-full max-w-[1640px] mx-auto px-6 md:px-10 py-8 md:py-12">
+<header class="mb-12 text-center max-w-5xl mx-auto">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-sm font-bold mb-6 border border-primary/10 mx-auto">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                        현재 단계 : 심층 분석
+                    </div>
+<h1 class="text-slate-900 text-2xl md:text-3xl lg:text-[36px] font-black leading-[1.3] md:leading-[1.4] tracking-tight mb-4 px-4 md:px-0">
+                더불어민주당-조국혁신당 합당 추진<br class="hidden md:block"/>중단 및 당내 내홍 심층 분석
+            </h1>
+<p class="text-slate-500 text-base font-medium leading-relaxed max-w-3xl mx-auto">
+                정청래 대표의 합당 드라이브와 19일 만의 중단 결정, 언론사별 시각차 분석
+            </p>
+</header>
+<section class="max-w-[1240px] mx-auto mb-16 grid grid-cols-1 lg:grid-cols-3 gap-8 bg-white border border-slate-100 rounded-2xl md:rounded-[32px] p-6 md:p-10 shadow-premium">
+<div class="lg:col-span-2">
+<div class="flex items-center gap-2 mb-6 text-primary">
+<span class="material-symbols-outlined text-[24px]">subject</span>
+<h3 class="text-[20px] font-bold text-slate-900">이슈 배경 상세</h3>
+</div>
+<div class="flex flex-wrap gap-2 mb-8">
+<div class="highlight-chip"><span class="text-slate-400 font-medium mr-1.5">핵심:</span> 19일 만의 합당 논의 중단</div>
+<div class="highlight-chip"><span class="text-slate-400 font-medium mr-1.5">발단:</span> 정청래 대표의 기습 제안</div>
+<div class="highlight-chip"><span class="text-slate-400 font-medium mr-1.5">쟁점:</span> 당내 민주주의 및 권력 투쟁</div>
+</div>
+<div class="space-y-4 pr-6">
+<div class="bullet-point">
+<div class="bullet-dot"></div>
+<p class="text-[15px] text-slate-600 leading-relaxed font-medium">지난달 22일 정청래 대표가 최고위와 상의 없이 조국혁신당에 합당을 기습 제안하며 촉발된 사안입니다.</p>
+</div>
+<div class="bullet-point">
+<div class="bullet-dot"></div>
+<p class="text-[15px] text-slate-600 leading-relaxed font-medium">당내 의원 패싱, 문건 유출 논란 등으로 계파 간 갈등이 격화되었고, 결국 19일 만에 논의를 중단하기로 결정했습니다.</p>
+</div>
+<div class="bullet-point">
+<div class="bullet-dot"></div>
+<p class="text-[15px] text-slate-600 leading-relaxed font-medium">언론계는 이를 정 대표의 리더십 위기로 규정하거나, 차기 당권과 공천권을 둘러싼 여권 내부의 '내부 권력 투쟁'으로 분석하고 있습니다.</p>
+</div>
+</div>
+</div>
+<div class="lg:col-span-1 bg-slate-50/50 rounded-2xl p-6">
+<div class="flex items-center gap-2 mb-6 text-slate-800">
+<span class="material-symbols-outlined text-[20px] text-primary">event_note</span>
+<span class="text-[15px] font-bold">이슈 타임라인</span>
+</div>
+<div class="flex flex-col">
+<div class="timeline-item">
+<div class="timeline-dot"></div>
+<div class="text-[11px] font-bold text-slate-400 mb-0.5">05.22</div>
+<div class="text-[13px] font-bold text-slate-700">정청래 대표, 합당 기습 제안</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-dot"></div>
+<div class="text-[11px] font-bold text-slate-400 mb-0.5">06.10</div>
+<div class="text-[13px] font-bold text-slate-700">비공개 의원총회 및 반발 격화</div>
+</div>
+<div class="timeline-item border-transparent">
+<div class="timeline-dot-active"></div>
+<div class="text-[11px] font-bold text-primary mb-0.5">06.11</div>
+<div class="text-[13px] font-bold text-slate-900">긴급 최고위, 합당 논의 중단 발표</div>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-20">
+<div class="flex flex-col xl:flex-row items-start xl:items-center justify-between bg-[#F9FAFB] border border-slate-100 rounded-3xl px-8 py-6 mb-8 gap-8">
+<div class="flex flex-col gap-1.5">
+    <div class="flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-[24px] text-primary">newspaper</span>
+        <h3 class="text-[20px] font-bold text-slate-900 tracking-tight whitespace-nowrap">언론사별 주요 논조</h3>
+    </div>
+    <div class="flex items-center gap-1 mt-2" id="stance-filter-tabs">
+        <button class="stance-tab active px-4 py-1.5 rounded-lg text-sm font-bold transition-all bg-primary text-white shadow-md shadow-primary/20" data-filter="all">전체</button>
+        <button class="stance-tab px-4 py-1.5 rounded-lg text-sm font-bold transition-all text-slate-400 hover:text-progressive" data-filter="progressive">진보</button>
+        <button class="stance-tab px-4 py-1.5 rounded-lg text-sm font-bold transition-all text-slate-400 hover:text-slate-600" data-filter="neutral">중립</button>
+        <button class="stance-tab px-4 py-1.5 rounded-lg text-sm font-bold transition-all text-slate-400 hover:text-conservative" data-filter="conservative">보수</button>
+    </div>
+</div>
+<div class="flex-1 max-w-3xl w-full">
+<div class="flex items-center justify-between mb-2.5">
+<div class="flex items-center gap-2">
+<span class="text-[12.5px] font-bold text-slate-500 uppercase tracking-wider">언론 지형 분포</span>
+<span class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-500 text-[11px] font-bold shadow-sm">158개 데이터</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="text-[12.5px] font-bold text-slate-900">데이터 신뢰도 99.1%</span>
+<span class="material-symbols-outlined text-[14px] text-blue-500" style="font-variation-settings: 'FILL' 1">verified</span>
+</div>
+</div>
+<div class="reliability-bar mb-2.5">
+<div class="reliability-segment bg-progressive/70" style="width: 30%"></div>
+<div class="reliability-segment bg-slate-300" style="width: 20%"></div>
+<div class="reliability-segment bg-conservative/70" style="width: 50%"></div>
+</div>
+<div class="flex justify-between items-center text-[11.5px] font-bold px-0.5">
+<div class="flex items-center gap-1.5 text-progressive">
+<span class="size-1.5 rounded-full bg-progressive"></span> 진보 30%
+                        </div>
+<div class="flex items-center gap-1.5 text-slate-400">
+<span class="size-1.5 rounded-full bg-slate-300"></span> 중립 20%
+                        </div>
+<div class="flex items-center gap-1.5 text-conservative">
+                            보수 50% <span class="size-1.5 rounded-full bg-conservative"></span>
+</div>
+</div>
+</div>
+</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <!-- 한겨레 -->
+                <div class="opinion-card transition-all duration-500" data-stance="progressive">
+                    <div class="media-badge bg-blue-50 text-progressive border border-blue-100">한겨레</div>
+                    <h4 class="text-[20px] font-bold text-slate-900 leading-[1.3] mb-6">
+                        "명분 없는 합당은 <span class="text-highlight-progressive">정치적 자해</span>"
+                    </h4>
+                    <div class="inner-analysis-box bg-blue-50/30 border-blue-100">
+                        <div class="font-bold text-slate-900 text-[16px] mb-2">절차적 정당성 상실과 정치적 신뢰 저하 비판</div>
+                        <p class="text-[14.5px] text-slate-600 leading-relaxed font-medium">
+                            정청래 대표의 기습적 제안이 가져온 당내 민주주의 훼손을 본질적인 문제로 진단합니다. 조국혁신당과의 합당이 단순한 숫자 늘리기가 아닌, 가치와 명분이 우선되어야 함을 강조하며, 이번 사태가 야권 전반의 도덕성과 정치적 신뢰도에 미칠 악영향을 우려하는 신중하고 비판적인 논조를 유지합니다.
+                        </p>
+                    </div>
+                    <details class="notion-toggle w-full">
+                        <summary class="notion-toggle-header">
+                            <span class="material-symbols-outlined toggle-icon text-[16px]">chevron_right</span>
+                            <span>관련 원문 기사</span>
+                        </summary>
+                        <div class="notion-toggle-content">
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">합당 무산, 명분보다 '정치공학' 앞세운 당연한 결말</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">민주주의 절차 무너뜨린 정청래의 독주, 당내 내홍 자초</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">차기 지방선거 공천권보다 중요한 것은 국민의 신뢰</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                        </div>
+                    </details>
+                </div>
+                <!-- 경향신문 -->
+                <div class="opinion-card transition-all duration-500" data-stance="progressive">
+                    <div class="media-badge bg-blue-50 text-progressive border border-blue-100">경향신문</div>
+                    <h4 class="text-[20px] font-bold text-slate-900 leading-[1.3] mb-6">
+                        "독단 리더십이 부른 <span class="text-highlight-progressive">당연한 결과</span>"
+                    </h4>
+                    <div class="inner-analysis-box bg-blue-50/30 border-blue-100">
+                        <div class="font-bold text-slate-900 text-[16px] mb-2">명분 없는 강행과 실질적 내홍 비판</div>
+                        <p class="text-[14.5px] text-slate-600 leading-relaxed font-medium">
+                            충분한 내부 소통 없는 '깜짝 제안'이 결국 실효성 없는 권력 투쟁만 불러왔다고 강도 높게 비판합니다. '연합정치'의 가치를 훼손하고 당내 민주주의를 위협하는 독단적 리더십이 이번 사태의 본질이라며, 수평적 소통 구조로의 회복을 통한 야권 연대를 대안으로 제시합니다.
+                        </p>
+                    </div>
+                    <details class="notion-toggle w-full">
+                        <summary class="notion-toggle-header">
+                            <span class="material-symbols-outlined toggle-icon text-[16px]">chevron_right</span>
+                            <span>관련 원문 기사</span>
+                        </summary>
+                        <div class="notion-toggle-content">
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">합당 무산, 3주 내홍 맹성하고 정치혁신 길로</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">정청래 리더십 위기, 민주주의 실종된 당내 민주화</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">야권 연대의 기초는 신뢰... 합당 소동의 교훈</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                        </div>
+                    </details>
+                </div>
+                <!-- 중앙일보 -->
+                <div class="opinion-card transition-all duration-500" data-stance="neutral">
+                    <div class="media-badge bg-slate-50 text-slate-600 border border-slate-200">중앙일보</div>
+                    <h4 class="text-[20px] font-bold text-slate-900 leading-[1.3] mb-6">
+                        "정략적 수단 의심받는 <span class="text-highlight-neutral">명·청 갈등</span> 본격화"
+                    </h4>
+                    <div class="inner-analysis-box bg-slate-50 border-slate-200">
+                        <div class="font-bold text-slate-900 text-[16px] mb-2">친명-친청 계파 간 주도권 경쟁 부각</div>
+                        <p class="text-[14.5px] text-slate-600 leading-relaxed font-medium">
+                            이번 합당 추진을 정 대표 개인의 정치적 입지 강화와 당권 장악을 위한 '고도의 정략'으로 규정합니다. 민생과 국정 현안은 뒤로한 채 오로지 차기 권력 구도에만 함몰되어 벌어지는 '명·청 계파 갈등'의 민낯을 부각시키며, 제1야당의 책임감 없는 태도를 강력히 비판하는 논조입니다.
+                        </p>
+                    </div>
+                    <details class="notion-toggle w-full">
+                        <summary class="notion-toggle-header">
+                            <span class="material-symbols-outlined toggle-icon text-[16px]">chevron_right</span>
+                            <span>관련 원문 기사</span>
+                        </summary>
+                        <div class="notion-toggle-content">
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">합당 무산, 정략에 골몰한 정청래의 예고된 결말</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">공천권 둘러싼 명·청 갈등, 야권 통합의 걸림돌</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">정청래의 무리수, 당내 반발만 사고 끝난 19일</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                        </div>
+                    </details>
+                </div>
+                <!-- 동아일보 -->
+                <div class="opinion-card transition-all duration-500" data-stance="conservative">
+                    <div class="media-badge bg-red-50 text-conservative border border-red-100">동아일보</div>
+                    <h4 class="text-[20px] font-bold text-slate-900 leading-[1.3] mb-6">
+                        "졸속 추진이 부른 <span class="text-highlight-conservative">신뢰의 위기</span>"
+                    </h4>
+                    <div class="inner-analysis-box bg-red-50/30 border-red-100">
+                        <div class="font-bold text-slate-900 text-[16px] mb-2">당정 및 내부 소통 부재 집중 조망</div>
+                        <p class="text-[14.5px] text-slate-600 leading-relaxed font-medium">
+                            주요 의원들을 철저히 '패싱'하고 정해진 결론만 밀어붙이는 '답정너'식 밀실 추진이 이번 혼란의 시발점이라고 지적합니다. 절차적 정당성이 결여된 행위가 불러온 불필요한 당내 에너지 소모와 정책 부재를 꼬집으며, 야권 전반의 신뢰 위기로 번질 가능성을 경고하는 목소리를 높이고 있습니다.
+                        </p>
+                    </div>
+                    <details class="notion-toggle w-full">
+                        <summary class="notion-toggle-header">
+                            <span class="material-symbols-outlined toggle-icon text-[16px]">chevron_right</span>
+                            <span>관련 원문 기사</span>
+                        </summary>
+                        <div class="notion-toggle-content">
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">불통과 졸속으로 혼란 자초한 '밀실' 합당</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">밀실 추진 합당, 누가 책임을 지는가</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">패싱당한 의원들, 계파 분열의 씨앗이 된 합당 제안</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                        </div>
+                    </details>
+                </div>
+                <!-- 조선일보 -->
+                <div class="opinion-card transition-all duration-500" data-stance="conservative">
+                    <div class="media-badge bg-red-50 text-conservative border border-red-100">조선일보</div>
+                    <h4 class="text-[20px] font-bold text-slate-900 leading-[1.3] mb-6">
+                        "본질은 <span class="text-highlight-conservative">공천권 다툼</span>인 난투극"
+                    </h4>
+                    <div class="inner-analysis-box bg-red-50/30 border-red-100">
+                        <div class="font-bold text-slate-900 text-[16px] mb-2">계파 간 실무적 이해관계 충돌 분석</div>
+                        <p class="text-[14.5px] text-slate-600 leading-relaxed font-medium">
+                            합당 논란의 본질을 차기 공천권이라는 '생존권'이 걸린 친명, 친노, 친청계 간의 처절한 권력 암투로 분석합니다. 명분 없는 싸움이 진흙탕 난투극으로 번진 결과라고 폄하하며, 이번 내홍이 일시적 중단에 그치지 않고 차기 당권 경쟁 과정에서 더욱 폭발적으로 전개될 것임을 강하게 전망합니다.
+                        </p>
+                    </div>
+                    <details class="notion-toggle w-full">
+                        <summary class="notion-toggle-header">
+                            <span class="material-symbols-outlined toggle-icon text-[16px]">chevron_right</span>
+                            <span>관련 원문 기사</span>
+                        </summary>
+                        <div class="notion-toggle-content">
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">본질은 ‘내부 권력 투쟁’, 내홍은 계속될 것</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">친명계 내부 암투 격화... 차기 당권을 향한 혈투</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                            <a class="source-link" href="#"><span class="text-[13.5px] font-semibold flex-1 truncate">정청래의 고립... 합당 무산이 남긴 처참한 상처</span><span class="material-symbols-outlined text-[14px] opacity-40">open_in_new</span></a>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            <div class="mt-10 flex justify-center">
+                <div class="flex items-center gap-3 px-6 py-3 bg-slate-50 rounded-2xl border border-slate-100">
+                    <span class="material-symbols-outlined text-slate-400 text-[20px]">info</span>
+                    <span class="text-slate-500 text-[14px] font-medium">정보의 응집력을 위해 섹션 헤더 및 데이터 분포 레이아웃을 최적화했습니다.</span>
+                </div>
+            </div>
+</section>
+<div class="h-32"></div>
+</main>
+
+<!-- 최종 반영: 하단 고정 액션 독 (Sticky Dock) -->
+<div class="action-dock">
+    <div class="flex items-center gap-3">
+        <div class="size-2 rounded-full bg-green-500 animate-pulse"></div>
+        <span class="text-slate-600 font-medium text-sm tracking-tight">심층 이슈 분석이 모두 완료되었습니다. 분석된 맥락을 바탕으로 바로 초안을 작성할 수 있습니다.</span>
+    </div>
+    <button onclick="openModal()" class="px-8 py-3 bg-primary text-white rounded-xl font-bold flex items-center justify-center hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
+        초안 작성 시작
+    </button>
+</div>
+
+<div id="draftModal" class="modal-overlay invisible opacity-0 fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 transition-all duration-300">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-[580px] overflow-hidden flex flex-col transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
+        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center transition-all">
+            <p class="text-slate-900 text-[20px] font-bold tracking-tight">작성할 초안의 가이드를 잡아주세요</p>
+            <button onclick="closeModal()" class="size-9 flex items-center justify-center text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+        </div>
+        <div class="p-8 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-3">기사 카테고리</label>
+                    <div class="relative">
+                        <select class="w-full h-12 pl-4 pr-10 rounded-lg border-2 border-slate-100 bg-slate-50 text-slate-800 font-medium focus:border-primary focus:ring-0 appearance-none text-sm">
+                            <option value="politics">정치</option>
+                            <option selected="" value="economy">경제</option>
+                            <option value="society">사회</option>
+                            <option value="it">IT / 과학</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xl">expand_more</span>
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-3">목표 분량</label>
+                    <div class="flex flex-col gap-2.5 px-1 py-1">
+                        <label class="flex items-center gap-2.5 cursor-pointer text-slate-700 font-medium text-sm whitespace-nowrap">
+                            <input class="w-5 h-5 border-2 border-slate-300 text-primary focus:ring-primary focus:ring-offset-0" name="length" type="radio" value="short"/>
+                            <span>단신 (500자 내외)</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer text-slate-700 font-medium text-sm whitespace-nowrap">
+                            <input checked="" class="w-5 h-5 border-2 border-slate-300 text-primary focus:ring-primary focus:ring-offset-0" name="length" type="radio" value="general"/>
+                            <span>일반 (1000자 내외)</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer text-slate-700 font-medium text-sm whitespace-nowrap">
+                            <input class="w-5 h-5 border-2 border-slate-300 text-primary focus:ring-primary focus:ring-offset-0" name="length" type="radio" value="deep"/>
+                            <span>심층 (2000자 이상)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between mb-1">
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.15em]">인용할 언론사 관점 및 소스 선택</label>
+                    <button id="media-toggle-btn" onclick="handleAllToggle()" class="text-[10px] font-bold text-primary hover:underline">전체 선택</button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <!-- 진보 -->
+                    <div class="space-y-2">
+                        <div class="text-[10px] font-bold text-progressive px-1.5 py-0.5 bg-blue-50 rounded w-fit uppercase mb-1">진보</div>
+                        <div class="flex flex-col gap-1.5">
+                            <div class="media-option px-3 py-2 rounded-xl border border-primary bg-primary/5 text-primary text-[12px] font-bold transition-all cursor-pointer flex items-center gap-2" onclick="toggleMedia(this)">
+                                <span class="material-symbols-outlined text-[18px]">check_box</span>한겨레
+                            </div>
+                            <div class="media-option px-3 py-2 rounded-xl border border-primary bg-primary/5 text-primary text-[12px] font-bold transition-all cursor-pointer flex items-center gap-2" onclick="toggleMedia(this)">
+                                <span class="material-symbols-outlined text-[18px]">check_box</span>경향신문
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 중립 -->
+                    <div class="space-y-2">
+                        <div class="text-[10px] font-bold text-slate-400 px-1.5 py-0.5 bg-slate-100 rounded w-fit uppercase mb-1">중립</div>
+                        <div class="flex flex-col gap-1.5">
+                            <div class="media-option px-3 py-2 rounded-xl border border-primary bg-primary/5 text-primary text-[12px] font-bold transition-all cursor-pointer flex items-center gap-2" onclick="toggleMedia(this)">
+                                <span class="material-symbols-outlined text-[18px]">check_box</span>한국일보
+                            </div>
+                            <div class="media-option px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 text-slate-500 text-[12px] font-medium transition-all cursor-pointer flex items-center gap-2 hover:border-slate-200" onclick="toggleMedia(this)">
+                                <span class="material-symbols-outlined text-[18px]">check_box_outline_blank</span>매일경제
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 보수 -->
+                    <div class="space-y-2">
+                        <div class="text-[10px] font-bold text-conservative px-1.5 py-0.5 bg-red-50 rounded w-fit uppercase mb-1">보수</div>
+                        <div class="flex flex-col gap-1.5">
+                            <div class="media-option px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 text-slate-500 text-[12px] font-medium transition-all cursor-pointer flex items-center gap-2 hover:border-slate-200" onclick="toggleMedia(this)">
+                                <span class="material-symbols-outlined text-[18px]">check_box_outline_blank</span>조선일보
+                            </div>
+                            <div class="media-option px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 text-slate-500 text-[12px] font-medium transition-all cursor-pointer flex items-center gap-2 hover:border-slate-200" onclick="toggleMedia(this)">
+                                <span class="material-symbols-outlined text-[18px]">check_box_outline_blank</span>동아일보
+                            </div>
+                            <div class="media-option px-3 py-2 rounded-xl border border-slate-100 bg-slate-50 text-slate-500 text-[12px] font-medium transition-all cursor-pointer flex items-center gap-2 hover:border-slate-200" onclick="toggleMedia(this)">
+                                <span class="material-symbols-outlined text-[18px]">check_box_outline_blank</span>중앙일보
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-between items-center pt-[28px] border-t border-slate-50">
+                <div class="flex items-center gap-2 text-slate-400">
+                    <span class="material-symbols-outlined text-[18px]">magic_button</span>
+                    <span class="text-[12px] font-medium tracking-tight">AI가 설정된 가이드에 따라 최적의 초안을 구성합니다.</span>
+                </div>
+                <button onclick="location.href='초안작성페이지.html'" class="px-10 py-3 bg-primary text-white rounded-xl font-bold flex items-center justify-center hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
+                    초안 작성 시작
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center text-slate-400 text-[10px] font-bold py-12 bg-white border-t border-slate-50 shrink-0 tracking-[0.2em] uppercase">
+    © 2024 INSIGHT HUB AI ANALYSIS. CONSOLIDATED MEDIA INSIGHTS ENGINE.
+</footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 성향 필터링 로직
+            const stanceTabs = document.querySelectorAll('.stance-tab');
+            const opinionCards = document.querySelectorAll('.opinion-card');
+
+            stanceTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+
+                    // 탭 스타일 전환
+                    stanceTabs.forEach(t => {
+                        t.classList.remove('active', 'bg-primary', 'text-white', 'shadow-md', 'shadow-primary/20');
+                        t.classList.add('text-slate-400');
+                    });
+                    this.classList.add('active', 'bg-primary', 'text-white', 'shadow-md', 'shadow-primary/20');
+                    this.classList.remove('text-slate-400');
+
+                    // 카드 필터링 (최적화)
+                    opinionCards.forEach(card => {
+                        const stance = card.getAttribute('data-stance');
+                        
+                        // 이전 애니메이션 타이머가 있다면 초기화하는 대신 즉시 상태 반영
+                        if (filter === 'all' || stance === filter) {
+                            card.style.display = 'flex';
+                            // 렌더링을 위해 아주 짧은 지연 후 opacity 조절
+                            requestAnimationFrame(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            });
+                        } else {
+                            // 사라지는 카드는 즉시 투명도 조절 후 레이아웃에서 제거
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(10px)';
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // 기존 드래프트 모달 로직 (유지)
+            const modal = document.getElementById('draftModal');
+            const modalContent = document.getElementById('modalContent');
+            const body = document.body;
+
+            window.openModal = function() {
+                modal.classList.remove('invisible', 'opacity-0');
+                modal.classList.add('opacity-100');
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+                body.style.overflow = 'hidden';
+            };
+
+            window.closeModal = function() {
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0');
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                
+                setTimeout(() => {
+                    modal.classList.add('invisible');
+                    body.style.overflow = '';
+                }, 300);
+            };
+
+            window.toggleMedia = function(el) {
+                const icon = el.querySelector('.material-symbols-outlined');
+                const isActive = el.classList.contains('border-primary');
+                
+                if (isActive) {
+                    el.classList.replace('border-primary', 'border-slate-100');
+                    el.classList.replace('bg-primary/5', 'bg-slate-50');
+                    el.classList.replace('text-primary', 'text-slate-500');
+                    el.classList.replace('font-bold', 'font-medium');
+                    icon.innerText = 'check_box_outline_blank';
+                } else {
+                    el.classList.replace('border-slate-100', 'border-primary');
+                    el.classList.replace('bg-slate-50', 'bg-primary/5');
+                    el.classList.replace('text-slate-500', 'text-primary');
+                    el.classList.replace('font-medium', 'font-bold');
+                    icon.innerText = 'check_box';
+                }
+                updateToggleBtnText();
+            };
+
+            window.handleAllToggle = function() {
+                const options = document.querySelectorAll('.media-option');
+                const allActive = Array.from(options).every(el => el.classList.contains('border-primary'));
+                toggleAllMedia(!allActive);
+            };
+
+            function toggleAllMedia(select) {
+                document.querySelectorAll('.media-option').forEach(el => {
+                    const isActive = el.classList.contains('border-primary');
+                    if (select && !isActive) {
+                        toggleMedia(el);
+                    } else if (!select && isActive) {
+                        toggleMedia(el);
+                    }
+                });
+                updateToggleBtnText();
+            }
+
+            function updateToggleBtnText() {
+                const btn = document.getElementById('media-toggle-btn');
+                const options = document.querySelectorAll('.media-option');
+                const allActive = Array.from(options).every(el => el.classList.contains('border-primary'));
+                btn.innerText = allActive ? '전체 해제' : '전체 선택';
+            }
+        });
+    </script>
+</body></html>

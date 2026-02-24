@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>foc-us | 실시간 이슈 브리핑</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f27f0d",
+                        "progressive": "#3b82f6",
+                        "moderate": "#64748b",
+                        "conservative": "#ef4444",
+                        "background-light": "#ffffff",
+                        "surface": "#fcfcfc",
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans KR", "Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-white text-slate-900;
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .card-pattern-1 {
+            background-image: radial-gradient(#f27f0d10 1px, transparent 1px);
+            background-size: 12px 12px;
+        }
+        .card-pattern-2 {
+            background-image: linear-gradient(45deg, #3b82f608 25%, transparent 25%, transparent 50%, #3b82f608 50%, #3b82f608 75%, transparent 75%, transparent);
+            background-size: 20px 20px;
+        }
+        .card-pattern-3 {
+            background-image: radial-gradient(circle at 2px 2px, #64748b0c 1px, transparent 0);
+            background-size: 16px 16px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between border-b border-slate-100 px-4 md:px-8 py-4 bg-white shrink-0 z-[60]">
+<div onclick="location.href='메인페이지.html'" class="flex items-center gap-3 w-1/2 md:w-1/4 cursor-pointer">
+<div class="size-8 md:size-9 bg-primary/10 text-primary flex items-center justify-center rounded-xl shadow-sm">
+<span class="material-symbols-outlined text-xl md:text-2xl font-bold">center_focus_strong</span>
+</div>
+<div>
+<h1 class="text-slate-900 text-base md:text-lg font-bold leading-tight tracking-tight">foc-us</h1>
+</div>
+</div>
+<nav class="hidden lg:flex flex-1 justify-center items-center">
+<div class="relative flex items-center gap-6 xl:gap-12">
+<div class="absolute h-0.5 bg-slate-100 top-1/2 left-0 right-0 -z-10"></div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='메인페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-primary text-white text-xs font-bold">1</span>
+<span class="text-sm font-bold text-primary">주제 선택</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='기사분석페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">2</span>
+<span class="text-sm font-medium text-slate-400">심층 분석</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='초안작성페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">3</span>
+<span class="text-sm font-medium text-slate-400">초안 작성</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='최종기사검토페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">4</span>
+<span class="text-sm font-medium text-slate-400">최종 검토</span>
+</div>
+</div>
+</nav>
+<div class="flex items-center justify-end gap-4 md:gap-6 w-1/2 md:w-1/4">
+<div onclick="location.href='마이페이지.html'" class="flex items-center gap-2 md:gap-3 cursor-pointer group">
+<div class="text-right hidden sm:block">
+<p class="text-[11px] md:text-xs font-bold text-slate-700 group-hover:text-primary transition-colors">김수현 기자</p>
+<p class="text-[9px] md:text-[10px] text-slate-400">정치부</p>
+</div>
+<div class="size-8 md:size-9 rounded-full bg-slate-100 border border-slate-200 overflow-hidden group-hover:border-primary transition-all shadow-sm">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAr0aqMf7xAbVeARzyxw_CRgr8ZJJDEKuBYUFJaU1LxnpgeHhK6pdsU93DgxLcvZ2ob9TDigZfEWdIMOD7XTJB995rjhwF3e8voXmDfi3td1zns6gWtxapziDHZsD5znrx1oNkFOFnbhL0mlm7fH35RPWkq8indxcfJ8WgXbCF6Y38CCHute4PZsrpxPlPsrolYx7cRZTB-vbYoQi7_MPvn5jJDBqf6cdIJtG9ShqFZ9CeT_fieiLeXi4Im0aSIWxptfymZOppuvTM"/>
+</div>
+</div>
+</div>
+</header>
+<div class="bg-white border-b border-slate-50 px-4 md:px-8 py-3 shrink-0">
+<div class="flex items-center gap-2 text-[12px] font-medium text-slate-400">
+<span class="material-symbols-outlined text-[16px]">home</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-slate-800 font-bold">'민주당 합당 논란' 검색 결과</span>
+</div>
+</div>
+<main class="flex-1 pb-24">
+<div class="bg-white border-b border-slate-100 pt-6 md:pt-8 pb-4 md:pb-6">
+<div class="max-w-[1280px] mx-auto px-4 md:px-8">
+<div class="flex flex-col w-full max-w-4xl mx-auto px-2 md:px-0">
+<div class="max-w-4xl w-full relative mx-auto">
+<input class="w-full h-12 md:h-14 pl-8 pr-16 bg-slate-50 border-slate-200 rounded-2xl text-slate-700 placeholder:text-slate-400 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-base font-medium shadow-sm" value="민주당 조국혁신당 합당 논란" type="text"/>
+<button class="absolute right-1.5 md:right-2 top-1 md:top-2 h-10 w-10 bg-primary text-white rounded-xl flex items-center justify-center hover:bg-primary-dark transition-colors shadow-lg">
+<span class="material-symbols-outlined font-bold text-2xl">search</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:pt-10">
+<div class="max-w-7xl mx-auto mb-6">
+<div class="flex items-start gap-3 p-5 rounded-2xl bg-orange-50/50 border border-primary/10">
+<span class="material-symbols-outlined text-primary text-2xl mt-0.5">info</span>
+<p class="text-slate-700 text-base leading-relaxed">
+                        검색하신 <strong class="text-primary font-black underline underline-offset-4 decoration-primary/30 text-lg">'민주당 합당 논란'</strong>과 관련하여, 가장 많이 거론되는 <strong class="text-primary font-black">5가지 이슈</strong>입니다.
+                    </p>
+</div>
+</div>
+<div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-start mb-16 px-4 md:px-0">
+            <button onclick="location.href='기사분석페이지.html'" class="flex flex-col text-left p-6 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 hover:shadow-xl transition-all group relative overflow-hidden">
+<div class="absolute inset-0 card-pattern-1 opacity-40 group-hover:opacity-60 transition-opacity"></div>
+<div class="relative z-10 flex flex-col h-full">
+<h4 class="text-slate-900 font-bold text-base leading-snug mb-4 group-hover:text-primary transition-colors">합당 추진 19일 만에<br/>전격 중단 배경</h4>
+<div class="mb-4">
+                        <p class="text-slate-600 text-xs leading-relaxed">
+                                정청래 대표의 기습 합당 제안이 당내 거센 반발에 부딪혔습니다. 특히 '의원 패싱'과 당내 민주주의 훼손 논란이 불거지며 계파 간 갈등이 표면화되었습니다. 비공개 최고위에서 결정된 중단 배경을 심층 분석합니다.
+                            </p>
+</div>
+<div class="space-y-2 mb-6 border-t border-slate-100 pt-4">
+<div class="flex items-start gap-2">
+<span class="size-1 rounded-full bg-primary mt-1.5 shrink-0"></span>
+<p class="text-[11px] text-slate-500 font-medium">당내 민주주의 절차 무시 논란</p>
+</div>
+<div class="flex items-start gap-2">
+<span class="size-1 rounded-full bg-primary mt-1.5 shrink-0"></span>
+<p class="text-[11px] text-slate-500 font-medium">지방선거 전 합당 중지 결정</p>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between border-t border-slate-50 pt-3">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-slate-400 text-sm">bar_chart</span>
+<span class="text-slate-500 text-[10px] font-bold">보도량 68건</span>
+</div>
+<span class="text-primary text-[10px] font-bold group-hover:underline">자세히 보기 &gt;</span>
+</div>
+</div>
+</button>
+            <button onclick="location.href='기사분석페이지.html'" class="flex flex-col text-left p-6 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 hover:shadow-xl transition-all group relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent card-pattern-2 opacity-30 group-hover:opacity-50 transition-opacity"></div>
+<div class="relative z-10 flex flex-col h-full">
+<h4 class="text-slate-900 font-bold text-base leading-snug mb-4 group-hover:text-primary transition-colors">언론사별 시각차 : <br/>리더십 vs 권력투쟁</h4>
+<div class="mb-4">
+                        <p class="text-slate-600 text-xs leading-relaxed">
+                                경향신문은 정 대표의 독단적 리더십을 비판한 반면, 조선일보 등 보수 언론은 이번 사태를 공천권과 당권을 둘러싼 여권 내부의 '난투극'으로 규정했습니다. 주요 언론사별 핵심 논조를 비교 정리했습니다.
+                            </p>
+</div>
+<div class="space-y-2 mb-6 border-t border-slate-100 pt-4">
+<div class="flex items-start gap-2">
+<span class="size-1 rounded-full bg-blue-500 mt-1.5 shrink-0"></span>
+<p class="text-[11px] text-slate-500 font-medium">기술 주권 약화 우려 표명</p>
+</div>
+<div class="flex items-start gap-2">
+<span class="size-1 rounded-full bg-blue-500 mt-1.5 shrink-0"></span>
+<p class="text-[11px] text-slate-500 font-medium">업계 공동 대응 기구 구성</p>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between border-t border-slate-50 pt-3">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-slate-400 text-sm">bar_chart</span>
+<span class="text-slate-500 text-[10px] font-bold">보도량 28건</span>
+</div>
+<span class="text-primary text-[10px] font-bold group-hover:underline">자세히 보기 &gt;</span>
+</div>
+</div>
+</button>
+            <button onclick="location.href='기사분석페이지.html'" class="flex flex-col text-left p-6 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 hover:shadow-xl transition-all group relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-slate-50/50 to-transparent card-pattern-3 opacity-40 group-hover:opacity-60 transition-opacity"></div>
+<div class="relative z-10 flex flex-col h-full">
+<h4 class="text-slate-900 font-bold text-base leading-snug mb-4 group-hover:text-primary transition-colors">지방선거 공천권<br/>주도권 다툼 양상</h4>
+<div class="mb-4">
+                        <p class="text-slate-600 text-xs leading-relaxed">
+                                이번 합당 논란의 기저에는 내년 지방선거 공천권 확보를 위한 계파 간 치열한 셈법이 깔려 있습니다. 조국혁신당과의 합당이 기존 호남권 물갈이로 이어질 것을 우려한 현역 의원들의 집단 반발 체계와 그 영향력을 분석합니다.
+                            </p>
+</div>
+<div class="space-y-2 mb-6 border-t border-slate-100 pt-4">
+<div class="flex items-start gap-2">
+<span class="size-1 rounded-full bg-slate-400 mt-1.5 shrink-0"></span>
+<p class="text-[11px] text-slate-500 font-medium">호남 지역구 공천 지형 변화</p>
+</div>
+<div class="flex items-start gap-2">
+<span class="size-1 rounded-full bg-slate-400 mt-1.5 shrink-0"></span>
+<p class="text-[11px] text-slate-500 font-medium">계파 간 공천 룰 줄다리기</p>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between border-t border-slate-50 pt-3">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-slate-400 text-sm">bar_chart</span>
+<span class="text-slate-500 text-[10px] font-bold">보도량 52건</span>
+</div>
+<span class="text-primary text-[10px] font-bold group-hover:underline">자세히 보기 &gt;</span>
+</div>
+</div>
+</button>
+            <button onclick="location.href='기사분석페이지.html'" class="flex flex-col text-left p-6 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 hover:shadow-xl transition-all group relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-orange-50/30 to-transparent card-pattern-1 opacity-20 group-hover:opacity-40 transition-opacity"></div>
+<div class="relative z-10 flex flex-col h-full">
+<h4 class="text-slate-900 font-bold text-base leading-snug mb-4 group-hover:text-primary transition-colors">중도층 이탈 우려와<br/>지지율 변화 추이</h4>
+<div class="mb-4">
+                        <p class="text-slate-600 text-xs leading-relaxed">
+                                반복되는 야권 통합 논란이 중도 성향 지지층에게 '정치공학적 야합'으로 비춰질 우려가 커지고 있습니다. 최근 여론조사 지표를 바탕으로 합당 논란 전후의 지지율 변동폭과 세대별 민심 이반 현상을 짚어봅니다.
+                            </p>
+</div>
+<div class="space-y-2 mb-6 border-t border-slate-100 pt-4">
+<div class="flex items-start gap-2">
+<span class="size-1 rounded-full bg-primary mt-1.5 shrink-0"></span>
+<p class="text-[11px] text-slate-500 font-medium">2030 세대 지지율 하락폭</p>
+</div>
+<div class="flex items-start gap-2">
+<span class="size-1 rounded-full bg-primary mt-1.5 shrink-0"></span>
+<p class="text-[11px] text-slate-500 font-medium">정치적 피로도 상승 지표</p>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between border-t border-slate-50 pt-3">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-slate-400 text-sm">bar_chart</span>
+<span class="text-slate-500 text-[10px] font-bold">보도량 34건</span>
+</div>
+<span class="text-primary text-[10px] font-bold group-hover:underline">자세히 보기 &gt;</span>
+</div>
+</div>
+</button>
+            <button onclick="location.href='기사분석페이지.html'" class="flex flex-col text-left p-6 rounded-2xl border border-slate-200 bg-white hover:border-primary/50 hover:shadow-xl transition-all group relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent card-pattern-2 opacity-20 group-hover:opacity-40 transition-opacity"></div>
+<div class="relative z-10 flex flex-col h-full">
+<h4 class="text-slate-900 font-bold text-base leading-snug mb-4 group-hover:text-primary transition-colors">향후 야권 통합<br/>시나리오 전망</h4>
+<div class="mb-4">
+                        <p class="text-slate-600 text-xs leading-relaxed">
+                                이번 논의는 중단되었지만, 대선을 앞둔 시점에서의 재추진 가능성은 여전히 열려 있습니다. '선거 연대' 방식의 느슨한 결합부터 '대선 후보 단일화'를 전제로 한 합당까지, 전문가들이 예측하는 3가지 시나리오를 제시합니다.
+                            </p>
+</div>
+<div class="space-y-2 mb-6 border-t border-slate-100 pt-4">
+<div class="flex items-start gap-2">
+<span class="size-1 rounded-full bg-blue-400 mt-1.5 shrink-0"></span>
+<p class="text-[11px] text-slate-500 font-medium">단계적 통합 로드맵 구상</p>
+</div>
+<div class="flex items-start gap-2">
+<span class="size-1 rounded-full bg-blue-400 mt-1.5 shrink-0"></span>
+<p class="text-[11px] text-slate-500 font-medium">대선 승리 전략과의 연계성</p>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between border-t border-slate-50 pt-3">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-slate-400 text-sm">bar_chart</span>
+<span class="text-slate-500 text-[10px] font-bold">보도량 27건</span>
+</div>
+<span class="text-primary text-[10px] font-bold group-hover:underline">자세히 보기 &gt;</span>
+</div>
+</div>
+</button>
+</div>
+<div class="max-w-4xl mx-auto border-t-4 border-double border-slate-100 pt-16 mb-8">
+<div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h3 class="text-lg font-bold text-slate-900 mb-1">찾으시는 이슈가 없다면?</h3>
+<p class="text-slate-500 text-sm">개별 기사 목록에서 검색하신 의도와 가장 유사한 기사를 선택해주세요.</p>
+</div>
+<div class="flex items-center gap-2 text-primary font-bold text-sm">
+<span class="material-symbols-outlined">arrow_downward</span>
+                        직접 선택하기
+                    </div>
+</div>
+</div>
+<div class="max-w-4xl mx-auto">
+<div class="flex flex-col gap-6 mb-8">
+<div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
+<div class="flex items-center gap-3">
+<span class="text-slate-500 text-xs font-bold whitespace-nowrap">언론사 필터:</span>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-primary bg-primary text-white">전체</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-slate-200 text-slate-500 bg-white hover:border-primary hover:text-primary">한겨레</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-slate-200 text-slate-500 bg-white hover:border-primary hover:text-primary">경향신문</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-slate-200 text-slate-500 bg-white hover:border-primary hover:text-primary">조선일보</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-slate-200 text-slate-500 bg-white hover:border-primary hover:text-primary">동아일보</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-slate-200 text-slate-500 bg-white hover:border-primary hover:text-primary">연합뉴스</button>
+</div>
+</div>
+<div class="flex items-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-100">
+<button class="px-3 py-1 text-xs font-bold bg-white text-slate-900 rounded shadow-sm">최신순</button>
+<button class="px-3 py-1 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">관련도순</button>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">list_alt</span>
+<h3 class="text-slate-900 text-lg font-bold">개별 뉴스 목록</h3>
+<span class="text-slate-400 text-sm font-medium ml-2">검색 결과 총 128건</span>
+</div>
+</div>
+<div class="divide-y divide-slate-100">
+            <div class="py-5 hover:bg-slate-50 transition-all group cursor-pointer border-l-4 border-transparent hover:border-primary px-4 -mx-4">
+                <div class="flex items-center gap-4">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="text-slate-600 text-sm font-bold">경향신문</span>
+                            <span class="text-slate-300 text-[10px]">•</span>
+                            <span class="text-slate-400 text-xs">15분 전</span>
+                        </div>
+                        <h4 class="text-slate-800 font-bold text-lg group-hover:text-primary transition-colors truncate">"명분 없는 합당은 독약"… 민주당 내 정청래 리더십 타격 불가피</h4>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all">chevron_right</span>
+                </div>
+            </div>
+            <div class="py-5 hover:bg-slate-50 transition-all group cursor-pointer border-l-4 border-transparent hover:border-primary px-4 -mx-4">
+                <div class="flex items-center gap-4">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <span class="text-slate-600 text-sm font-bold">조선일보</span>
+                            <span class="text-slate-300 text-[10px]">•</span>
+                            <span class="text-slate-400 text-xs">32분 전</span>
+                        </div>
+                        <h4 class="text-slate-800 font-bold text-lg group-hover:text-primary transition-colors truncate">야권 합당 소동의 본질은 '공천 전쟁'… 계파 간 이전투구 본격화</h4>
+                    </div>
+                    <span class="material-symbols-outlined text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all">chevron_right</span>
+                </div>
+            </div>
+<div class="py-5 hover:bg-slate-50 transition-all group cursor-pointer border-l-4 border-transparent hover:border-primary px-4 -mx-4">
+<div class="flex items-center gap-4">
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="text-slate-600 text-sm font-bold">중앙일보</span>
+<span class="text-slate-300 text-[10px]">•</span>
+<span class="text-slate-400 text-xs">48분 전</span>
+</div>
+<h4 class="text-slate-800 font-bold text-lg group-hover:text-primary transition-colors truncate">EU AI법 확정, 글로벌 표준될까? 국내 정치권도 기본법 제정 속도</h4>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all">chevron_right</span>
+</div>
+</div>
+<div class="py-5 hover:bg-slate-50 transition-all group cursor-pointer border-l-4 border-transparent hover:border-primary px-4 -mx-4">
+<div class="flex items-center gap-4">
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="text-slate-600 text-sm font-bold">디지털타임스</span>
+<span class="text-slate-300 text-[10px]">•</span>
+<span class="text-slate-400 text-xs">1시간 전</span>
+</div>
+<h4 class="text-slate-800 font-bold text-lg group-hover:text-primary transition-colors truncate">[분석] AI 가이드라인, 준수하지 못할 시 매출의 7% 과징금 리스크</h4>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all">chevron_right</span>
+</div>
+</div>
+<div class="py-5 hover:bg-slate-50 transition-all group cursor-pointer border-l-4 border-transparent hover:border-primary px-4 -mx-4">
+<div class="flex items-center gap-4">
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="text-slate-600 text-sm font-bold">한겨레</span>
+<span class="text-slate-300 text-[10px]">•</span>
+<span class="text-slate-400 text-xs">2시간 전</span>
+</div>
+<h4 class="text-slate-800 font-bold text-lg group-hover:text-primary transition-colors truncate">빅테크 규제 정점 찍은 EU AI법... "데이터 주권 회복의 시작"</h4>
+</div>
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all">chevron_right</span>
+</div>
+</div>
+</div>
+<div class="mt-10 flex justify-center">
+<button class="flex items-center gap-2 px-8 py-3 rounded-xl border border-slate-200 text-slate-500 font-bold text-sm hover:bg-slate-50 hover:text-primary hover:border-primary/30 transition-all group">
+                        더 보기
+                        <span class="material-symbols-outlined text-lg group-hover:translate-y-0.5 transition-transform">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-auto border-t border-slate-100 bg-white py-8 px-12 lg:px-24">
+<div class="max-w-[1280px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex flex-col md:flex-row items-center gap-4 md:gap-8">
+<span class="text-slate-400 text-xs">© 2024 인사이트 허브. All rights reserved.</span>
+<div class="flex items-center gap-6">
+<a class="text-slate-400 text-xs hover:text-primary transition-colors" href="#">이용약관</a>
+<a class="text-slate-400 text-xs hover:text-primary transition-colors" href="#">개인정보 처리방침</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<div class="size-1.5 bg-emerald-500 rounded-full"></div>
+<span class="text-slate-500 text-[10px] font-bold tracking-wider">시스템 정상 작동 중</span>
+</div>
+</div>
+</div>
+</footer>
+</div>
+
+</body></html>

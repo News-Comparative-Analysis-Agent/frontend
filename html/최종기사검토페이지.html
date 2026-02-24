@@ -1,0 +1,316 @@
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>최종 기사 발행 검토 - AI Focus Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f27f0d",
+                        "progressive": "#2563eb",
+                        "conservative": "#dc2626",
+                        "neutral": "#64748b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans KR", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .article-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        .circular-gauge {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+                .circular-gauge svg {
+            transform: rotate(-90deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen flex flex-col overflow-hidden font-display">
+<header class="flex items-center justify-between border-b border-slate-100 px-4 md:px-8 py-4 bg-white shrink-0 z-[60]">
+<div onclick="location.href='메인페이지.html'" class="flex items-center gap-3 w-1/2 md:w-1/4 cursor-pointer">
+<div class="size-8 md:size-9 bg-primary/10 text-primary flex items-center justify-center rounded-xl shadow-sm">
+<span class="material-symbols-outlined text-xl md:text-2xl font-bold">center_focus_strong</span>
+</div>
+<div>
+<h1 class="text-slate-900 text-base md:text-lg font-bold leading-tight tracking-tight">foc-us</h1>
+</div>
+</div>
+<nav class="hidden lg:flex flex-1 justify-center items-center">
+<div class="relative flex items-center gap-6 xl:gap-12">
+<div class="absolute h-0.5 bg-slate-100 top-1/2 left-0 right-0 -z-10"></div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='메인페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">1</span>
+<span class="text-sm font-medium text-slate-400">주제 선택</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='기사분석페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">2</span>
+<span class="text-sm font-medium text-slate-400">심층 분석</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='초안작성페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-slate-100 text-slate-400 text-xs font-bold">3</span>
+<span class="text-sm font-medium text-slate-400">초안 작성</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" onclick="location.href='최종기사검토페이지.html'">
+<span class="flex items-center justify-center size-7 rounded-full bg-primary text-white text-xs font-bold">4</span>
+<span class="text-sm font-bold text-primary">최종 검토</span>
+</div>
+</div>
+</nav>
+<div class="flex items-center justify-end gap-4 md:gap-6 w-1/2 md:w-1/4">
+<div onclick="location.href='마이페이지.html'" class="flex items-center gap-2 md:gap-3 cursor-pointer group">
+<div class="text-right hidden sm:block">
+<p class="text-[11px] md:text-xs font-bold text-slate-700 group-hover:text-primary transition-colors">김수현 기자</p>
+<p class="text-[9px] md:text-[10px] text-slate-400">정치부</p>
+</div>
+<div class="size-8 md:size-9 rounded-full bg-slate-100 border border-slate-200 overflow-hidden group-hover:border-primary transition-all shadow-sm">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAr0aqMf7xAbVeARzyxw_CRgr8ZJJDEKuBYUFJaU1LxnpgeHhK6pdsU93DgxLcvZ2ob9TDigZfEWdIMOD7XTJB995rjhwF3e8voXmDfi3td1zns6gWtxapziDHZsD5znrx1oNkFOFnbhL0mlm7fH35RPWkq8indxcfJ8WgXbCF6Y38CCHute4PZsrpxPlPsrolYx7cRZTB-vbYoQi7_MPvn5jJDBqf6cdIJtG9ShqFZ9CeT_fieiLeXi4Im0aSIWxptfymZOppuvTM"/>
+</div>
+</div>
+</div>
+</header>
+<div class="bg-white border-b border-slate-50 px-4 md:px-8 py-3 shrink-0">
+<div class="flex items-center gap-2 text-[12px] font-medium text-slate-400">
+<span class="material-symbols-outlined text-[16px]">home</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span>심층 분석</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span>초안 작성</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-slate-800 font-bold">최종 검토</span>
+</div>
+</div>
+<main class="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
+<section class="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center py-6 md:py-10 min-h-0 px-4">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-sm font-bold mb-8 border border-primary/10">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                        현재 단계 : 최종 검토
+                    </div>
+<div class="w-full max-w-[800px] bg-white border border-slate-200 rounded-xl article-shadow flex flex-col mb-10">
+<div class="p-6 md:p-10 border-b border-slate-50">
+<div class="flex items-center gap-2 mb-6">
+<div class="bg-slate-900 text-white px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded">Politics Focus</div>
+<div class="h-3 w-px bg-slate-200 mx-1"></div>
+<span class="text-xs text-slate-500 font-medium">정치 / 정당 행정 섹션</span>
+</div>
+<h2 class="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 leading-[1.3] mb-8 tracking-tight">
+    민주당-조국혁신당 합당 추진 전격 중단… 계파 갈등 속 '정청래식 리더십' 도마 위
+</h2>
+<div class="flex items-center justify-between py-4 border-y border-slate-100">
+<div class="flex items-center gap-4">
+<div class="flex flex-col">
+<span class="text-xs font-bold text-slate-800">김태현 기자</span>
+<span class="text-[11px] text-slate-400">politics_editor@insight-hub.com</span>
+</div>
+</div>
+<div class="text-right">
+<span class="text-xs text-slate-500 block">발행 일시</span>
+<span class="text-xs font-medium text-slate-800">2024년 05월 24일 17:00 예정</span>
+</div>
+</div>
+</div>
+<article class="px-6 md:px-10 py-8">
+<div class="mb-10 group relative">
+<img alt="Article Image" class="w-full rounded-lg object-cover max-h-[450px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY33rzUtzizNkambfkpf7PrbmaCPi3Vs2XhrFST7J9j0Auo6ROoJdI99n39p8kX3QyEEUtTFw75VImv0O4NvrIXq7CP2ZKyO8NbkqCkZWvxbEuti95lCCVBtBSHUVRbhJUC4-VdAA96qxNc_KRHTo_MGtnkhEZxjymY8608LA8RGNGJcovh3J3VhAUB4vyUA2L3SC7YvAK7EHrW114yDftkTUpbD47aXsHvTyjTFWeLDGYtAqFdkUtvQPbmkio8Z-MJGKA70SaKR0"/>
+<p class="mt-3 text-[13px] text-slate-500 text-center leading-relaxed italic">
+    ▲ 지난 비공개 최고위원회의에서 합당 논의 중단 결정을 발표하고 있는 더불어민주당 지도부의 모습. (사진=인사이트 허브)
+</p>
+</div>
+<div class="space-y-6 text-[17px] leading-[1.85] text-slate-800">
+<p>
+    더불어민주당 정청래 최고위원이 제안한 조국혁신당과의 합당 추진이 당내 거센 반발에 직면하며 19일 만에 공식 중단되었습니다. 이번 사태는 정당 간의 물리적 결합이라는 의미를 넘어, 당내 의사결정 구조의 투명성과 리더십의 정당성에 대한 근본적인 의문을 제기하고 있습니다.
+</p>
+<p class="transition-all duration-500">
+    <span id="target-span-plagiarism" class="transition-all duration-300">경향신문을 비롯한 진보 성향 매체들은 "충분한 내부 소통 없는 독단적 추진이 부른 예고된 참사"라고 정의하며</span>, 당내 민주주의 시스템의 훼손을 경고했습니다. 특히 호남 지역구 의원들을 중심으로 한 계파 갈등이 수면 위로 부상하며 차기 지방선거 공천권을 둘러싼 당내 내홍이 격화될 조짐을 보이고 있습니다.
+</p>
+        <p class="transition-all duration-500">
+            반면 조선일보 등 보수 언론은 이번 사태의 본질을 '내부 권력 투쟁'으로 규정했습니다. <span id="target-span-adjective" class="transition-all duration-300">정 최고위원이 자신의 정치적 입지를 강화하기 위해 '합당 카드'를 꺼내들었으나</span>, 실질적인 득실 계산이 끝난 타 계파의 저항에 부딪혀 낙마했다는 분석입니다. 이러한 이해관계의 충돌은 야권 통합의 진정성을 희석시키고 있다는 지적입니다.
+        </p>
+<p>
+    결론적으로 이번 합당 무산은 단순한 논의의 중단을 넘어, 민주당 리더십의 중대한 시험대가 될 전망입니다. 산적한 민생 현안 속에서 불필요한 정치공학적 논란으로 인한 국정 동력 소모를 막기 위해, 보다 투명하고 합리적인 거버넌스 구축이 시급한 시점입니다.
+</p>
+</div>
+<div class="mt-16 pt-8 border-t border-slate-100">
+<div class="bg-slate-50 border border-slate-200/60 rounded-lg p-4 flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400 text-[20px]">info</span>
+<p class="text-xs text-slate-500 font-medium">
+    본 기사는 <span class="text-slate-700 font-bold">AI 분석 시스템</span>을 통해 주요 언론사별 시각차를 교차 검증하여 작성된 초안을 바탕으로 기자가 최종 편집을 완료했습니다.
+</p>
+</div>
+</div>
+</article>
+</div>
+</section>
+    <aside class="w-full lg:w-[420px] border-t lg:border-t-0 lg:border-l border-slate-200 bg-white p-6 shrink-0 overflow-y-auto custom-scrollbar min-h-0">
+        <h3 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2 text-slate-700 mb-6">
+            <span class="material-symbols-outlined text-primary text-xl">analytics</span>
+            최종 품질 검토 리포트
+        </h3>
+
+        <div class="space-y-6">
+            <!-- 1. 신뢰도 및 표절 분석 카드 -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-xl">verified_user</span>
+                        <h4 class="font-bold text-sm text-slate-800 tracking-tight">신뢰도 및 표절 분석</h4>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="grid grid-cols-12 gap-4">
+                        <!-- 왼쪽: 표절률 위험 게이지 -->
+                        <div class="col-span-5 bg-red-50 rounded-xl p-3 border border-red-100 flex flex-col items-center group/plagiarism cursor-pointer"
+                             onmouseenter="highlightTarget('target-span-plagiarism', true)" 
+                             onmouseleave="highlightTarget('target-span-plagiarism', false)">
+                            <span class="text-[10px] font-bold text-red-500 uppercase mb-2 tracking-tight">표절률 위험</span>
+                            <div class="circular-gauge scale-100">
+                                <svg class="w-full h-full" viewBox="0 0 36 36">
+                                    <path class="text-slate-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+                                    <path class="text-red-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="24, 100" stroke-linecap="round" stroke-width="3"></path>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-sm font-bold text-red-600">24%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 오른쪽: 유사 기사 소스 -->
+                        <div class="col-span-7 space-y-2">
+                            <h5 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">list_alt</span>
+                                유사 기사 소스 (3건)
+                            </h5>
+                            <div class="bg-slate-50 border border-slate-100 rounded-lg p-2.5 hover:border-red-200 transition-all cursor-pointer group/source" onclick="window.open('https://www.joongang.co.kr', '_blank')">
+                                <div class="flex items-center justify-between mb-0.5">
+                                    <span class="text-[9px] font-bold text-slate-500">중앙일보</span>
+                                    <span class="text-[10px] font-bold text-red-600">85%</span>
+                                </div>
+                                <h5 class="text-[10px] font-bold text-slate-700 leading-tight truncate group-hover/source:text-red-700">"정청래 최고위원 합당 제안 반발..."</h5>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-100 rounded-lg p-2.5 hover:border-slate-300 transition-all cursor-pointer group/source" onclick="window.open('https://www.hani.co.kr', '_blank')">
+                                <div class="flex items-center justify-between mb-0.5">
+                                    <span class="text-[9px] font-bold text-slate-500">한겨레</span>
+                                    <span class="text-[10px] font-bold text-orange-600">42%</span>
+                                </div>
+                                <h5 class="text-[10px] font-bold text-slate-700 leading-tight truncate group-hover/source:text-primary">야권 통합 진정성인가 계파...</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 윤리 가이드라인 검증 카드 -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-green-600 text-xl">gavel</span>
+                        <h4 class="font-bold text-sm text-slate-800 tracking-tight">윤리 가이드라인 검증</h4>
+                    </div>
+                    <span class="flex items-center gap-1 text-red-600 text-[10px] font-bold bg-red-50 px-2 py-0.5 rounded border border-red-100">
+                        <span class="material-symbols-outlined text-[12px] font-bold">warning</span>
+                        CAUTION
+                    </span>
+                </div>
+                <div class="p-5 space-y-2">
+                    <div class="flex items-center gap-3 text-xs font-medium text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <span class="material-symbols-outlined text-green-500 text-xl font-bold">check_circle</span>
+                        혐오 표현 및 차별적 서술 없음
+                    </div>
+                    <div class="flex items-center gap-3 text-xs font-bold text-red-600 bg-red-50/50 p-2.5 rounded-xl border border-red-100 cursor-pointer group/alert" 
+                         onmouseenter="highlightTarget('target-span-adjective', true)" 
+                         onmouseleave="highlightTarget('target-span-adjective', false)">
+                        <span class="material-symbols-outlined text-red-500 text-xl font-bold group-hover/alert:scale-110 transition-transform">error</span>
+                        자극적인 형용사 사용 감지 (보안 권장)
+                    </div>
+                    <div class="flex items-center gap-3 text-xs font-medium text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <span class="material-symbols-outlined text-green-500 text-xl font-bold">check_circle</span>
+                        등장 인물 개인정보 노출 위험 없음
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. AI 종합 의견 카드 -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-xl">psychology</span>
+                        <h4 class="font-bold text-sm text-slate-800 tracking-tight">AI 최종 종합 의견</h4>
+                    </div>
+                </div>
+                <div class="px-5 py-3">
+                    <div class="bg-red-50/50 rounded-xl p-4 border border-red-100">
+                        <p class="text-[12px] text-red-800 leading-[1.7] font-medium">
+                            <span class="flex items-center gap-1.5 mb-2 text-red-600 font-bold">
+                                <span class="material-symbols-outlined text-base">dangerous</span>
+                                발행 불가: 심각한 표절 저촉 우려
+                            </span>
+                            현재 기사 본문 중 <span class="font-bold">두 번째 문단</span>이 외부 소스와 85% 이상 일치하며, <span class="font-bold underline">자극적인 형용사</span> 사용이 감지되었습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+</aside>
+</main>
+<footer class="h-20 border-t border-slate-200 bg-white px-4 md:px-8 flex items-center justify-between z-30 shrink-0 shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.03)]">
+<div class="flex items-center gap-2 text-slate-400">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+<span class="text-[12px] font-medium tracking-tight">발행 시 실제 뉴스 사이트에 적용될 레이아웃입니다.</span>
+</div>
+<div class="flex items-center gap-4">
+        <button onclick="location.href='초안작성페이지.html'" class="px-8 py-3 text-[14px] font-bold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all duration-200 active:scale-95 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">edit</span>
+            <span>수정하러 돌아가기</span>
+        </button>
+<button class="px-10 py-3 text-[14px] font-bold bg-primary text-white rounded-xl hover:bg-orange-600 hover:shadow-xl hover:shadow-primary/20 transition-all duration-200 active:scale-95 flex items-center gap-2">
+            <span>최종 발행 확정</span>
+            <span class="material-symbols-outlined text-[20px]">publish</span>
+</button>
+</div>
+</footer>
+
+<script>
+    function highlightTarget(id, active) {
+        const target = document.getElementById(id);
+        if (!target) return;
+
+        if (active) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('bg-red-100', 'text-red-900', 'font-bold', 'px-1', 'rounded', 'ring-1', 'ring-red-300');
+        } else {
+            target.classList.remove('bg-red-100', 'text-red-900', 'font-bold', 'px-1', 'rounded', 'ring-1', 'ring-red-300');
+        }
+    }
+</script>
+</body></html>

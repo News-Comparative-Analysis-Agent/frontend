@@ -1,0 +1,20 @@
+import { Routes, Route } from 'react-router-dom'
+import MainPage from '../pages/MainPage'
+import AnalysisPage from '../pages/AnalysisPage'
+import DraftingPage from '../pages/DraftingPage'
+import FinalReviewPage from '../pages/FinalReviewPage'
+import SearchResultsPage from '../pages/SearchResultsPage'
+
+const AppRouter = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<MainPage />} />
+      <Route path="/analysis" element={<AnalysisPage />} />
+      <Route path="/drafting" element={<DraftingPage />} />
+      <Route path="/final-review" element={<FinalReviewPage />} />
+      <Route path="/search" element={<SearchResultsPage />} />
+    </Routes>
+  )
+}
+
+export default AppRouter

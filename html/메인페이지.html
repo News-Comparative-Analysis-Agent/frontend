@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>인사이트 허브 - 통합 분석 대시보드</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f27f0d",
+                        "primary-dark": "#d96e08",
+                        "primary-light": "#ff9d3d",
+                        "stance-blue": "#2563eb",
+                        "stance-red": "#dc2626",
+                        "stance-gray": "#64748b",
+                        "background": "#ffffff",
+                        "surface": "#f8fafc",
+                        "border-light": "#f1f5f9",
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans KR", "Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        'none': '0',
+                        'sm': '4px',
+                        'DEFAULT': '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px 5px rgba(255, 255, 255, 0.4)',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-white text-slate-900 font-sans antialiased;
+                line-height: 1.6;
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 1;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        * {
+            font-style: normal !important;
+        }
+        .rank-number {
+            font-family: 'Inter', sans-serif;
+        }
+        .section-highlight {
+            @apply relative inline-block;
+        }
+        .section-highlight::after {
+            content: '';
+            @apply absolute left-0 bottom-[-10px] w-12 h-1.5 bg-primary/20 rounded-full;
+        }
+        .capsule-tab-container {
+            @apply bg-[#f1f5f9] p-1 rounded-xl flex gap-1;
+        }
+        .capsule-tab-active {
+            @apply bg-white text-primary font-extrabold shadow-sm rounded-lg py-2 flex-1 text-center transition-all;
+        }
+        .capsule-tab-inactive {
+            @apply text-slate-400 font-bold py-2 flex-1 text-center hover:text-slate-500 transition-all;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-white">
+<header class="h-16 flex items-center justify-between border-b border-white/10 px-4 md:px-8 py-4 bg-primary shrink-0 sticky top-0 z-[100] relative overflow-hidden">
+<div onclick="location.href='메인페이지.html'" class="flex items-center gap-3 w-1/4 cursor-pointer">
+<div class="size-8 md:size-9 bg-white text-primary flex items-center justify-center rounded-xl shadow-sm">
+<span class="material-symbols-outlined text-xl md:text-2xl font-bold">center_focus_strong</span>
+</div>
+<div>
+<h1 class="text-white text-base md:text-lg font-bold leading-tight tracking-tight">foc-us</h1>
+</div>
+</div>
+<div class="hidden lg:flex flex-1 justify-center items-center">
+    <!-- 가이드 요소는 히어로 섹션으로 이동되었으므로 헤더에서는 제외함 -->
+</div>
+<div class="flex items-center justify-end gap-3 md:gap-6 w-1/4">
+<div onclick="location.href='마이페이지.html'" class="flex items-center gap-2 md:gap-3 cursor-pointer group">
+<div class="text-right hidden sm:block">
+<p class="text-[11px] md:text-xs font-bold text-white group-hover:text-white/80 transition-colors">김수현 기자</p>
+<p class="text-[9px] md:text-[10px] text-white/60 font-medium">정치부</p>
+</div>
+<div class="size-8 md:size-9 rounded-full bg-white/20 border border-white/10 overflow-hidden group-hover:border-white/40 transition-all shadow-sm">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQMmRYbTKfMjQsrK5Q0p9GMzb0Hg4oPzylpIZr07bk9kQNYiOVfoYllXStq10-l5C9avhhNGkb6Wt-Z6qs-9dUhho8YNtt3fJFKZErnTm2aKSOC-_uP1OYQLWY25ytXO1OpMUB6tYHyiT7NdLtcQOxbm7GKYLyk_Pv9GPjj7K9Bw1xIMcOWS-axJzCD1Is338PACAqnfiJXlOWD5ySP0Vx7hZSz0ahl1829Y0UcSruAn9zTSu9rfiVHm2h4L8VanUEL8c1B91pJaQ"/>
+</div>
+</div>
+</div>
+</header>
+<main class="min-h-screen">
+    <section class="bg-primary h-[220px] px-12 flex flex-col justify-center">
+        <div class="max-w-[1240px] w-full mx-auto flex items-center justify-between gap-12">
+<div class="flex-1 text-left shrink-0">
+<h2 class="text-4xl font-extrabold text-white tracking-tight leading-[1.3] break-keep">
+                    기사 작성의 모든 과정,<br/>실시간으로 도와드립니다.
+                </h2>
+<p class="text-white/70 mt-3 text-sm font-medium">기자님을 위한 실시간 이슈 트래킹 및 분석 가이드입니다.</p>
+</div>
+<div class="flex flex-row items-start gap-10 py-6 flex-[2]">
+<div class="flex flex-col items-start gap-2 flex-1 relative cursor-pointer" onclick="location.href='메인페이지.html'">
+<span class="flex items-center justify-center size-14 rounded-full bg-white text-primary text-2xl font-black shadow-glow ring-4 ring-white/30 shrink-0">1</span>
+<div class="text-left">
+<p class="text-[18px] font-black text-white leading-none">주제 선택</p>
+<p class="text-[13px] text-white mt-2 leading-snug font-medium opacity-90">분석할 주제를 선택하거나 직접 검색합니다.</p>
+</div>
+</div>
+<!-- 2~4단계의 상단 여백을 mt-5에서 mt-2로 미세 조정 -->
+<div class="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70 cursor-pointer hover:opacity-100 transition-opacity" onclick="location.href='기사분석페이지.html'">
+<span class="flex items-center justify-center size-10 rounded-full bg-white/20 text-white text-lg font-bold border border-white/30 shrink-0">2</span>
+<div class="text-left">
+<p class="text-[16px] font-bold text-white leading-none">심층 분석</p>
+<p class="text-[12px] text-white/80 mt-2 leading-snug font-normal">진보/보수 관점을 비교 분석합니다.</p>
+</div>
+</div>
+<div class="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70 cursor-pointer hover:opacity-100 transition-opacity" onclick="location.href='초안작성페이지.html'">
+<span class="flex items-center justify-center size-10 rounded-full bg-white/20 text-white text-lg font-bold border border-white/30 shrink-0">3</span>
+<div class="text-left">
+<p class="text-[16px] font-bold text-white leading-none">초안 작성</p>
+<p class="text-[12px] text-white/80 mt-2 leading-snug font-normal">AI가 기사 초안을 작성합니다.</p>
+</div>
+</div>
+<div class="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70 cursor-pointer hover:opacity-100 transition-opacity" onclick="location.href='최종기사검토페이지.html'">
+<span class="flex items-center justify-center size-10 rounded-full bg-white/20 text-white text-lg font-bold border border-white/30 shrink-0">4</span>
+<div class="text-left">
+<p class="text-[16px] font-bold text-white leading-none">최종 발행</p>
+<p class="text-[12px] text-white/80 mt-2 leading-snug font-normal">기사 품질 검토 후 발행합니다.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div class="max-w-[1100px] mx-auto px-6 pt-12">
+<div class="flex items-center justify-between border-b-2 border-slate-900/5 pb-6">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-[28px] font-bold">trending_up</span>
+<h2 class="text-2xl font-black text-slate-900 tracking-tight">오늘의 뉴스 트렌드</h2>
+</div>
+<p class="text-[13px] text-slate-400 font-medium pl-10">2026년 2월 23일 기준 실시간 분석 결과입니다</p>
+</div>
+        <div class="flex items-center gap-3">
+            <div class="relative w-64 focus-within:w-80 transition-all duration-500 ease-out group">
+                <input id="search-input" class="w-full pl-11 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all bg-white shadow-sm placeholder:text-slate-400" placeholder="찾는 뉴스가 있으신가요?" type="text" onkeydown="if(event.key === 'Enter') location.href='자연어검색후.html'"/>
+                <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] group-focus-within:text-primary group-focus-within:scale-110 transition-all cursor-pointer" onclick="location.href='자연어검색후.html'">search</span>
+            </div>
+            <button class="size-11 bg-primary text-white rounded-xl flex items-center justify-center hover:bg-primary-dark hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md shrink-0 active:scale-95 group" onclick="location.href='자연어검색후.html'">
+                <span class="material-symbols-outlined text-[22px] group-hover:rotate-12 transition-transform">search</span>
+            </button>
+        </div>
+</div>
+</div>
+<div class="max-w-[1100px] mx-auto px-6 pb-20 pt-8">
+<div class="flex flex-col xl:flex-row gap-16 items-start">
+<div class="w-full xl:w-[55%] flex flex-col">
+<div class="mb-10">
+<div class="flex items-center justify-between h-10 mb-2">
+<div class="flex items-center">
+<h2 class="text-slate-800 text-xl font-bold tracking-tight section-highlight">각 언론사별 현재 인기 뉴스에요</h2>
+</div>
+</div>
+<div class="w-full h-px bg-slate-100"></div>
+</div>
+<div class="mb-10 w-full">
+    <div class="flex flex-nowrap gap-2 pb-2 no-scrollbar" id="filter-chips-container">
+        <label class="cursor-pointer select-none shrink-0">
+            <input type="checkbox" class="filter-checkbox peer hidden" value="전체">
+            <div class="relative flex items-center justify-center px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-400 text-[12px] font-bold transition-all hover:border-slate-300 peer-checked:bg-primary/5 peer-checked:border-primary peer-checked:text-primary">
+                <span class="material-symbols-outlined absolute left-2 text-[16px] leading-none opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all">check_circle</span>
+                <span>전체</span>
+            </div>
+        </label>
+        <label class="cursor-pointer select-none shrink-0">
+            <input type="checkbox" class="filter-checkbox peer hidden" value="조선일보" checked>
+            <div class="relative flex items-center justify-center px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-400 text-[12px] font-bold transition-all hover:border-slate-300 peer-checked:bg-primary/5 peer-checked:border-primary peer-checked:text-primary">
+                <span class="material-symbols-outlined absolute left-2 text-[16px] leading-none opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all">check_circle</span>
+                <span>조선</span>
+            </div>
+        </label>
+        <label class="cursor-pointer select-none shrink-0">
+            <input type="checkbox" class="filter-checkbox peer hidden" value="한겨레" checked>
+            <div class="relative flex items-center justify-center px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-400 text-[12px] font-bold transition-all hover:border-slate-300 peer-checked:bg-primary/5 peer-checked:border-primary peer-checked:text-primary">
+                <span class="material-symbols-outlined absolute left-2 text-[16px] leading-none opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all">check_circle</span>
+                <span>한겨레</span>
+            </div>
+        </label>
+        <label class="cursor-pointer select-none shrink-0">
+            <input type="checkbox" class="filter-checkbox peer hidden" value="경향신문">
+            <div class="relative flex items-center justify-center px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-400 text-[12px] font-bold transition-all hover:border-slate-300 peer-checked:bg-primary/5 peer-checked:border-primary peer-checked:text-primary">
+                <span class="material-symbols-outlined absolute left-2 text-[16px] leading-none opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all">check_circle</span>
+                <span>경향</span>
+            </div>
+        </label>
+        <label class="cursor-pointer select-none shrink-0">
+            <input type="checkbox" class="filter-checkbox peer hidden" value="동아일보">
+            <div class="relative flex items-center justify-center px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-400 text-[12px] font-bold transition-all hover:border-slate-300 peer-checked:bg-primary/5 peer-checked:border-primary peer-checked:text-primary">
+                <span class="material-symbols-outlined absolute left-2 text-[16px] leading-none opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all">check_circle</span>
+                <span>동아</span>
+            </div>
+        </label>
+        <label class="cursor-pointer select-none shrink-0">
+            <input type="checkbox" class="filter-checkbox peer hidden" value="연합뉴스">
+            <div class="relative flex items-center justify-center px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-400 text-[12px] font-bold transition-all hover:border-slate-300 peer-checked:bg-primary/5 peer-checked:border-primary peer-checked:text-primary">
+                <span class="material-symbols-outlined absolute left-2 text-[16px] leading-none opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all">check_circle</span>
+                <span>연합</span>
+            </div>
+        </label>
+    </div>
+</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12" id="news-board-grid">
+                <div class="news-board-card" data-category="조선일보">
+                    <div class="border-t-[3px] border-slate-300 mb-3"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-slate-600 flex items-center gap-1">조선일보 <span class="material-symbols-outlined text-sm">chevron_right</span></h4>
+                    </div>
+<div class="space-y-0 divide-y divide-slate-50">
+<div class="pb-6 pt-1 group cursor-pointer border-b border-slate-100" onclick="location.href='기사분석페이지.html'">
+<div class="relative w-full aspect-video mb-3 overflow-hidden rounded-xl">
+<img alt="Ranking 1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6vD1QlBx3MahuJNiT6ytN9XeqWM597DkfYGsWN3ekocpYn6M_wR3jStIE787NRsro8oDCsIuoncTgS3gjLQGRqEWlPQCFj3mMSNQxrwm-5zNbFtYUN0vvdOgK3mFswhymhZ5uVLJfuu8r13461nGjKauRq5GUgiYzHoNgsND91Mwc9WyGviVi2TG2HBy_e6U7TJE-loGe_DZD5MUcz6zhFBFQxOElNyGnclId6qkcdr-nnoUjfB_uaubNW-zWmd9LNuYsciLGR7w"/>
+<div class="absolute top-2 left-2 size-7 bg-slate-900 text-white flex items-center justify-center font-bold rank-number rounded shadow-md">1</div>
+</div>
+<h5 class="text-[15px] font-bold text-slate-900 leading-snug group-hover:text-primary transition-colors">반도체 초격차 전략, 정부 대규모 세제 혜택 지원책 발표</h5>
+</div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">2</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">노동시장 유연화 및 근로시간 개편안 쟁점 정리</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">3</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">한미일 경제 안보 협력 강화 및 공급망 대응</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">4</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">수도권 광역급행철도(GTX) 노선 연장 및 부동산 동향</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">5</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">지방시대 선포 및 지역 균형 발전 로드맵 발표</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">6</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">기업 상속세 개편을 통한 가업 승계 활성화 방안</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">7</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">글로벌 공급망 재편에 따른 전략물자 확보 전략</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">8</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">국가 첨단 전략 산업 육성 및 규제 혁파 대책</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">9</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">디지털 금융 혁신을 위한 규제 샌드박스 확대</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">10</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">한일 셔틀 외교 복원과 경제 협력 협의체 구성</p>
+                                </div>
+</div>
+</div>
+                <div class="news-board-card" data-category="한겨레">
+                    <div class="border-t-[3px] border-slate-300 mb-3"></div>
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-lg font-bold text-slate-600 flex items-center gap-1">한겨레 <span class="material-symbols-outlined text-sm">chevron_right</span></h4>
+</div>
+<div class="space-y-0 divide-y divide-slate-50">
+<div class="pb-6 pt-1 group cursor-pointer border-b border-slate-100" onclick="location.href='기사분석페이지.html'">
+<div class="relative w-full aspect-video mb-3 overflow-hidden rounded-xl">
+<img alt="Ranking 1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6vD1QlBx3MahuJNiT6ytN9XeqWM597DkfYGsWN3ekocpYn6M_wR3jStIE787NRsro8oDCsIuoncTgS3gjLQGRqEWlPQCFj3mMSNQxrwm-5zNbFtYUN0vvdOgK3mFswhymhZ5uVLJfuu8r13461nGjKauRq5GUgiYzHoNgsND91Mwc9WyGviVi2TG2HBy_e6U7TJE-loGe_DZD5MUcz6zhFBFQxOElNyGnclId6qkcdr-nnoUjfB_uaubNW-zWmd9LNuYsciLGR7w"/>
+<div class="absolute top-2 left-2 size-7 bg-stance-blue text-white flex items-center justify-center font-bold rank-number rounded shadow-md">1</div>
+</div>
+<h5 class="text-[15px] font-bold text-slate-900 leading-snug group-hover:text-stance-blue transition-colors">EU AI법 가이드라인 최종 확정 및 국내 산업계 파급 효과 심층 분석</h5>
+</div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">2</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">전세사기 특별법 개정안 국회 본회의 통과</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">3</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">기후 위기 대응 예산 전면 재검토 촉구</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">4</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">비정규직 처우 개선을 위한 제도적 장치 마련 시급</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">5</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">지역 균형 발전을 위한 공공기관 이전 로드맵 발표</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">6</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">고령화 사회 대비 노인 돌봄 서비스 체계 개편안</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">7</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">디지털 화폐(CBDC) 도입 가능성 및 금융 보안 혁신</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">8</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">탄소중립 실천을 위한 자원 순환 및 저감 정책</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">9</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">사회적 약자 보호를 위한 맞춤형 복지 시스템 구축</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">10</span>
+                                </div>
+</div>
+</div>
+                <div class="news-board-card" data-category="경향신문">
+                    <div class="border-t-[3px] border-slate-300 mb-3"></div>
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-lg font-bold text-slate-600 flex items-center gap-1">경향신문 <span class="material-symbols-outlined text-sm">chevron_right</span></h4>
+</div>
+<div class="space-y-0 divide-y divide-slate-50">
+<div class="pb-6 pt-1 group cursor-pointer border-b border-slate-100" onclick="location.href='기사분석페이지.html'">
+<div class="relative w-full aspect-video mb-3 overflow-hidden rounded-xl">
+<img alt="Ranking 1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6vD1QlBx3MahuJNiT6ytN9XeqWM597DkfYGsWN3ekocpYn6M_wR3jStIE787NRsro8oDCsIuoncTgS3gjLQGRqEWlPQCFj3mMSNQxrwm-5zNbFtYUN0vvdOgK3mFswhymhZ5uVLJfuu8r13461nGjKauRq5GUgiYzHoNgsND91Mwc9WyGviVi2TG2HBy_e6U7TJE-loGe_DZD5MUcz6zhFBFQxOElNyGnclId6qkcdr-nnoUjfB_uaubNW-zWmd9LNuYsciLGR7w"/>
+<div class="absolute top-2 left-2 size-7 bg-stance-blue text-white flex items-center justify-center font-bold rank-number rounded shadow-md">1</div>
+</div>
+<h5 class="text-[15px] font-bold text-slate-900 leading-snug group-hover:text-stance-blue transition-colors">탄소중립 이행 속도조절 논란과 환경 규제의 미래</h5>
+</div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">2</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">비정규직 처우 개선을 위한 제도적 장치 마련 시급</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">3</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">지역 균형 발전 및 인구 감소 대응 전략 발표</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">4</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">저출생 극복을 위한 공공 보육 인프라 확충 정책</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">5</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">친환경 에너지 전환 및 탄소세 도입 논의 본격화</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">6</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">플랫폼 노동자 권리 보장을 위한 법적 장치 마련</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">7</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">대학 교육 혁신 및 미래 인재 양성을 위한 로드맵</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">8</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">공기업 경영 효율성 제고 및 윤리 경영 강화 방안</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">9</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">공공 의료 서비스 질 향상을 위한 거점 병원 육성</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">10</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-blue">사회적 기업 육성을 위한 금융 지원 및 판로 확대</p>
+                                </div>
+</div>
+</div>
+                <div class="news-board-card" data-category="동아일보">
+                    <div class="border-t-[3px] border-slate-300 mb-3"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-slate-600 flex items-center gap-1">동아일보 <span class="material-symbols-outlined text-sm">chevron_right</span></h4>
+                    </div>
+<div class="space-y-0 divide-y divide-slate-50">
+<div class="pb-6 pt-1 group cursor-pointer border-b border-slate-100" onclick="location.href='기사분석페이지.html'">
+<div class="relative w-full aspect-video mb-3 overflow-hidden rounded-xl">
+<img alt="Ranking 1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEPC0qaSQdhMPAmor8apr5IvZbwMp7ACI2i5Ouj6YbNNNA33m26f_XWM6AAaGuNnDyAaG1SEsM7oNOcljulIvcsjT5IyUmas3ITkFmUA14jsBWBKF5hLNYw5sLjoOUsjkLTfhChdNZiYEUcMwI0-tjCieWfemfwcAkZQ4Q-q8ohZluK8BNJtbGN5pbbzNrdUecDaQDc1b_bnAacgsYBghHD4uFubGBpOa47R93Rb6QJLFyFmL1iaS85_jKSfoSSqcoj5hsHnpWLzw"/>
+<div class="absolute top-2 left-2 size-7 bg-slate-900 text-white flex items-center justify-center font-bold rank-number rounded shadow-md">1</div>
+</div>
+<h5 class="text-[15px] font-bold text-slate-900 leading-snug group-hover:text-primary transition-colors">기업 상속세 개편을 통한 가업 승계 활성화 방안 확정</h5>
+</div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">2</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">첨단 전략 산업 육성을 위한 규제 샌드박스 확대</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">3</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">한일 셔틀 외교 및 안보 협력 협의체 구성</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">4</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">반도체 클러스터 구축 가속화 및 인력 양성 대책</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">5</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">수출 경쟁력 제고를 위한 금융 지원 및 규제 혁파</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">6</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">인공지능(AI) 국가 전략 추진 및 법적 가이드라인</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">7</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">해외 건설 스마트 시티 수주 총력 지원 정책</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">8</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">청년 창업 생태계 활성화를 위한 매칭 펀드 조성</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">9</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">우주 항공청 설립 및 민간 우주 산업 육성 로드맵</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">10</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="news-board-card" data-category="연합뉴스">
+                            <div class="border-t-[3px] border-slate-300 mb-3"></div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-lg font-bold text-slate-600 flex items-center gap-1">연합뉴스 <span class="material-symbols-outlined text-sm">chevron_right</span></h4>
+                            </div>
+                            <div class="space-y-0 divide-y divide-slate-50">
+                                <div class="pb-6 pt-1 group cursor-pointer border-b border-slate-100" onclick="location.href='기사분석페이지.html'">
+                                    <div class="relative w-full aspect-video mb-3 overflow-hidden rounded-xl">
+                                        <img alt="Ranking 1" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3WxwE-l9jRD6ciDraaxxq0hQK_p1y3UYb8OzN6nZ16UqrfMZnIPAiQnf-nsP0F8B-Jq1fHHFNmQZd18446rh_68xe8Par948YJ2WFweazGZih_qnLMYEeqQxNC6JCd_EcBep1N5QHb_lMougAX9HOQA4XWTwS16Cf5_z30YkMC4L7yK7FXgDRtz5eD7F60I74eD8knzEPy7YlncpIJg6REQ1SlkwVzk0i6Ru7KWsTTbJEZnF5o65Ru3Y7uZujE52VLftu6v_G5Mtk0"/>
+                                        <div class="absolute top-2 left-2 size-7 bg-stance-gray text-white flex items-center justify-center font-bold rank-number rounded shadow-md">1</div>
+                                    </div>
+                                    <h5 class="text-[15px] font-bold text-slate-900 leading-snug group-hover:text-stance-gray transition-colors">실시간 속보 및 국내외 뉴스 통합 유통 시스템 고도화 전략 발표</h5>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">2</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-gray">국내외 주요 지표 실시간 트래킹 및 데이터 제공 확대</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">3</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-gray">신속하고 정확한 정보 전달을 위한 팩트체크 시스템 강화</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">4</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-gray">정부 정책 발표에 따른 업계 반응 및 현장 속보 취재</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">5</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-gray">국제 정세 변화에 따른 긴급 분석 및 특별 기획 보도</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">6</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-gray">사회적 이슈에 대한 다각도 심층 취재 및 기획 보도</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">7</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-gray">국내 경제 동향 변동에 따른 기업 및 증시 영향 분석</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">8</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-gray">첨단 기술 트렌드 및 산업 현장 혁신 사례 집중 보도</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">9</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-gray">문화계 신간 및 주요 전시 행사 관련 동정 소식 전달</p>
+                                </div>
+                                <div class="py-2.5 group cursor-pointer flex gap-3 items-baseline" onclick="location.href='기사분석페이지.html'">
+                                    <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">10</span>
+                                    <p class="text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:text-stance-gray">스포츠 경기 결과 및 선수 인터뷰 등 현장 정보 제공</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+</div>
+<div class="w-full xl:w-[45%] border-l border-slate-100 pl-16 flex flex-col">
+<div class="mb-10">
+<div class="flex items-center justify-between h-10 mb-2">
+<div class="flex items-center">
+<h2 class="text-slate-800 text-xl font-bold tracking-tight section-highlight">언론사 공통으로 다루는 인기 뉴스에요</h2>
+</div>
+</div>
+<div class="w-full h-px bg-slate-100"></div>
+</div>
+<div class="flex flex-col flex-1">
+<div class="news-board-card group cursor-pointer max-w-[400px] mb-3" onclick="location.href='기사분석페이지.html'">
+<div class="border-t-[3px] border-primary mb-3"></div>
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-lg font-bold text-primary flex items-center gap-1">통합 인기 1위</h4>
+</div>
+<div class="pb-4 pt-1 group cursor-pointer border-b border-slate-100">
+<div class="relative w-full aspect-video mb-3 overflow-hidden rounded-xl">
+<img alt="EU AI Law" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6vD1QlBx3MahuJNiT6ytN9XeqWM597DkfYGsWN3ekocpYn6M_wR3jStIE787NRsro8oDCsIuoncTgS3gjLQGRqEWlPQCFj3mMSNQxrwm-5zNbFtYUN0vvdOgK3mFswhymhZ5uVLJfuu8r13461nGjKauRq5GUgiYzHoNgsND91Mwc9WyGviVi2TG2HBy_e6U7TJE-loGe_DZD5MUcz6zhFBFQxOElNyGnclId6qkcdr-nnoUjfB_uaubNW-zWmd9LNuYsciLGR7w"/>
+<div class="absolute top-2 left-2 size-7 bg-primary text-white flex items-center justify-center font-bold rank-number rounded shadow-md">1</div>
+</div>
+<h5 class="text-[15px] font-bold text-slate-900 leading-snug group-hover:text-primary transition-colors">EU AI 법 최종 가이드라인 발표에 따른 국내 기술 기업의 글로벌 시장 대응 전략 및 규제 리스크 분석</h5>
+</div>
+</div>
+<div class="divide-y divide-slate-50 bg-white">
+                        <div class="py-2.5 group cursor-pointer flex gap-4 items-baseline" onclick="location.href='기사분석페이지.html'">
+                            <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">2</span>
+                            <p class="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">차세대 반도체 HBM4 수주전 격화와 글로벌 공급망 입지 변화</p>
+                        </div>
+                        <div class="py-2.5 group cursor-pointer flex gap-4 items-baseline" onclick="location.href='기사분석페이지.html'">
+                            <span class="rank-number text-xs font-bold text-slate-400 w-4 text-center">3</span>
+                            <p class="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">수도권 부동산 시장 회복세 및 기준 금리 동결의 시장 영향</p>
+                        </div>
+                        <div class="py-2.5 group cursor-pointer flex gap-4 items-baseline" onclick="location.href='기사분석페이지.html'">
+                            <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">4</span>
+                            <p class="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">의대 증원 행정 고시 강행에 따른 의료계 반발 심화</p>
+                        </div>
+                        <div class="py-2.5 group cursor-pointer flex gap-4 items-baseline" onclick="location.href='기사분석페이지.html'">
+                            <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">5</span>
+                            <p class="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">국민연금 모수개혁안 여야 협상 타결 가능성 및 쟁점</p>
+                        </div>
+                        <div class="py-2.5 group cursor-pointer flex gap-4 items-baseline" onclick="location.href='기사분석페이지.html'">
+                            <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">6</span>
+                            <p class="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">생성형 AI 가짜 뉴스 방지 및 디지털 주권 확보 전략</p>
+                        </div>
+                        <div class="py-2.5 group cursor-pointer flex gap-4 items-baseline" onclick="location.href='기사분석페이지.html'">
+                            <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">7</span>
+                            <p class="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">탄소중립 RE100 달성을 위한 중소기업 에너지 지원체계</p>
+                        </div>
+                        <div class="py-2.5 group cursor-pointer flex gap-4 items-baseline" onclick="location.href='기사분석페이지.html'">
+                            <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">8</span>
+                            <p class="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">미디어 리터러시 교육 강화 및 허위 정보 대응 로드맵</p>
+                        </div>
+                        <div class="py-2.5 group cursor-pointer flex gap-4 items-baseline" onclick="location.href='기사분석페이지.html'">
+                            <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">9</span>
+                            <p class="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">글로벌 콘텐츠 시장 확대를 위한 K-컬처 지식재산권 보호</p>
+                        </div>
+                        <div class="py-2.5 group cursor-pointer flex gap-4 items-baseline" onclick="location.href='기사분석페이지.html'">
+                            <span class="rank-number text-xs font-bold text-slate-300 w-4 text-center">10</span>
+                            <p class="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary">스타트업 스케일업을 위한 대규모 매칭 펀드 투자 확대</p>
+                        </div>
+</div>
+</div>
+<div class="flex justify-end mt-12">
+<button class="px-5 py-2.5 bg-white text-slate-600 text-xs font-bold rounded-xl border border-slate-200 flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+<span class="material-symbols-outlined text-base">tune</span> 필터 및 매체 설정
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<footer class="py-12 border-t border-slate-100 px-16 text-[11px] text-slate-400 bg-white mt-12">
+<div class="max-w-[1100px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 grayscale opacity-50 cursor-pointer" onclick="location.href='메인페이지.html'">
+<span class="material-symbols-outlined text-sm font-bold">hub</span>
+<span class="font-bold">인사이트 허브</span>
+</div>
+<p class="font-bold">© 2024 Insight Hub Engine. All Rights Reserved.</p>
+</div>
+<div class="flex items-center gap-6 uppercase font-bold tracking-tight">
+<a class="hover:text-primary transition-colors" href="#">서비스 약관</a>
+<a class="hover:text-primary transition-colors" href="#">개인정보 처리방침</a>
+<a class="hover:text-primary transition-colors" href="#">API 가이드</a>
+</div>
+</div>
+</footer>
+</main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.filter-checkbox');
+            const boards = document.querySelectorAll('.news-board-card[data-category]');
+            const allCheckbox = Array.from(checkboxes).find(cb => cb.value === '전체');
+            const mediaCheckboxes = Array.from(checkboxes).filter(cb => cb.value !== '전체');
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.value === '전체') {
+                        // '전체' 체크박스 클릭 시 모든 개별 언론사 체크박스 상태 동기화
+                        mediaCheckboxes.forEach(cb => cb.checked = this.checked);
+                    } else {
+                        // 개별 언론사 체크박스 클릭 시 '전체' 체크박스 상태 업데이트
+                        const allChecked = mediaCheckboxes.every(cb => cb.checked);
+                        allCheckbox.checked = allChecked;
+                    }
+                    updateFiltering();
+                });
+            });
+
+            function updateFiltering() {
+                const checkedMedia = Array.from(mediaCheckboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+
+                boards.forEach(board => {
+                    const category = board.getAttribute('data-category');
+                    if (checkedMedia.includes(category)) {
+                        board.style.display = 'block';
+                    } else {
+                        board.style.display = 'none';
+                    }
+                });
+            }
+
+            // 초기 필터링 적용
+            updateFiltering();
+        });
+    </script>
+</body></html>
