@@ -1,3 +1,6 @@
+# Old HTML prototypes (not part of React build)
+html/
+
 # Logs
 logs
 *.log
