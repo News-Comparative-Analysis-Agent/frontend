@@ -37,20 +37,20 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
             {steps.map((step) => (
               <div 
                 key={step.id} 
-                className="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" 
+                className={`flex items-center gap-2 px-3 z-10 cursor-pointer transition-all ${isWhite ? 'bg-white' : 'bg-primary'}`} 
                 onClick={() => navigate(step.path)}
               >
                 <span className={`flex items-center justify-center size-7 rounded-full text-xs font-bold transition-all ${
                   activeStep === step.id 
-                    ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                    : 'bg-slate-100 text-slate-400'
+                    ? isWhite ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white text-primary shadow-lg shadow-white/20'
+                    : isWhite ? 'bg-slate-100 text-slate-400' : 'bg-white/20 text-white/50'
                 }`}>
                   {step.id}
                 </span>
                 <span className={`text-sm transition-all ${
                   activeStep === step.id 
-                    ? 'font-bold text-primary' 
-                    : 'font-medium text-slate-400'
+                    ? `font-bold ${isWhite ? 'text-primary' : 'text-white'}`
+                    : `font-medium ${isWhite ? 'text-slate-400' : 'text-white/50'}`
                 }`}>
                   {step.label}
                 </span>

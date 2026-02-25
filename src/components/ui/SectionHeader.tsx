@@ -15,10 +15,9 @@ interface SectionHeaderProps {
  * 아이콘, 제목, 설명, 뱃지 등 일관된 레이아웃을 제공합니다.
  */
 const SectionHeader = ({ 
-  icon, 
+  icon,   
   title, 
   description, 
-  badge, 
   className = '', 
   align = 'left',
   titleSize = 'section'
@@ -28,12 +27,6 @@ const SectionHeader = ({
 
   return (
     <header className={`${isCenter ? 'text-center' : 'text-left'} ${className}`}>
-      {badge && (
-        <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-sm font-bold mb-6 border border-primary/10 ${isCenter ? 'mx-auto' : ''}`}>
-          <span className="material-symbols-outlined text-[16px]">info</span>
-          {badge}
-        </div>
-      )}
       <div className={`flex items-center gap-2.5 ${isCenter ? 'justify-center' : ''} ${description ? 'mb-2' : ''}`}>
         {icon && <span className="material-symbols-outlined text-primary text-[28px] font-bold">{icon}</span>}
         <h2 className={`${

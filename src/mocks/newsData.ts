@@ -1,4 +1,4 @@
-import { MediaGroup, OpinionItem, SearchIssue, MockNewsItem, Quote } from '../types';
+import { MediaGroup, OpinionItem, SearchIssue, MockNewsItem, Quote, Article } from '../types';
 
 export const mainNewsData: MediaGroup[] = [
   {
@@ -98,6 +98,7 @@ export const opinions: OpinionItem[] = [
     id: 1,
     media: '한겨레',
     stance: 'progressive',
+    score: -4.5,
     bg: 'bg-blue-50',
     border: 'border-blue-100',
     textHighlight: 'text-highlight-progressive',
@@ -114,6 +115,7 @@ export const opinions: OpinionItem[] = [
     id: 2,
     media: '경향신문',
     stance: 'progressive',
+    score: -4.2,
     bg: 'bg-blue-50',
     border: 'border-blue-100',
     textHighlight: 'text-highlight-progressive',
@@ -130,6 +132,7 @@ export const opinions: OpinionItem[] = [
     id: 3,
     media: '중앙일보',
     stance: 'neutral',
+    score: 0.8,
     bg: 'bg-slate-50',
     border: 'border-slate-200',
     textHighlight: 'text-highlight-neutral',
@@ -146,6 +149,7 @@ export const opinions: OpinionItem[] = [
     id: 4,
     media: '동아일보',
     stance: 'conservative',
+    score: 3.8,
     bg: 'bg-red-50',
     border: 'border-red-100',
     textHighlight: 'text-highlight-conservative',
@@ -162,6 +166,7 @@ export const opinions: OpinionItem[] = [
     id: 5,
     media: '조선일보',
     stance: 'conservative',
+    score: 4.8,
     bg: 'bg-red-50',
     border: 'border-red-100',
     textHighlight: 'text-highlight-conservative',
@@ -279,3 +284,22 @@ export const draftingQuotes: Quote[] = [
     ]
   }
 ];
+
+export const commonPopularNews: Article[] = [
+  {
+    id: 1,
+    rank: 1,
+    title: 'EU AI 법 최종 가이드라인 발표에 따른 국내 기술 기업의 글로벌 시장 대응 전략 및 규제 리스크 분석',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=800&auto=format&fit=crop'
+  },
+  { id: 2, rank: 2, title: '차세대 반도체 HBM4 수주전 격화와 글로벌 공급망 입지 변화' },
+  { id: 3, rank: 3, title: '수도권 부동산 시장 회복세 및 기준 금리 동결의 시장 영향' },
+  { id: 4, rank: 4, title: '의대 증원 행정 고시 강행에 따른 의료계 반발 심화' },
+  { id: 5, rank: 5, title: '국민연금 모수개혁안 여야 협상 타결 가능성 및 쟁점' },
+  { id: 6, rank: 6, title: '국내 자동차 업계 미래차 전환 및 투자 확대 전략' },
+  { id: 7, rank: 7, title: '이차전지 소재 국산화 및 공급 안정성 확보 방안' },
+  { id: 8, rank: 8, title: '금융권 디지털 전환 가속화 및 보안 시스템 강화' },
+  { id: 9, rank: 9, title: '관광 산업 활성화를 위한 해외 관광객 유치 전략' },
+  { id: 10, rank: 10, title: '스타트업 생태계 활성화 및 규제 샌드박스 성과' },
+];
+

@@ -17,6 +17,7 @@ export interface OpinionItem {
   id: number;
   media: string;
   stance: 'progressive' | 'neutral' | 'conservative';
+  score: number;
   bg: string;
   border: string;
   textHighlight: string;

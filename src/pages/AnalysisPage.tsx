@@ -6,6 +6,7 @@ import Button from '../components/ui/Button'
 import SectionHeader from '../components/ui/SectionHeader'
 import HighlightChip from '../components/ui/HighlightChip'
 import OpinionCard from '../components/ui/OpinionCard'
+import Breadcrumbs from '../components/ui/Breadcrumbs'
 
 const AnalysisPage = () => {
   const navigate = useNavigate()
@@ -13,15 +14,14 @@ const AnalysisPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedMediaOptions, setSelectedMediaOptions] = useState<string[]>(['한겨레', '경향신문', '한국일보'])
 
+  const breadcrumbItems = [
+    { label: '심층 분석', isLast: false },
+    { label: '민주당-혁신당 합당 논란', isLast: true }
+  ]
+
   useEffect(() => {
-    if (isModalOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'auto'
-    }
-    return () => {
-      document.body.style.overflow = 'auto'
-    }
+    document.body.style.overflow = isModalOpen ? 'hidden' : 'auto'
+    return () => { document.body.style.overflow = 'auto' }
   }, [isModalOpen])
 
   const toggleMediaOption = (media: string) => {
@@ -43,84 +43,78 @@ const AnalysisPage = () => {
   }
 
   return (
-    <Layout variant="white" activeStep={2} hideFooter>
+    <Layout variant="primary" activeStep={2} hideFooter>
       <div className="analysis-global-loader"></div>
-      <div className="bg-white border-b border-slate-50 px-4 md:px-8 py-3 shrink-0">
-        <div className="flex items-center gap-2 text-[12px] font-medium text-slate-400">
-          <span className="material-symbols-outlined text-[16px]">home</span>
-          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          <span>심층 분석</span>
-          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          <span className="text-slate-800 font-bold">민주당-혁신당 합당 논란</span>
-        </div>
-      </div>
+      <Breadcrumbs items={breadcrumbItems} />
 
       <section className="flex-1 w-full py-8 md:py-12 animate-page-in overflow-y-auto custom-scrollbar min-h-0">
-        <div className="max-w-[1640px] mx-auto px-6 md:px-10">
-        <header className="mb-12 text-center max-w-5xl mx-auto">
-          <SectionHeader 
-            title="더불어민주당-조국혁신당 합당 추진 중단 및 당내 내홍 심층 분석" 
-            badge="현재 단계 : 심층 분석"
-            align="center"
-            titleSize="page"
-            className="mb-4"
-          />
-          <p className="text-slate-500 text-[15px] font-medium leading-relaxed max-w-3xl mx-auto">
-            정청래 대표의 합당 드라이브와 19일 만의 중단 결정, 언론사별 시각차 분석
-          </p>
-        </header>
+        <div className="page-container">
+          <header className="mb-12 text-center max-w-5xl mx-auto">
+            <SectionHeader 
+              title="이슈 심층분석: 더불어민주당-조국혁신당 합당 추진 중단 및 당내 내홍" 
+              align="center"
+              titleSize="page"
+              className="mb-4"
+            />
+            <p className="text-slate-500 text-[15px] font-medium leading-relaxed max-w-3xl mx-auto">
+              정청래 대표의 합당 드라이브와 19일 만의 중단 결정, 언론사별 시각차 분석
+            </p>
+          </header>
 
-        <section className="max-w-[1240px] mx-auto mb-16 grid grid-cols-1 lg:grid-cols-3 gap-8 bg-white border border-slate-100 rounded-2xl md:rounded-[32px] p-6 md:p-10 shadow-premium">
-          <div className="lg:col-span-2 text-left">
-            <div className="flex items-center gap-2 mb-6 text-primary">
-              <span className="material-symbols-outlined text-[24px]">subject</span>
-              <h3 className="text-[20px] font-bold text-slate-900">이슈 배경 상세</h3>
-            </div>
-            <div className="flex flex-wrap gap-2 mb-8">
-              <HighlightChip label="핵심:" value="19일 만의 합당 논의 중단" />
-              <HighlightChip label="발단:" value="정청래 대표의 기습 제안" />
-              <HighlightChip label="쟁점:" value="당내 민주주의 및 권력 투쟁" />
-            </div>
-            <div className="space-y-4 pr-6">
-              <div className="bullet-point">
-                <div className="bullet-dot"></div>
-                <p className="text-[15px] text-slate-600 leading-relaxed font-medium">지난달 22일 정청래 대표가 최고위와 상의 없이 조국혁신당에 합당을 기습 제안하며 촉발된 사안입니다.</p>
+          <section className="max-w-[1240px] mx-auto mb-16 grid grid-cols-1 lg:grid-cols-3 gap-8 card-premium">
+            <div className="lg:col-span-2 text-left">
+              <div className="flex items-center gap-2 mb-6 text-primary">
+                <span className="material-symbols-outlined text-[24px]">subject</span>
+                <h3 className="text-[20px] font-bold text-slate-900">이슈 배경 상세</h3>
               </div>
-              <div className="bullet-point">
-                <div className="bullet-dot"></div>
-                <p className="text-[15px] text-slate-600 leading-relaxed font-medium">당내 의원 패싱, 문건 유출 논란 등으로 계파 간 갈등이 격화되었고, 결국 19일 만에 논의를 중단하기로 결정했습니다.</p>
+              <div className="flex flex-wrap gap-2 mb-8">
+                <HighlightChip label="핵심:" value="19일 만의 합당 논의 중단" />
+                <HighlightChip label="발단:" value="정청래 대표의 기습 제안" />
+                <HighlightChip label="쟁점:" value="당내 민주주의 및 권력 투쟁" />
               </div>
-              <div className="bullet-point">
-                <div className="bullet-dot"></div>
-                <p className="text-[15px] text-slate-600 leading-relaxed font-medium">언론계는 이를 정 대표의 리더십 위기로 규정하거나, 차기 당권과 공천권을 둘러싼 여권 내부의 '내부 권력 투쟁'으로 분석하고 있습니다.</p>
-              </div>
-            </div>
-          </div>
-          <div className="lg:col-span-1 bg-slate-50/50 rounded-2xl p-6 text-left">
-            <div className="flex items-center gap-2 mb-6 text-slate-800">
-              <span className="material-symbols-outlined text-[20px] text-primary">event_note</span>
-              <span className="text-[15px] font-bold">이슈 타임라인</span>
-            </div>
-            <div className="flex flex-col">
-              <div className="timeline-item">
-                <div className="timeline-dot"></div>
-                <div className="text-[11px] font-bold text-slate-400 mb-0.5">05.22</div>
-                <div className="text-[13px] font-bold text-slate-700">정청래 대표, 합당 기습 제안</div>
-              </div>
-              <div className="timeline-item">
-                <div className="timeline-dot"></div>
-                <div className="text-[11px] font-bold text-slate-400 mb-0.5">06.10</div>
-                <div className="text-[13px] font-bold text-slate-700">비공개 의원총회 및 반발 격화</div>
-              </div>
-              <div className="timeline-item border-transparent">
-                <div className="timeline-dot-active"></div>
-                <div className="text-[11px] font-bold text-primary mb-0.5">06.11</div>
-                <div className="text-[13px] font-bold text-slate-900">긴급 최고위, 합당 논의 중단 발표</div>
+              <div className="space-y-4 pr-6">
+                {[
+                  "지난달 22일 정청래 대표가 최고위와 상의 없이 조국혁신당에 합당을 기습 제안하며 촉발된 사안입니다.",
+                  "당내 의원 패싱, 문건 유출 논란 등으로 계파 간 갈등이 격화되었고, 결국 19일 만에 논의를 중단하기로 결정했습니다.",
+                  "언론계는 이를 정 대표의 리더십 위기로 규정하거나, 차기 당권과 공천권을 둘러싼 여권 내부의 '내부 권력 투쟁'으로 분석하고 있습니다."
+                ].map((text, i) => (
+                  <div key={i} className="bullet-point">
+                    <div className="bullet-dot"></div>
+                    <p className="text-[15px] text-slate-600 leading-relaxed font-medium">{text}</p>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        </section>
-
+            
+            <div className="lg:col-span-1 bg-slate-50/50 rounded-2xl p-6 text-left">
+              <div className="flex items-center gap-2 mb-6 text-slate-800">
+                <span className="material-symbols-outlined text-[22px]">trending_up</span>
+                <h4 className="text-[17px] font-bold">언론 노출 트렌드</h4>
+              </div>
+              <div className="space-y-6">
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[13px] font-bold text-slate-500">전일 대비 관련 기사</span>
+                    <span className="text-red-500 font-bold text-xs flex items-center gap-0.5">
+                      <span className="material-symbols-outlined text-sm">arrow_upward</span> 42%
+                    </span>
+                  </div>
+                  <div className="text-2xl font-black text-slate-900">1,248건</div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-[13px] font-bold"><span className="text-slate-500">진보 매체</span><span className="text-blue-600">45%</span></div>
+                  <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden flex">
+                    <div className="h-full bg-blue-500" style={{ width: '45%' }}></div>
+                    <div className="h-full bg-slate-400" style={{ width: '25%' }}></div>
+                    <div className="h-full bg-red-500" style={{ width: '30%' }}></div>
+                  </div>
+                  <div className="flex justify-between text-[11px] font-medium text-slate-400">
+                    <span>진보</span><span>중립</span><span>보수</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         <section className="mb-20">
           <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between bg-[#F9FAFB] border border-slate-100 rounded-3xl px-8 py-6 mb-8 gap-8">
             <div className="flex flex-col gap-1.5 text-left">
@@ -179,18 +173,27 @@ const AnalysisPage = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            {opinions.filter(o => activeStance === 'all' || o.stance === activeStance).map(o => (
-              <OpinionCard 
-                key={o.id}
-                media={o.media}
-                stance={o.stance as any}
-                title={o.title}
-                analysisTitle={o.analysisTitle}
-                description={o.description}
-                sources={o.sources}
-              />
-            ))}
+          <div className="relative group/scroll">
+            <div className="horizontal-scroll-container hide-scrollbar !px-0">
+              {opinions.filter(o => activeStance === 'all' || o.stance === activeStance).map(o => (
+                <OpinionCard 
+                  key={o.id}
+                  media={o.media}
+                  stance={o.stance as any}
+                  score={o.score}
+                  title={o.title}
+                  analysisTitle={o.analysisTitle}
+                  description={o.description}
+                  sources={o.sources}
+                />
+              ))}
+            </div>
+            {/* Scroll Hint Gradient */}
+            <div className="absolute top-0 right-0 h-full w-20 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 opacity-60 group-hover/scroll:opacity-20 transition-opacity"></div>
+            <div className="flex justify-center gap-1.5 mt-2">
+              <div className="size-1.5 rounded-full bg-primary/40 animate-pulse"></div>
+              <span className="text-[11px] font-bold text-slate-300 uppercase tracking-tighter cursor-default select-none">Scroll for more context</span>
+            </div>
           </div>
 
           <div className="mt-10 flex justify-center">
