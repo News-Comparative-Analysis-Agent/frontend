@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Layout from '../layouts/Layout'
 import Button from '../components/ui/Button'
 import SectionHeader from '../components/ui/SectionHeader'
+import StickyDock from '../components/ui/StickyDock'
 
 const FinalReviewPage = () => {
   const navigate = useNavigate()
@@ -210,29 +211,33 @@ const FinalReviewPage = () => {
         </aside>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 h-20 border-t border-slate-200 bg-white/90 backdrop-blur-xl px-4 md:px-8 flex items-center justify-between z-[1000] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <div className="flex items-center gap-2 text-slate-400">
-          <span className="material-symbols-outlined text-[20px]">visibility</span>
-          <span className="text-[12px] font-medium tracking-tight whitespace-nowrap">발행 시 실제 뉴스 사이트에 적용될 레이아웃입니다.</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
-            icon="edit"
-            onClick={() => navigate('/drafting')} 
-            className="px-8"
-          >
-            수정하러 돌아가기
-          </Button>
-          <Button 
-            size="lg"
-            icon="publish"
-            className="px-10"
-          >
-            최종 발행 확정
-          </Button>
-        </div>
-      </div>
+      <StickyDock
+        leftContent={
+          <div className="flex items-center gap-2 text-slate-400">
+            <span className="material-symbols-outlined text-[20px]">visibility</span>
+            <span className="text-[12px] font-medium tracking-tight whitespace-nowrap">발행 시 실제 뉴스 사이트에 적용될 레이아웃입니다.</span>
+          </div>
+        }
+        rightContent={
+          <>
+            <Button 
+              variant="outline" 
+              icon="edit"
+              onClick={() => navigate('/drafting')} 
+              className="px-8"
+            >
+              수정하러 돌아가기
+            </Button>
+            <Button 
+              size="lg"
+              icon="publish"
+              className="px-10"
+            >
+              최종 발행 확정
+            </Button>
+          </>
+        }
+      />
     </Layout>
   )
 }

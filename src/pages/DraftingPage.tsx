@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Layout from '../layouts/Layout'
 import { draftingQuotes } from '../mocks/newsData'
 import Button from '../components/ui/Button'
+import StickyDock from '../components/ui/StickyDock'
 import { useDraftStore } from '../stores/useDraftStore'
 
 const DraftingPage = () => {
@@ -277,7 +278,7 @@ const DraftingPage = () => {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <div className="max-w-3xl mx-auto py-12 px-8 relative">
+            <div className="max-w-3xl mx-auto py-3 px-8 relative">
               {dropIndicator.index !== -1 && dropIndicator.rect && (
                 <div 
                   className="absolute left-8 right-8 h-1 bg-primary rounded-full z-50 pointer-events-none shadow-[0_0_10px_rgba(242,127,13,0.5)] transition-all duration-75"
@@ -291,7 +292,7 @@ const DraftingPage = () => {
                 />
               )}
 
-              <div className="group relative mb-10 w-full">
+              <div className="group relative mb-5 w-full">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Article Title</span>
                   <div className="flex items-center bg-orange-50 border border-orange-100 rounded-lg shadow-sm hover:bg-orange-100 transition-colors group/regen overflow-hidden">
@@ -436,26 +437,29 @@ const DraftingPage = () => {
           </aside>
         </main>
 
-        <footer className="h-20 border-t border-slate-200 bg-white px-4 md:px-8 flex items-center justify-between z-30 shrink-0 shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.03)]">
-          <div className="flex items-center gap-2">
+        <StickyDock
+          variant="footer"
+          leftContent={
             <span className="flex items-center gap-1.5 text-[12px] font-medium text-slate-400 tracking-tight">
               <span className="material-symbols-outlined text-base">history</span>
               마지막 저장: {formatLastSaved()}
             </span>
-          </div>
-          <div className="flex items-center gap-2 md:gap-3">
-            <Button variant="outline" icon="save" onClick={saveDraft}>
-              <span>임시저장</span>
-            </Button>
-            <Button 
-              onClick={() => navigate('/final-review')}
-              size="lg"
-              className="px-10"
-            >
-              <span>검토 이동</span>
-            </Button>
-          </div>
-        </footer>
+          }
+          rightContent={
+            <>
+              <Button variant="outline" icon="save" onClick={saveDraft}>
+                <span>임시저장</span>
+              </Button>
+              <Button 
+                onClick={() => navigate('/final-review')}
+                size="lg"
+                className="px-10"
+              >
+                <span>검토 이동</span>
+              </Button>
+            </>
+          }
+        />
     </Layout>
   )
 }

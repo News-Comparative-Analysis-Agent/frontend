@@ -7,6 +7,7 @@ import SectionHeader from '../components/ui/SectionHeader'
 import HighlightChip from '../components/ui/HighlightChip'
 import OpinionCard from '../components/ui/OpinionCard'
 import Breadcrumbs from '../components/ui/Breadcrumbs'
+import StickyDock from '../components/ui/StickyDock'
 
 const AnalysisPage = () => {
   const navigate = useNavigate()
@@ -49,7 +50,7 @@ const AnalysisPage = () => {
 
       <section className="flex-1 w-full py-8 md:py-12 animate-page-in overflow-y-auto custom-scrollbar min-h-0">
         <div className="page-container">
-          <header className="mb-12 text-center max-w-5xl mx-auto">
+          <header className="mb-5 text-center max-w-5xl mx-auto">
             <SectionHeader 
               title="이슈 심층분석: 더불어민주당-조국혁신당 합당 추진 중단 및 당내 내홍" 
               align="center"
@@ -61,13 +62,13 @@ const AnalysisPage = () => {
             </p>
           </header>
 
-          <section className="max-w-[1240px] mx-auto mb-16 grid grid-cols-1 lg:grid-cols-3 gap-8 card-premium">
+          <section className="max-w-[1240px] mx-auto mb-5 grid grid-cols-1 lg:grid-cols-3 gap-8 card-premium">
             <div className="lg:col-span-2 text-left">
               <div className="flex items-center gap-2 mb-6 text-primary">
                 <span className="material-symbols-outlined text-[24px]">subject</span>
                 <h3 className="text-[20px] font-bold text-slate-900">이슈 배경 상세</h3>
               </div>
-              <div className="flex flex-wrap gap-2 mb-8">
+              <div className="flex flex-wrap gap-2 mb-5">
                 <HighlightChip label="핵심:" value="19일 만의 합당 논의 중단" />
                 <HighlightChip label="발단:" value="정청래 대표의 기습 제안" />
                 <HighlightChip label="쟁점:" value="당내 민주주의 및 권력 투쟁" />
@@ -115,7 +116,7 @@ const AnalysisPage = () => {
               </div>
             </div>
           </section>
-        <section className="mb-20">
+        <section className="mb-4">
           <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between bg-[#F9FAFB] border border-slate-100 rounded-3xl px-8 py-6 mb-8 gap-8">
             <div className="flex flex-col gap-1.5 text-left">
               <div className="flex items-center gap-2.5">
@@ -208,18 +209,22 @@ const AnalysisPage = () => {
       </section>
 
       {/* Sticky Dock */}
-      <div className="fixed bottom-0 left-0 right-0 z-[1000] bg-white/90 backdrop-blur-xl border-t border-slate-200 px-8 py-4 flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
-        <div className="flex items-center gap-3">
-          <div className="size-2 rounded-full bg-green-500 animate-pulse"></div>
-          <span className="text-slate-600 font-medium text-sm tracking-tight">심층 이슈 분석이 모두 완료되었습니다. 분석된 맥락을 바탕으로 바로 초안을 작성할 수 있습니다.</span>
-        </div>
-        <Button 
-          onClick={() => setIsModalOpen(true)}
-          size="lg"
-        >
-          초안 작성 시작
-        </Button>
-      </div>
+      <StickyDock
+        leftContent={
+          <>
+            <div className="size-2 rounded-full bg-green-500 animate-pulse"></div>
+            <span className="text-slate-600 font-medium text-sm tracking-tight text-left">심층 이슈 분석이 모두 완료되었습니다. 분석된 맥락을 바탕으로 바로 초안을 작성할 수 있습니다.</span>
+          </>
+        }
+        rightContent={
+          <Button 
+            onClick={() => setIsModalOpen(true)}
+            size="lg"
+          >
+            초안 작성 시작
+          </Button>
+        }
+      />
 
       {/* Modal Overlay & Content - High Z-index to cover header */}
       {isModalOpen && (
