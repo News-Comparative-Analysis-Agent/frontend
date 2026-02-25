@@ -10,7 +10,7 @@ import { ArticleCard } from '../components/main/ArticleCard'
 
 const MainPage = () => {
   const navigate = useNavigate()
-  const [selectedMedia, setSelectedMedia] = useState<string[]>(['조선일보', '한겨레'])
+  const [selectedMedia, setSelectedMedia] = useState<string[]>(['조선일보', '한겨레', '경향신문', '동아일보', '연합뉴스'])
 
   const handleMediaChange = (media: string) => {
     const allMedia = ['조선일보', '한겨레', '경향신문', '동아일보', '연합뉴스']
@@ -45,7 +45,7 @@ const MainPage = () => {
           </div>
         </section>
 
-        <div className="max-w-[1100px] mx-auto px-6 pt-7">
+        <div className="page-container pt-8 md:pt-12">
           <div className="flex items-center justify-between border-b-2 border-slate-900/5 pb-6">
             <SectionHeader 
               icon="trending_up" 
@@ -78,7 +78,7 @@ const MainPage = () => {
           </div>
         </div>
 
-        <div className="max-w-[1100px] mx-auto px-6 pb-20 pt-8">
+        <div className="page-container pb-20 pt-8 md:pt-12">
           <div className="flex flex-col xl:flex-row gap-16 items-start">
             <div className="w-full xl:w-[55%] flex flex-col">
               <div className="mb-10 text-left">
