@@ -68,7 +68,10 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
           </button>
         )}
 
-        <div className="flex items-center gap-2 md:gap-3 cursor-pointer group">
+        <div 
+          className="flex items-center gap-2 md:gap-3 cursor-pointer group"
+          onClick={() => navigate('/login')}
+        >
           <div className="text-right hidden sm:block">
             <p className={`text-[11px] md:text-xs font-bold ${isWhite ? 'text-slate-700' : 'text-white'} group-hover:text-primary transition-colors`}>{user?.name}</p>
             <p className={`text-[9px] md:text-[10px] ${isWhite ? 'text-slate-400' : 'text-white/60'} font-medium`}>{user?.role}</p>

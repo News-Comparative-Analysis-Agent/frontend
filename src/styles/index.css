@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --primary: 242, 127, 13;
-  --primary-dark: 217, 110, 8;
-  --primary-light: 255, 157, 61;
-  --progressive: 37, 99, 235;
-  --conservative: 220, 38, 38;
-  --stance-gray: 100, 116, 139;
-  --background: 255, 255, 255;
-  --surface: 248, 250, 252;
-  --border-light: 241, 245, 249;
-  --text-main: 15, 23, 42;
-  --text-muted: 100, 116, 139;
+  --primary: 242 127 13;
+  --primary-dark: 217 110 8;
+  --primary-light: 255 157 61;
+  --progressive: 37 99 235;
+  --conservative: 220 38 38;
+  --stance-gray: 100 116 139;
+  --background: 255 255 255;
+  --surface: 248 250 252;
+  --border-light: 241 245 249;
+  --text-main: 15 23 42;
+  --text-muted: 100 116 139;
   --hl-progressive-bg: #dbeafe;
   --hl-progressive-text: #1e40af;
   --hl-neutral-bg: #f1f5f9;
@@ -38,6 +38,11 @@
   display: inline-block;
   vertical-align: middle;
   line-height: 1;
+}
+
+.digital-grid {
+  background-image: radial-gradient(#e2e8f0 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
