@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../layouts/Layout'
-import { opinions } from '../mocks/newsData'
+import { opinions } from '../mocks/analysisData'
 import Button from '../components/ui/Button'
 import SectionHeader from '../components/ui/SectionHeader'
 import HighlightChip from '../components/ui/HighlightChip'
 import OpinionCard from '../components/ui/OpinionCard'
+import Breadcrumb from '../components/ui/Breadcrumb'
 
 const AnalysisPage = () => {
   const navigate = useNavigate()
@@ -45,19 +46,11 @@ const AnalysisPage = () => {
   return (
     <Layout variant="white" activeStep={2} hideFooter>
       <div className="analysis-global-loader"></div>
-      <div className="bg-white border-b border-slate-50 px-4 md:px-8 py-3 shrink-0">
-        <div className="flex items-center gap-2 text-[12px] font-medium text-slate-400">
-          <span className="material-symbols-outlined text-[16px]">home</span>
-          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          <span>심층 분석</span>
-          <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          <span className="text-slate-800 font-bold">민주당-혁신당 합당 논란</span>
-        </div>
-      </div>
+      <Breadcrumb items={['심층 분석', '민주당-혁신당 합당 논란']} />
 
-      <section className="flex-1 w-full py-8 md:py-12 animate-page-in overflow-y-auto custom-scrollbar min-h-0">
-        <div className="max-w-[1640px] mx-auto px-6 md:px-10">
-        <header className="mb-12 text-center max-w-5xl mx-auto">
+      <section className="flex-1 w-full py-6 md:py-8 animate-page-in overflow-y-auto custom-scrollbar min-h-0">
+        <div className="max-w-[1400px] mx-auto px-6">
+        <header className="mb-8 text-center max-w-5xl mx-auto">
           <SectionHeader 
             title="더불어민주당-조국혁신당 합당 추진 중단 및 당내 내홍 심층 분석" 
             badge="현재 단계 : 심층 분석"
@@ -70,8 +63,8 @@ const AnalysisPage = () => {
           </p>
         </header>
 
-        <section className="max-w-[1240px] mx-auto mb-16 grid grid-cols-1 lg:grid-cols-3 gap-8 bg-white border border-slate-100 rounded-2xl md:rounded-[32px] p-6 md:p-10 shadow-premium">
-          <div className="lg:col-span-2 text-left">
+        <section className="max-w-[1400px] mx-auto mb-1 grid grid-cols-1 lg:grid-cols-4 gap-8 bg-white border border-slate-100 rounded-2xl md:rounded-[32px] p-6 md:p-8 shadow-premium">
+          <div className="lg:col-span-3 text-left">
             <div className="flex items-center gap-2 mb-6 text-primary">
               <span className="material-symbols-outlined text-[24px]">subject</span>
               <h3 className="text-[20px] font-bold text-slate-900">이슈 배경 상세</h3>
@@ -84,22 +77,22 @@ const AnalysisPage = () => {
             <div className="space-y-4 pr-6">
               <div className="bullet-point">
                 <div className="bullet-dot"></div>
-                <p className="text-[15px] text-slate-600 leading-relaxed font-medium">지난달 22일 정청래 대표가 최고위와 상의 없이 조국혁신당에 합당을 기습 제안하며 촉발된 사안입니다.</p>
+                <p className="text-[15px] text-slate-600 leading-relaxed font-medium max-w-[1050px] line-clamp-2">지난달 22일 정청래 대표가 최고위와 상의 없이 조국혁신당에 합당을 기습 제안하며 촉발된 사안입니다.</p>
               </div>
               <div className="bullet-point">
                 <div className="bullet-dot"></div>
-                <p className="text-[15px] text-slate-600 leading-relaxed font-medium">당내 의원 패싱, 문건 유출 논란 등으로 계파 간 갈등이 격화되었고, 결국 19일 만에 논의를 중단하기로 결정했습니다.</p>
+                <p className="text-[15px] text-slate-600 leading-relaxed font-medium max-w-[1050px] line-clamp-2">당내 의원 패싱, 문건 유출 논란 등으로 계파 간 갈등이 격화되었고, 결국 19일 만에 논의를 중단하기로 결정했습니다.</p>
               </div>
               <div className="bullet-point">
                 <div className="bullet-dot"></div>
-                <p className="text-[15px] text-slate-600 leading-relaxed font-medium">언론계는 이를 정 대표의 리더십 위기로 규정하거나, 차기 당권과 공천권을 둘러싼 여권 내부의 '내부 권력 투쟁'으로 분석하고 있습니다.</p>
+                <p className="text-[15px] text-slate-600 leading-relaxed font-medium max-w-[1050px] line-clamp-2">언론계는 이를 정 대표의 리더십 위기로 규정하거나, 차기 당권과 공천권을 둘러싼 여권 내부의 '내부 권력 투쟁'으로 분석하고 있습니다.</p>
               </div>
             </div>
           </div>
           <div className="lg:col-span-1 bg-slate-50/50 rounded-2xl p-6 text-left">
             <div className="flex items-center gap-2 mb-6 text-slate-800">
               <span className="material-symbols-outlined text-[20px] text-primary">event_note</span>
-              <span className="text-[15px] font-bold">이슈 타임라인</span>
+              <h4 className="text-[15px] font-bold text-slate-800">이슈 타임라인</h4>
             </div>
             <div className="flex flex-col">
               <div className="timeline-item">
@@ -121,14 +114,26 @@ const AnalysisPage = () => {
           </div>
         </section>
 
-        <section className="mb-20">
-          <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between bg-[#F9FAFB] border border-slate-100 rounded-3xl px-8 py-6 mb-8 gap-8">
-            <div className="flex flex-col gap-1.5 text-left">
+        <div className="max-w-[1400px] mx-auto border-t border-slate-100 my-1"></div>
+
+        <section className="max-w-[1400px] mx-auto mb-12">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between bg-[#F9FAFB] border border-slate-100 rounded-3xl px-8 pt-6 pb-1 mb-0 gap-8">
+            <div className="flex flex-col gap-1.5 text-left flex-1">
               <div className="flex items-center gap-2.5">
                 <span className="material-symbols-outlined text-[24px] text-primary">newspaper</span>
                 <h3 className="text-[20px] font-bold text-slate-900 tracking-tight whitespace-nowrap">언론사별 주요 논조</h3>
               </div>
-              <div className="flex items-center gap-1 mt-2">
+              {/* 직관적인 텍스트 요약 디자인 */}
+              <div className="w-full mt-2 bg-white px-5 py-3 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4">
+                <p className="text-[14px] text-slate-700 font-medium truncate">
+                  전체 보도 중 <span className="font-bold text-[#dc2626]">보수 성향(50%)</span> 언론이 가장 많은 비중을 차지했으며, 이어 <span className="font-bold text-[#2563eb]">진보 성향(30%)</span>과 <span className="font-bold text-slate-500">중립 성향(20%)</span> 보도가 따릅니다.
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-start gap-3 bg-white p-3 rounded-xl border border-slate-100 shadow-sm shrink-0 mt-[-4px]">
+              <span className="text-[12px] font-bold text-slate-500 mr-1 tracking-tight">원하는 언론사의 논조만 골라보세요</span>
+              <div className="flex items-center gap-1.5">
                 {[
                   { id: 'all', label: '전체' },
                   { id: 'progressive', label: '진보', hover: 'hover:text-progressive' },
@@ -141,7 +146,7 @@ const AnalysisPage = () => {
                     className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
                       activeStance === tab.id
                         ? 'bg-primary text-white shadow-md shadow-primary/20'
-                        : `text-slate-400 ${tab.hover}`
+                          : `text-slate-400 bg-slate-50 ${tab.hover}`
                     }`}
                   >
                     {tab.label}
@@ -149,54 +154,33 @@ const AnalysisPage = () => {
                 ))}
               </div>
             </div>
-            <div className="flex-1 max-w-3xl w-full text-left">
-              <div className="flex items-center justify-between mb-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-[12.5px] font-bold text-slate-500 uppercase tracking-wider">언론 지형 분포</span>
-                  <span className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-500 text-[11px] font-bold shadow-sm">158개 데이터</span>
+          </div>
+
+          <div className="relative group">
+            <div className="flex gap-6 overflow-x-auto pb-8 pt-0 no-scrollbar scroll-smooth">
+              {opinions.filter(o => activeStance === 'all' || o.stance === activeStance).map((o, idx) => (
+                <div key={o.id} className="min-w-[380px] w-[380px] md:min-w-[420px] md:w-[420px] flex-shrink-0">
+                  <OpinionCard 
+                    media={o.media}
+                    stance={o.stance as any}
+                    title={o.title}
+                    analysisTitle={o.analysisTitle}
+                    description={o.description}
+                    sources={o.sources}
+                  />
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-[12.5px] font-bold text-slate-900">데이터 신뢰도 99.1%</span>
-                  <span className="material-symbols-outlined text-[14px] text-blue-500" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                </div>
-              </div>
-              <div className="reliability-bar mb-2.5 bg-slate-200">
-                <div className="reliability-segment bg-[#2563eb]/70" style={{ width: '30%' }}></div>
-                <div className="reliability-segment bg-slate-300" style={{ width: '20%' }}></div>
-                <div className="reliability-segment bg-[#dc2626]/70" style={{ width: '50%' }}></div>
-              </div>
-              <div className="flex justify-between items-center text-[11.5px] font-bold px-0.5">
-                <div className="flex items-center gap-1.5 text-[#2563eb]">
-                  <span className="size-1.5 rounded-full bg-[#2563eb]"></span> 진보 30%
-                </div>
-                <div className="flex items-center gap-1.5 text-slate-400">
-                  <span className="size-1.5 rounded-full bg-slate-300"></span> 중립 20%
-                </div>
-                <div className="flex items-center gap-1.5 text-[#dc2626]">
-                  보수 50% <span className="size-1.5 rounded-full bg-[#dc2626]"></span>
-                </div>
-              </div>
+              ))}
+              {/* 여백용 투명 요소 */}
+              <div className="min-w-[100px] shrink-0"></div>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            {opinions.filter(o => activeStance === 'all' || o.stance === activeStance).map(o => (
-              <OpinionCard 
-                key={o.id}
-                media={o.media}
-                stance={o.stance as any}
-                title={o.title}
-                analysisTitle={o.analysisTitle}
-                description={o.description}
-                sources={o.sources}
-              />
-            ))}
-          </div>
-
-          <div className="mt-10 flex justify-center">
-            <div className="flex items-center gap-3 px-6 py-3 bg-slate-50 rounded-2xl border border-slate-100">
-              <span className="material-symbols-outlined text-slate-400 text-[20px]">info</span>
-              <span className="text-slate-500 text-[14px] font-medium">정보의 응집력을 위해 섹션 헤더 및 데이터 분포 레이아웃을 최적화했습니다.</span>
+            
+            {/* 좌우 페이드 인디케이터 */}
+            <div className="absolute top-0 right-0 h-full w-32 bg-gradient-to-l from-white via-white/40 to-transparent pointer-events-none z-10 opacity-100 group-hover:opacity-0 transition-opacity"></div>
+            
+            {/* 스크롤 가이드 */}
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 z-20 pointer-events-none animate-bounce flex flex-col items-center gap-2 text-primary opacity-80 group-hover:opacity-0 transition-opacity">
+              <span className="material-symbols-outlined text-[32px] bg-white/80 rounded-full shadow-lg p-2">arrow_forward_ios</span>
+              <span className="text-[11px] font-black bg-white/80 px-2 py-0.5 rounded shadow-sm">옆으로 넘겨보세요</span>
             </div>
           </div>
         </section>
@@ -218,7 +202,7 @@ const AnalysisPage = () => {
         </Button>
       </div>
 
-      {/* Modal Overlay & Content - High Z-index to cover header */}
+      {/* Modal Overlay & Content */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-[5000] flex items-center justify-center p-4 animate-page-in">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-[580px] overflow-hidden flex flex-col animate-modal-up">

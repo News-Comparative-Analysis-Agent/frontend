@@ -6,6 +6,7 @@ import FinalReviewPage from '../pages/FinalReviewPage'
 import SearchResultsPage from '../pages/SearchResultsPage'
 import LoginPage from '../pages/LoginPage'
 import SignupPage from '../pages/SignupPage'
+import MyPage from '../pages/MyPage'
 
 const AppRouter = () => {
   return (
@@ -17,6 +18,7 @@ const AppRouter = () => {
       <Route path="/search" element={<SearchResultsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/mypage" element={<MyPage />} />
     </Routes>
   )
 }

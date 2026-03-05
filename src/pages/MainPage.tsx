@@ -1,24 +1,52 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../layouts/Layout'
-import { mainNewsData } from '../mocks/newsData'
 import Button from '../components/ui/Button'
 import SectionHeader from '../components/ui/SectionHeader'
+import { fetchTopNewsByPublisher } from '../api/news'
+import { NewsArticle } from '../types'
+
+// 언론사별 색상 설정
+const PUBLISHER_STYLES: Record<string, { borderColor: string; color: string; textColor: string }> = {
+  '조선일보': { borderColor: 'border-blue-500',   color: 'bg-blue-500',   textColor: 'text-blue-600' },
+  '한겨레':   { borderColor: 'border-red-500',    color: 'bg-red-500',    textColor: 'text-red-600' },
+  '경향신문': { borderColor: 'border-green-500',  color: 'bg-green-500',  textColor: 'text-green-600' },
+  '동아일보': { borderColor: 'border-purple-500', color: 'bg-purple-500', textColor: 'text-purple-600' },
+  '연합뉴스': { borderColor: 'border-orange-500', color: 'bg-orange-500', textColor: 'text-orange-600' },
+}
+const DEFAULT_STYLE = { borderColor: 'border-slate-400', color: 'bg-slate-400', textColor: 'text-slate-600' }
+const PUBLISHER_ORDER = ['조선일보', '한겨레', '경향신문', '동아일보', '연합뉴스']
+
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop'
 
 const MainPage = () => {
   const navigate = useNavigate()
   const [selectedMedia, setSelectedMedia] = useState<string[]>(['조선일보', '한겨레'])
+  const [newsData, setNewsData] = useState<Record<string, NewsArticle[]>>({})
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setLoading(true)
+        const data = await fetchTopNewsByPublisher()
+        setNewsData(data)
+      } catch (e) {
+        setError('뉴스를 불러오는 중 오류가 발생했습니다.')
+        console.error(e)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchNews()
+  }, [])
 
   const handleMediaChange = (media: string) => {
     if (media === '전체') {
-      if (selectedMedia.length === 5) {
-        setSelectedMedia([])
-      } else {
-        setSelectedMedia(['조선일보', '한겨레', '경향신문', '동아일보', '연합뉴스'])
-      }
+      setSelectedMedia(selectedMedia.length === 5 ? [] : [...PUBLISHER_ORDER])
       return
     }
-
     if (selectedMedia.includes(media)) {
       setSelectedMedia(selectedMedia.filter(m => m !== media))
     } else {
@@ -26,23 +54,25 @@ const MainPage = () => {
     }
   }
 
+  const filteredPublishers = PUBLISHER_ORDER.filter(p => selectedMedia.includes(p))
+
   return (
     <Layout>
       <div className="animate-page-in">
-        <section className="bg-primary h-[220px] px-12 flex flex-col justify-center">
-          <div className="max-w-[1240px] w-full mx-auto flex items-center justify-between gap-24">
+        {/* Hero */}
+        <section className="bg-primary h-[180px] flex flex-col justify-center">
+          <div className="max-w-[1400px] w-full mx-auto px-6 flex items-center justify-between gap-24">
             <div className="flex-1 text-left shrink-0">
               <h2 className="text-4xl font-extrabold text-white tracking-tight leading-[1.3] break-keep">
                 기사 작성의 모든 과정,<br />실시간으로 도와드립니다.
               </h2>
-              <p className="text-white/70 mt-3 text-sm font-medium">기자님을 위한 실시간 이슈 트래킹 및 분석 가이드입니다.</p>
             </div>
             <div className="flex flex-row items-start gap-8 py-6 flex-[2]">
               <div className="flex flex-col items-start gap-2 flex-1 relative cursor-pointer" onClick={() => navigate('/')}>
                 <span className="flex items-center justify-center size-14 rounded-full bg-white text-primary text-2xl font-black shadow-glow ring-4 ring-white/30 shrink-0">1</span>
                 <div className="text-left">
                   <p className="text-[18px] font-black text-white leading-none">주제 선택</p>
-                  <p className="text-[13px] text-white mt-2 leading-snug font-medium opacity-90">분석할 주제를 선택하거나 직접 검색합니다.</p>
+                   <p className="text-[13px] text-white mt-1.5 leading-snug font-medium opacity-90">주제를 선택하거나 검색해 보세요.</p>
                 </div>
               </div>
               <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70 cursor-pointer hover:opacity-100 transition-opacity" onClick={() => navigate('/analysis')}>
@@ -62,7 +92,7 @@ const MainPage = () => {
               <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70 cursor-pointer hover:opacity-100 transition-opacity -ml-6" onClick={() => navigate('/final-review')}>
                 <span className="flex items-center justify-center size-10 rounded-full bg-white/20 text-white text-lg font-bold border border-white/30 shrink-0">4</span>
                 <div className="text-left">
-                  <p className="text-[16px] font-bold text-white leading-none">최종 발행</p>
+                   <p className="text-[16px] font-bold text-white leading-none">최종 검토</p>
                   <p className="text-[12px] text-white/80 mt-2 leading-snug font-normal">기사 품질 검토 후 발행합니다.</p>
                 </div>
               </div>
@@ -70,74 +100,62 @@ const MainPage = () => {
           </div>
         </section>
 
-        <div className="max-w-[1100px] mx-auto px-6 pt-12">
+        {/* 검색 헤더 */}
+        <div className="max-w-[1400px] mx-auto px-6 pt-8">
           <div className="flex items-center justify-between border-b-2 border-slate-900/5 pb-6">
-            <SectionHeader 
-              icon="trending_up" 
-              title="오늘의 뉴스 트렌드" 
-              description="2026년 2월 23일 기준 실시간 분석 결과입니다" 
+            <SectionHeader
+              icon="trending_up"
+              title="오늘의 뉴스 트렌드"
+              description="2026년 2월 23일 기준 실시간 분석 결과입니다"
             />
-            <div className="flex items-center gap-3">
-              <div className="relative w-64 focus-within:w-80 transition-all duration-500 ease-out group">
-                <input 
-                  id="search-input" 
-                  className="w-full pl-11 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all bg-white shadow-sm placeholder:text-slate-400" 
-                  placeholder="찾는 뉴스가 있으신가요?" 
-                  type="text" 
-                  onKeyDown={(e) => e.key === 'Enter' && navigate('/search')}
-                />
-                <span 
-                  className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] group-focus-within:text-primary group-focus-within:scale-110 transition-all cursor-pointer" 
-                  onClick={() => navigate('/search')}
-                >
-                  search
-                </span>
+            <div className="relative w-[380px] focus-within:w-[480px] transition-all duration-500 ease-out group">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+                <span className="material-symbols-outlined text-[20px]">search</span>
               </div>
-              <Button 
-                variant="icon" 
-                size="icon" 
-                icon="search" 
-                onClick={() => navigate('/search')}
-                className="group-hover:rotate-12 transition-transform"
+              <input
+                id="search-input"
+                className="w-full pl-10 pr-10 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all bg-white shadow-sm placeholder:text-slate-400"
+                placeholder="찾는 뉴스가 있으신가요?"
+                type="text"
+                onKeyDown={(e) => e.key === 'Enter' && navigate('/search')}
               />
+              <button
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-primary transition-colors"
+                onClick={() => navigate('/search')}
+                type="button"
+              >
+                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <div className="max-w-[1100px] mx-auto px-6 pb-20 pt-8">
-          <div className="flex flex-col xl:flex-row gap-16 items-start">
+        {/* 뉴스 본문 */}
+        <div className="max-w-[1400px] mx-auto px-6 pb-12 pt-6">
+          <div className="flex flex-col xl:flex-row gap-10 items-start">
+
+            {/* 왼쪽: 언론사별 인기 뉴스 */}
             <div className="w-full xl:w-[55%] flex flex-col">
-              <div className="mb-10 text-left">
+              <div className="mb-6 text-left">
                 <div className="flex items-center justify-between h-10 mb-2">
-                  <div className="flex items-center">
-                    <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">각 언론사별 현재 인기 뉴스에요</h2>
-                  </div>
+                  <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">각 언론사별 현재 인기 뉴스에요</h2>
                 </div>
                 <div className="w-full h-px bg-slate-100"></div>
               </div>
 
-              <div className="mb-10 w-full">
+              {/* 필터 체크박스 */}
+              <div className="mb-6 w-full">
                 <div className="flex flex-nowrap gap-2 pb-2 no-scrollbar" id="filter-chips-container">
                   <label className="cursor-pointer select-none shrink-0">
-                    <input 
-                      type="checkbox" 
-                      className="filter-checkbox peer hidden" 
-                      checked={selectedMedia.length === 5} 
-                      onChange={() => handleMediaChange('전체')}
-                    />
+                    <input type="checkbox" className="filter-checkbox peer hidden" checked={selectedMedia.length === 5} onChange={() => handleMediaChange('전체')} />
                     <div className="relative flex items-center justify-center px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-400 text-[12px] font-bold transition-all hover:border-slate-300 peer-checked:bg-primary/5 peer-checked:border-primary peer-checked:text-primary">
                       <span className="material-symbols-outlined absolute left-2 text-[16px] leading-none opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all">check_circle</span>
                       <span>전체</span>
                     </div>
                   </label>
-                  {['조선일보', '한겨레', '경향신문', '동아일보', '연합뉴스'].map(media => (
+                  {PUBLISHER_ORDER.map(media => (
                     <label key={media} className="cursor-pointer select-none shrink-0">
-                      <input 
-                        type="checkbox" 
-                        className="filter-checkbox peer hidden" 
-                        checked={selectedMedia.includes(media)} 
-                        onChange={() => handleMediaChange(media)}
-                      />
+                      <input type="checkbox" className="filter-checkbox peer hidden" checked={selectedMedia.includes(media)} onChange={() => handleMediaChange(media)} />
                       <div className="relative flex items-center justify-center px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-400 text-[12px] font-bold transition-all hover:border-slate-300 peer-checked:bg-primary/5 peer-checked:border-primary peer-checked:text-primary">
                         <span className="material-symbols-outlined absolute left-2 text-[16px] leading-none opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all">check_circle</span>
                         <span>{media.replace('신문', '').replace('일보', '')}</span>
@@ -147,66 +165,91 @@ const MainPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
-                {mainNewsData.filter(board => selectedMedia.includes(board.category)).map(board => (
-                  <div key={board.category} className="news-board-card text-left">
-                    <div className={`border-t-[3px] ${board.borderColor} mb-3`}></div>
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-bold text-slate-600 flex items-center gap-1">
-                        {board.category} <span className="material-symbols-outlined text-sm">chevron_right</span>
-                      </h4>
+              {/* 로딩 / 에러 / 뉴스 카드 */}
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                  {[1, 2].map(i => (
+                    <div key={i} className="animate-pulse space-y-3">
+                      <div className="h-3 w-20 bg-slate-200 rounded" />
+                      <div className="w-full aspect-video bg-slate-200 rounded-xl" />
+                      <div className="h-4 bg-slate-200 rounded w-3/4" />
+                      {[...Array(5)].map((_, j) => <div key={j} className="h-3 bg-slate-100 rounded" />)}
                     </div>
-                    <div className="space-y-0 divide-y divide-slate-50">
-                      {board.articles.map((article, idx) => (
-                        <div 
-                          key={article.id} 
-                          className={`${idx === 0 ? 'pb-6 pt-1 border-b border-slate-100' : 'py-2.5 flex gap-3 items-baseline'} group cursor-pointer`}
-                          onClick={() => navigate('/analysis')}
-                        >
-                          {idx === 0 ? (
-                            <>
-                              <div className="relative w-full aspect-video mb-3 overflow-hidden rounded-xl">
-                                <img 
-                                  alt={`Ranking ${article.rank}`} 
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                                  src={article.image}
-                                />
-                                <div className={`absolute top-2 left-2 size-7 ${board.color} text-white flex items-center justify-center font-bold rank-number rounded shadow-md`}>
-                                  {article.rank}
-                                </div>
-                              </div>
-                              <h5 className={`text-[15px] font-bold text-slate-900 leading-snug group-hover:${board.textColor} transition-colors`}>
-                                {article.title}
-                              </h5>
-                            </>
-                          ) : (
-                            <>
-                              <span className="rank-number text-xs font-bold text-slate-400 w-4 text-center">{article.rank}</span>
-                              <p className={`text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:${board.textColor}`}>
-                                {article.title}
-                              </p>
-                            </>
-                          )}
+                  ))}
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center py-16 text-slate-400 gap-2">
+                  <span className="material-symbols-outlined text-5xl">wifi_off</span>
+                  <p className="text-sm font-medium">{error}</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
+                  {filteredPublishers.map(publisher => {
+                    const articles = newsData[publisher] ?? []
+                    const style = PUBLISHER_STYLES[publisher] ?? DEFAULT_STYLE
+                    return (
+                      <div key={publisher} className="news-board-card text-left">
+                        <div className={`border-t-[3px] ${style.borderColor} mb-3`}></div>
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-lg font-bold text-slate-600 flex items-center gap-1">
+                            {publisher} <span className="material-symbols-outlined text-sm">chevron_right</span>
+                          </h4>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                        <div className="space-y-0 divide-y divide-slate-50">
+                          {articles.map((article, idx) => (
+                            <a
+                              key={article.id}
+                              href={article.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`${idx === 0 ? 'pb-6 pt-1 border-b border-slate-100 block' : 'py-2.5 flex gap-3 items-baseline'} group cursor-pointer`}
+                            >
+                              {idx === 0 ? (
+                                <>
+                                  <div className="relative w-full aspect-video mb-3 overflow-hidden rounded-xl bg-slate-100">
+                                    <img
+                                      alt={article.title}
+                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                      src={article.image_url || DEFAULT_IMAGE}
+                                    />
+                                    <div className={`absolute top-2 left-2 size-7 ${style.color} text-white flex items-center justify-center font-bold rank-number rounded shadow-md`}>1</div>
+                                  </div>
+                                  <h5 className={`text-[15px] font-bold text-slate-900 leading-snug group-hover:${style.textColor} transition-colors`}>
+                                    {article.title}
+                                  </h5>
+                                  {article.reporter && (
+                                    <p className="text-[11px] text-slate-400 mt-1">{article.reporter} 기자</p>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <span className="rank-number text-xs font-bold text-slate-400 w-4 text-center shrink-0">{idx + 1}</span>
+                                  <p className={`text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:${style.textColor}`}>
+                                    {article.title}
+                                  </p>
+                                </>
+                              )}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
-            <div className="w-full xl:w-[45%] border-l border-slate-100 pl-16 flex flex-col text-left">
-              <div className="mb-10">
+            {/* 오른쪽: 통합 인기 뉴스 */}
+            <div className="xl:flex-1 min-w-0 border-l border-slate-100 pl-10 flex flex-col text-left">
+              <div className="mb-6">
                 <div className="flex items-center justify-between h-10 mb-2">
-                  <div className="flex items-center">
-                    <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">언론사 공통으로 다루는 인기 뉴스에요</h2>
-                  </div>
+                  <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">언론사 공통으로 다루는 인기 뉴스에요</h2>
                 </div>
                 <div className="w-full h-px bg-slate-100"></div>
               </div>
-              
+
               <div className="flex flex-col flex-1 divide-y divide-slate-100">
-                <div className="news-board-card group cursor-pointer max-w-[400px] mb-3" onClick={() => navigate('/analysis')}>
+                <div className="news-board-card group cursor-pointer w-full mb-3" onClick={() => navigate('/analysis')}>
                   <div className="border-t-[3px] border-primary mb-3"></div>
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-lg font-bold text-primary flex items-center gap-1">통합 인기 1위</h4>
@@ -241,13 +284,14 @@ const MainPage = () => {
                   ))}
                 </div>
               </div>
-              
+
               <div className="flex justify-end mt-12">
                 <Button variant="outline" size="sm" icon="tune">
                   필터 및 매체 설정
                 </Button>
               </div>
             </div>
+
           </div>
         </div>
       </div>

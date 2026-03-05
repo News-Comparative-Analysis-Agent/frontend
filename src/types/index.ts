@@ -52,3 +52,17 @@ export interface Quote {
   text: string;
   links: string[];
 }
+
+export interface NewsArticle {
+  id: number;
+  title: string;
+  url: string;
+  published_at: string;
+  summary: string;
+  bias: string;
+  bias_score: number;
+  reporter: string;
+  publisher_id: number;
+  publisher_name: string;
+  image_url?: string;
+}

@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../layouts/Layout'
-import { draftingQuotes } from '../mocks/newsData'
+import { draftingQuotes } from '../mocks/draftingData'
 import Button from '../components/ui/Button'
 import { useDraftStore } from '../stores/useDraftStore'
+import Breadcrumb from '../components/ui/Breadcrumb'
 
 const DraftingPage = () => {
   const navigate = useNavigate()
@@ -178,15 +179,7 @@ const DraftingPage = () => {
 
   return (
     <Layout variant="white" activeStep={3} hideFooter>
-        <div className="bg-white border-b border-slate-50 px-4 md:px-8 py-3 shrink-0">
-          <div className="flex items-center gap-2 text-[12px] font-medium text-slate-400">
-            <span className="material-symbols-outlined text-[16px]">home</span>
-            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-            <span>심층 분석</span>
-            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-            <span className="text-slate-800 font-bold">초안 작성</span>
-          </div>
-        </div>
+        <Breadcrumb items={['심층 분석', '초안 작성']} />
 
         <main className="flex-1 flex overflow-hidden min-h-0">
           {/* Left Sidebar */}

@@ -1,21 +1,16 @@
 import { useNavigate } from 'react-router-dom'
 import Layout from '../layouts/Layout'
-import { searchIssues, searchNewsList } from '../mocks/newsData'
+import { searchIssues, searchNewsList } from '../mocks/searchData'
 import Button from '../components/ui/Button'
 import SectionHeader from '../components/ui/SectionHeader'
+import Breadcrumb from '../components/ui/Breadcrumb'
 
 const SearchResultsPage = () => {
   const navigate = useNavigate()
 
   return (
     <Layout variant="white" activeStep={1} hideFooter>
-        <div className="bg-white border-b border-slate-50 px-4 md:px-8 py-3 shrink-0">
-          <div className="flex items-center gap-2 text-[12px] font-medium text-slate-400">
-            <span className="material-symbols-outlined text-[16px]">home</span>
-            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-            <span className="text-slate-800 font-bold">'민주당 합당 논란' 검색 결과</span>
-          </div>
-        </div>
+        <Breadcrumb items={["'민주당 합당 논란' 검색 결과"]} />
 
         <section className="flex-1 overflow-y-auto custom-scrollbar animate-page-in min-h-0">
           <div className="bg-white border-b border-slate-100 pt-6 md:pt-8 pb-4 md:pb-6">
