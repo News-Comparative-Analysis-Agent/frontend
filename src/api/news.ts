@@ -21,6 +21,7 @@ export const fetchTopNewsByPublisher = async (): Promise<Record<string, NewsArti
     }
 
     return response.json();
+
   } catch (e) {
     if (e instanceof DOMException && e.name === 'AbortError') {
       throw new Error('서버 응답이 너무 늦어 요청이 취소되었습니다. 잠시 후 다시 시도해주세요.');
