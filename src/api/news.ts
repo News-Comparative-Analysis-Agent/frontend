@@ -1,6 +1,6 @@
 import { NewsArticle } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://209.38.76.211:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
 const REQUEST_TIMEOUT_MS = 10000; // 10초
 
 /**
