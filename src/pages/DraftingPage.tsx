@@ -5,6 +5,13 @@ import { draftingQuotes } from '../mocks/draftingData'
 import Button from '../components/ui/Button'
 import { useDraftStore } from '../stores/useDraftStore'
 import Breadcrumb from '../components/ui/Breadcrumb'
+import { chatWithAI } from '../api/drafting'
+
+interface ChatMessage {
+  role: 'user' | 'ai';
+  content: string;
+  modifiedContent?: string;
+}
 
 const DraftingPage = () => {
   const navigate = useNavigate()
@@ -13,8 +20,19 @@ const DraftingPage = () => {
   const [chatbotWidth, setChatbotWidth] = useState(320)
   const [isResizing, setIsResizing] = useState(false)
   const [dropIndicator, setDropIndicator] = useState<{ index: number; rect: DOMRect | null }>({ index: -1, rect: null })
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: 'ai', content: '안녕하세요! 기사의 문장력을 높이거나 특정 논조를 강화하고 싶으시면 말씀해주세요.' }
+  ])
+  const [inputMessage, setInputMessage] = useState('')
+  const [isChatLoading, setIsChatLoading] = useState(false)
   const editorRef = useRef<HTMLDivElement>(null)
+  const chatEndRef = useRef<HTMLDivElement>(null)
   const resizeRafRef = useRef<number | null>(null)
+
+  // 채팅 자동 스크롤
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   // 초기 본문 설정 (한 번만 실행)
   useEffect(() => {
@@ -175,6 +193,40 @@ const DraftingPage = () => {
     if (!lastSaved) return '저장되지 않음'
     const date = new Date(lastSaved)
     return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')} 저장됨`
+  }
+
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || isChatLoading) return
+
+    const userMsg = inputMessage.trim()
+    setInputMessage('')
+    setMessages(prev => [...prev, { role: 'user', content: userMsg }])
+    setIsChatLoading(true)
+
+    try {
+      const response = await chatWithAI({
+        message: userMsg,
+        current_content: content
+      })
+
+      setMessages(prev => [...prev, { 
+        role: 'ai', 
+        content: response.response,
+        modifiedContent: response.modified_content 
+      }])
+    } catch (error) {
+      console.error('Chat error:', error)
+      setMessages(prev => [...prev, { role: 'ai', content: '죄송합니다. 서버와 통신 중 오류가 발생했습니다.' }])
+    } finally {
+      setIsChatLoading(false)
+    }
+  }
+
+  const applyModifiedContent = (modifiedContent: string) => {
+    if (editorRef.current) {
+      editorRef.current.innerHTML = modifiedContent
+      setContent(modifiedContent)
+    }
   }
 
   return (
@@ -399,28 +451,71 @@ const DraftingPage = () => {
                 </h3>
               </div>
               <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4 text-sm">
-                <div className="flex gap-2">
-                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-white text-[14px]">smart_toy</span>
+                {messages.map((msg, idx) => (
+                  <div key={idx} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : ''}`}>
+                    {msg.role === 'ai' && (
+                      <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-white text-[14px]">smart_toy</span>
+                      </div>
+                    )}
+                    <div className={`flex flex-col gap-2 max-w-[85%] ${msg.role === 'user' ? 'items-end' : ''}`}>
+                      <div className={`p-3 rounded-xl leading-relaxed ${
+                        msg.role === 'user' 
+                          ? 'bg-orange-50 border border-orange-100 text-slate-800 rounded-tr-none' 
+                          : 'bg-slate-100 text-slate-700 rounded-tl-none'
+                      }`}>
+                        {msg.content}
+                      </div>
+                      
+                      {msg.modifiedContent && (
+                        <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col gap-2">
+                          <div className="flex items-center gap-1.5 text-primary">
+                            <span className="material-symbols-outlined text-[16px]">edit_note</span>
+                            <span className="text-[11px] font-bold">AI의 수정 제안이 있습니다</span>
+                          </div>
+                          <button 
+                            onClick={() => applyModifiedContent(msg.modifiedContent!)}
+                            className="w-full py-1.5 bg-primary text-white text-[11px] font-bold rounded-lg hover:bg-orange-600 transition-colors shadow-sm"
+                          >
+                            본문에 반영하기
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="bg-slate-100 p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl text-slate-700 leading-relaxed">
-                    안녕하세요! 기사의 문장력을 높이거나 특정 논조를 강화하고 싶으시면 말씀해주세요.
+                ))}
+                {isChatLoading && (
+                  <div className="flex gap-2">
+                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-white text-[14px]">smart_toy</span>
+                    </div>
+                    <div className="bg-slate-100 p-3 rounded-xl rounded-tl-none">
+                      <div className="flex gap-1">
+                        <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                        <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                        <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-2 justify-end">
-                  <div className="bg-orange-50 border border-orange-100 p-3 rounded-tl-xl rounded-br-xl rounded-bl-xl text-slate-800 leading-relaxed max-w-[85%]">
-                    현재 문단에 중립적 데이터 통계를 하나 추가해줘.
-                  </div>
-                </div>
+                )}
+                <div ref={chatEndRef} />
               </div>
               <div className="p-3 border-t border-slate-100">
                 <div className="relative">
                   <input 
-                    className="w-full bg-slate-50 border-slate-200 rounded-xl py-2 px-3 pr-10 text-[13px] outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all" 
-                    placeholder="AI와 대화하여 기사 작성..." 
+                    className="w-full bg-slate-50 border-slate-200 rounded-xl py-2 px-3 pr-10 text-[13px] outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all disabled:opacity-50" 
+                    placeholder={isChatLoading ? "AI가 생각 중입니다..." : "AI와 대화하여 기사 작성..."}
                     type="text" 
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                    disabled={isChatLoading}
                   />
-                  <button className="absolute right-2 top-1.5 text-primary hover:text-orange-600 transition-colors">
+                  <button 
+                    className={`absolute right-2 top-1.5 transition-colors ${isChatLoading || !inputMessage.trim() ? 'text-slate-300 pointer-events-none' : 'text-primary hover:text-orange-600'}`}
+                    onClick={handleSendMessage}
+                    disabled={isChatLoading || !inputMessage.trim()}
+                  >
                     <span className="material-symbols-outlined text-[20px]">send</span>
                   </button>
                 </div>

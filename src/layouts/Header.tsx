@@ -62,7 +62,9 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
 
       <div className="flex items-center justify-end gap-3 md:gap-6 w-1/4">
         {activeStep === 3 && (
-          <button className="flex items-center gap-2 px-2 md:px-3 py-1.5 bg-orange-50 text-primary border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 active:scale-95 group">
+          <button 
+            className="flex items-center gap-2 px-2 md:px-3 py-1.5 bg-orange-50 text-primary border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 active:scale-95 group"
+          >
             <span className="material-symbols-outlined text-[18px] group-hover:rotate-180 transition-transform duration-500">refresh</span>
             <span className="text-[10px] md:text-xs font-bold whitespace-nowrap">초안 다시 생성</span>
           </button>

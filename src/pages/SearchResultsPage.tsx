@@ -1,4 +1,5 @@
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import Layout from '../layouts/Layout'
 import { searchIssues, searchNewsList } from '../mocks/searchData'
 import Button from '../components/ui/Button'
@@ -7,19 +8,32 @@ import Breadcrumb from '../components/ui/Breadcrumb'
 
 const SearchResultsPage = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const query = searchParams.get('q') ?? ''
+  const [inputValue, setInputValue] = useState(query)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  const handleSearch = () => {
+    if (inputValue.trim()) {
+      navigate(`/search?q=${encodeURIComponent(inputValue.trim())}`)
+    }
+  }
 
   return (
     <Layout variant="white" activeStep={1} hideFooter>
-        <Breadcrumb items={["'민주당 합당 논란' 검색 결과"]} />
+        <Breadcrumb items={[`'${query}' 검색 결과`]} />
 
         <section className="flex-1 overflow-y-auto custom-scrollbar animate-page-in min-h-0">
           <div className="bg-white border-b border-slate-100 pt-6 md:pt-8 pb-4 md:pb-6">
-            <div className="max-w-[1280px] mx-auto px-4 md:px-8">
-              <div className="flex flex-col w-full max-w-4xl mx-auto px-2 md:px-0">
+            <div className="max-w-[1400px] mx-auto px-6">
+              <div className="flex flex-col w-full max-w-4xl mx-auto md:px-0">
                 <div className="max-w-4xl w-full relative mx-auto">
                   <input 
                     className="w-full h-12 md:h-14 pl-8 pr-16 bg-slate-50 border-slate-200 rounded-2xl text-slate-700 placeholder:text-slate-400 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-base font-medium shadow-sm" 
-                    defaultValue="민주당 조국혁신당 합당 논란" 
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     type="text" 
                   />
                   <Button 
@@ -27,18 +41,19 @@ const SearchResultsPage = () => {
                     size="icon" 
                     icon="search" 
                     className="absolute right-1.5 md:right-2 top-1 md:top-2 h-10 w-10"
+                    onClick={handleSearch}
                   />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:pt-10">
+          <div className="max-w-[1400px] mx-auto px-6 py-6 md:pt-10">
             <div className="max-w-7xl mx-auto mb-6 text-left">
               <div className="flex items-start gap-3 p-5 rounded-2xl bg-orange-50/50 border border-primary/10 text-left">
                 <span className="material-symbols-outlined text-primary text-2xl mt-0.5">info</span>
                 <p className="text-slate-700 text-base leading-relaxed">
-                  검색하신 <strong className="text-primary font-black underline underline-offset-4 decoration-primary/30 text-lg">'민주당 합당 논란'</strong>과 관련하여, 가장 많이 거론되는 <strong className="text-primary font-black">5가지 이슈</strong>입니다.
+                  검색하신 <strong className="text-primary font-black underline underline-offset-4 decoration-primary/30 text-lg">'{query}'</strong>과 관련하여, 가장 많이 거론되는 <strong className="text-primary font-black">5가지 이슈</strong>입니다.
                 </p>
               </div>
             </div>
@@ -78,7 +93,7 @@ const SearchResultsPage = () => {
               ))}
             </div>
 
-            <div className="max-w-4xl mx-auto border-t-4 border-double border-slate-100 pt-16 mb-8 text-left">
+            <div className="max-w-7xl mx-auto border-t-4 border-double border-slate-100 pt-16 mb-8 text-left">
               <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 mb-1 text-left">찾으시는 이슈가 없다면?</h3>
@@ -91,7 +106,7 @@ const SearchResultsPage = () => {
               </div>
             </div>
 
-            <div className="max-w-4xl mx-auto text-left">
+            <div className="max-w-7xl mx-auto text-left">
               <div className="flex flex-col gap-6 mb-8">
                 <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100">
                   <div className="flex items-center gap-3">
@@ -122,31 +137,74 @@ const SearchResultsPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="divide-y divide-slate-100">
-                {searchNewsList.map(news => (
-                  <div 
-                    key={news.id} 
-                    onClick={() => navigate('/analysis')}
-                    className="py-5 hover:bg-slate-50 transition-all group cursor-pointer border-l-4 border-transparent hover:border-primary px-4 -mx-4"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <span className="text-slate-600 text-sm font-bold">{news.media}</span>
-                          <span className="text-slate-300 text-[10px]">•</span>
-                          <span className="text-slate-400 text-xs">{news.time}</span>
+              <div className="flex flex-col h-[680px]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-0 border-t border-slate-100/60 flex-1">
+                  {(() => {
+                    const startIndex = (currentPage - 1) * itemsPerPage;
+                    const currentItems = searchNewsList.slice(startIndex, startIndex + itemsPerPage);
+                    return currentItems.map(news => (
+                      <div 
+                        key={news.id} 
+                        onClick={() => navigate('/analysis')}
+                        className="py-3 hover:bg-slate-50 transition-all group cursor-pointer border-l-4 border-transparent hover:border-primary px-6 border-b border-r border-slate-100/60 md:last:border-r-0"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <span className="text-slate-600 text-sm font-bold">{news.media}</span>
+                              <span className="text-slate-300 text-[10px]">•</span>
+                              <span className="text-slate-400 text-xs">{news.time}</span>
+                            </div>
+                            <h4 className="text-slate-800 font-bold text-base group-hover:text-primary transition-colors truncate">{news.title}</h4>
+                          </div>
+                          <span className="material-symbols-outlined text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all">chevron_right</span>
                         </div>
-                        <h4 className="text-slate-800 font-bold text-lg group-hover:text-primary transition-colors truncate">{news.title}</h4>
                       </div>
-                      <span className="material-symbols-outlined text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all">chevron_right</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-10 flex justify-center">
-                <Button variant="outline" icon="expand_more" className="px-8 group">
-                  더 보기
-                </Button>
+                    ));
+                  })()}
+                </div>
+
+                {/* 페이지네이션 UI - mt-auto를 통해 하단 고정 */}
+                <div className="mt-auto pt-10 mb-16 flex items-center justify-center gap-2">
+                  {(() => {
+                    const totalPages = Math.ceil(searchNewsList.length / itemsPerPage);
+                    return (
+                      <>
+                        <button 
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          disabled={currentPage === 1}
+                          className={`size-9 flex items-center justify-center rounded-xl transition-all ${currentPage === 1 ? 'text-slate-200 cursor-not-allowed' : 'text-slate-400 hover:bg-slate-100 hover:text-primary'}`}
+                        >
+                          <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                        </button>
+                        {[...Array(totalPages)].map((_, i) => (
+                          <button
+                            key={i + 1}
+                            onClick={() => {
+                              setCurrentPage(i + 1);
+                              // 페이지 이동 시 상단으로 스크롤 (원할 경우 추가)
+                              document.querySelector('section')?.scrollTo({ top: 300, behavior: 'smooth' });
+                            }}
+                            className={`size-9 flex items-center justify-center rounded-xl text-[14px] font-bold transition-all ${
+                              currentPage === i + 1 
+                                ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' 
+                                : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'
+                            }`}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
+                        <button 
+                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                          disabled={currentPage === totalPages}
+                          className={`size-9 flex items-center justify-center rounded-xl transition-all ${currentPage === totalPages ? 'text-slate-200 cursor-not-allowed' : 'text-slate-400 hover:bg-slate-100 hover:text-primary'}`}
+                        >
+                          <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                        </button>
+                      </>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
           </div>
