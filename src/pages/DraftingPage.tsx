@@ -1,11 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import Layout from '../layouts/Layout'
-import { draftingQuotes } from '../mocks/draftingData'
 import Button from '../components/ui/Button'
 import { useDraftStore } from '../stores/useDraftStore'
 import Breadcrumb from '../components/ui/Breadcrumb'
 import { chatWithAI } from '../api/drafting'
+import { fetchIssueDraft } from '../api/issues'
+import { PreGeneratedDraft, SidebarQuote } from '../types/analysis'
+import { buildMediaColorMap } from '../utils/mediaColors'
+import DOMPurify from 'dompurify'
 
 interface ChatMessage {
   role: 'user' | 'ai';
@@ -25,6 +28,10 @@ const DraftingPage = () => {
   ])
   const [inputMessage, setInputMessage] = useState('')
   const [isChatLoading, setIsChatLoading] = useState(false)
+  const [sidebarQuotes, setSidebarQuotes] = useState<SidebarQuote[]>([])
+  const [searchParams] = useSearchParams()
+  const issueId = searchParams.get('id') || '1'
+  
   const editorRef = useRef<HTMLDivElement>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const resizeRafRef = useRef<number | null>(null)
@@ -34,12 +41,83 @@ const DraftingPage = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // 초기 본문 설정 (한 번만 실행)
+  // 실제 데이터 로드 및 본문 생성
+  useEffect(() => {
+    const loadDraft = async () => {
+      try {
+        const data = await fetchIssueDraft(issueId)
+        
+        if (!data.pre_generated_draft) return
+
+        let draft: PreGeneratedDraft
+        try {
+          draft = JSON.parse(data.pre_generated_draft)
+        } catch {
+          console.error('초안 JSON 파싱 실패')
+          return
+        }
+
+        setTitle(draft.title)
+        
+        // 0. 언론사별 통합 색상 맵 생성 (사이드바와 본문 동기화용)
+        const cards = data.claim_cards ?? []
+        const allMedia = [
+          ...cards.map(c => c.press),
+          ...draft.contentions.flatMap(c => c.media_views.map(v => v.press))
+        ]
+        const mediaColorMap = buildMediaColorMap(allMedia)
+        
+        // 1. 사이드바 인용구 매핑
+        const mappedQuotes: SidebarQuote[] = cards.map((card) => {
+          const scheme = mediaColorMap[card.press]
+          return {
+            id: card.id,
+            media: card.press,
+            bg: scheme.bg,
+            textColor: scheme.text,
+            borderColor: scheme.border,
+            text: card.claim,
+            evidence: card.evidence,
+            links: [card.url]
+          }
+        })
+        setSidebarQuotes(mappedQuotes)
+        
+        // 2. HTML 본문 생성
+        let html = `<p class="mb-4">${draft.introduction}</p>`
+        
+        draft.contentions.forEach(contention => {
+          html += `<h4 class="font-bold text-slate-900 mt-8 mb-4">${contention.contention_title}</h4>`
+          html += `<p class="mb-4">${contention.conflict_summary}</p>`
+          
+          contention.media_views.forEach(view => {
+            const scheme = mediaColorMap[view.press]
+            const hlClass = scheme ? scheme.hl : 'hl-neutral'
+            html += `<p class="mb-3"><span class="${hlClass}">${view.press}</span>은(는) "${view.claim}"라고 주장하며, "${view.narrative}"라고 전했습니다.</p>`
+          })
+        })
+        
+        html += `<p class="mt-8 pt-4 border-t border-slate-100">${draft.summary}</p>`
+        
+        const safeHtml = DOMPurify.sanitize(html)
+        setContent(safeHtml)
+        if (editorRef.current) {
+          editorRef.current.innerHTML = safeHtml
+        }
+      } catch (e) {
+        console.error('Failed to load draft:', e)
+      }
+    }
+    
+    loadDraft()
+  }, [issueId, setTitle, setContent])
+
+  // 초기 본문 설정 (store의 content가 있을 때 반영)
   useEffect(() => {
     if (editorRef.current && content && editorRef.current.innerHTML !== content) {
       editorRef.current.innerHTML = content
     }
-  }, [])
+  }, [content])
 
   const handleEditorInput = () => {
     if (editorRef.current) {
@@ -255,7 +333,7 @@ const DraftingPage = () => {
                 />
               </div>
               <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
-                {draftingQuotes.map(quote => (
+                {sidebarQuotes.map(quote => (
                   <div key={quote.id} className={`bg-white border-l-4 ${quote.borderColor} rounded shadow-sm overflow-hidden group px-3 py-2.5`}>
                     <details className="source-details group/details text-left">
                       <summary className="source-summary list-none outline-none cursor-pointer mb-2">
@@ -275,13 +353,16 @@ const DraftingPage = () => {
                       <div className="bg-slate-50 rounded-lg p-2.5 mb-3 border border-slate-100 text-left">
                         <p className="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-tight flex items-center gap-1">
                           <span className="material-symbols-outlined text-[10px]">list_alt</span>
-                          참조 원문 기사 리스트
+                          참조 근거 및 원문 기사
                         </p>
+                        <div className="space-y-2 mb-3">
+                          <p className="text-[12px] text-slate-600 leading-relaxed bg-white p-2 rounded border border-slate-100">{quote.evidence}</p>
+                        </div>
                         <div className="space-y-2">
-                          {quote.links.map((link, idx) => (
-                             <div key={idx} className="flex items-start gap-2 text-[12px] text-slate-600 hover:text-primary leading-tight transition-colors cursor-pointer">
+                          {quote.links.map((link: string, idx: number) => (
+                             <div key={idx} className="flex items-start gap-2 text-[12px] text-slate-600 hover:text-primary leading-tight transition-colors cursor-pointer" onClick={() => window.open(link, '_blank')}>
                               <span className="material-symbols-outlined text-[12px] mt-0.5 opacity-40 shrink-0">open_in_new</span>
-                              <span>{link}</span>
+                              <span className="truncate w-full">{link}</span>
                             </div>
                           ))}
                         </div>
@@ -290,6 +371,11 @@ const DraftingPage = () => {
                     <p className="text-[13px] leading-relaxed text-slate-700 font-medium line-clamp-3 text-left">{quote.text}</p>
                   </div>
                 ))}
+                {sidebarQuotes.length === 0 && (
+                  <div className="py-10 text-center text-slate-400 text-sm">
+                    인용할 수 있는 핵심 정보가 없습니다.
+                  </div>
+                )}
               </div>
               <div className="p-5 border-t border-slate-200 bg-white text-left">
                 <div className="flex items-center justify-between mb-4">

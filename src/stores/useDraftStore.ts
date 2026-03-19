@@ -14,7 +14,7 @@ interface DraftState {
 export const useDraftStore = create<DraftState>()(
   persist(
     (set) => ({
-      title: '정청래발 ‘합당 파동’ 중단… 당내 갈등·정략적 리더십 상처만 남았다',
+      title: '',
       content: '', // 실제 에디터 내용은 AnalysisPage 등에서 넘어옴
       lastSaved: null,
       setTitle: (title) => set({ title }),

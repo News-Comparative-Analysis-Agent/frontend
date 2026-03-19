@@ -3,7 +3,7 @@ import StanceBadge from './StanceBadge'
 
 interface OpinionCardProps {
   media: string
-  stance: 'progressive' | 'neutral' | 'conservative'
+  color?: 'indigo' | 'violet' | 'emerald' | 'cyan' | 'slate'
   title: string
   analysisTitle: string
   description: string
@@ -14,20 +14,22 @@ interface OpinionCardProps {
  * 기사 분석 페이지에서 사용되는 개별 의견 카드 컴포넌트입니다.
  * StanceBadge와 연동되어 일관된 디자인을 유지합니다.
  */
-const OpinionCard = ({ media, stance, title, analysisTitle, description, sources }: OpinionCardProps) => {
+const OpinionCard = ({ media, color = 'slate', title, analysisTitle, description, sources }: OpinionCardProps) => {
   const innerBoxStyles = {
-    progressive: 'bg-blue-50/30 border-blue-100',
-    neutral: 'bg-slate-50 border-slate-200',
-    conservative: 'bg-red-50/30 border-red-100',
+    indigo: 'bg-indigo-50/40 border-indigo-100',
+    violet: 'bg-violet-50/40 border-violet-100',
+    emerald: 'bg-emerald-50/40 border-emerald-100',
+    cyan: 'bg-cyan-50/40 border-cyan-100',
+    slate: 'bg-slate-50/40 border-slate-100',
   }
 
   return (
     <div className="opinion-card transition-all duration-300">
-      <StanceBadge stance={stance}>
+      <StanceBadge color={color}>
         {media}
       </StanceBadge>
       <h4 className="text-[20px] font-bold text-slate-900 leading-[1.3] mb-6" dangerouslySetInnerHTML={{ __html: title }}></h4>
-      <div className={`inner-analysis-box ${innerBoxStyles[stance]}`}>
+      <div className={`inner-analysis-box ${innerBoxStyles[color]}`}>
         <div className="font-bold text-slate-900 text-[16px] mb-2">{analysisTitle}</div>
         <p className="text-[14.5px] text-slate-600 leading-relaxed font-medium">{description}</p>
       </div>
