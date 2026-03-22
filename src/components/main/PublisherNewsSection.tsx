@@ -1,0 +1,147 @@
+import React from 'react'
+import { NewsArticle } from '../../types'
+
+interface PublisherNewsSectionProps {
+  loading: boolean
+  error: string | null
+  newsData: Record<string, NewsArticle[]>
+  selectedMedia: string[]
+  handleMediaChange: (media: string) => void
+  filteredPublishers: string[]
+}
+
+const PUBLISHER_STYLES: Record<string, { borderColor: string; color: string; textColor: string }> = {
+  '조선일보': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
+  '한겨레': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
+  '경향신문': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
+  '동아일보': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
+  '연합뉴스': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
+}
+const DEFAULT_STYLE = { borderColor: 'border-slate-400', color: 'bg-slate-400', textColor: 'text-primary' }
+const PUBLISHER_ORDER = ['조선일보', '한겨레', '경향신문', '동아일보', '연합뉴스']
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop'
+
+const PublisherNewsSection = ({
+  loading, error, newsData, selectedMedia, handleMediaChange, filteredPublishers
+}: PublisherNewsSectionProps) => {
+  return (
+    <div className="w-full xl:w-[54%] flex flex-col">
+      <div className="h-[135px] flex flex-col">
+        <div className="flex items-center justify-between h-8 mb-1">
+          <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">
+            각 언론사별 현재 인기 뉴스에요
+          </h2>
+        </div>
+        <div className="flex items-center gap-1.5 mt-3.5 mb-2 text-[12px] text-slate-500 font-medium opacity-90">
+          <span className="material-symbols-outlined text-[14px] text-primary">info</span>
+          필터를 선택하여 원하는 언론사의 인기 뉴스만 골라볼 수 있어요.
+        </div>
+        <div className="w-full h-px bg-slate-100 mb-2"></div>
+
+        <div className="mt-auto pb-2">
+          <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-full w-full no-scrollbar overflow-x-auto border border-slate-200/50 shadow-inner">
+            <button 
+              onClick={() => handleMediaChange('전체')}
+              className={`flex-1 min-w-[70px] py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${
+                selectedMedia.length === 5 
+                  ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
+              }`}
+              style={selectedMedia.length === 5 ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
+            >
+              전체
+            </button>
+            {PUBLISHER_ORDER.map(media => (
+              <button 
+                key={media}
+                onClick={() => handleMediaChange(media)}
+                className={`flex-1 min-w-[70px] py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${
+                  selectedMedia.includes(media) 
+                    ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100' 
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
+                }`}
+                style={selectedMedia.includes(media) ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
+              >
+                {media.replace('신문', '').replace('일보', '')}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+          {[1, 2].map(i => (
+            <div key={i} className="animate-pulse space-y-3">
+              <div className="h-3 w-20 bg-slate-200 rounded" />
+              <div className="w-full aspect-video bg-slate-200 rounded-xl" />
+              <div className="h-4 bg-slate-200 rounded w-3/4" />
+              {[...Array(5)].map((_, j) => <div key={j} className="h-3 bg-slate-100 rounded" />)}
+            </div>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="flex flex-col h-[820px]">
+          <div className="flex flex-col items-center justify-center py-16 text-slate-400 gap-2 flex-1">
+            <span className="material-symbols-outlined text-5xl">wifi_off</span>
+            <p className="text-sm font-medium">{error}</p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+          {filteredPublishers.map(publisher => {
+            const articles = newsData[publisher] ?? []
+            const style = PUBLISHER_STYLES[publisher] ?? DEFAULT_STYLE
+            return (
+              <div key={publisher} className="shadow-premium-card p-6 transition-all duration-300 group/card">
+                <div className={`border-t-[3px] ${style.borderColor} mb-5`}></div>
+                <div className="flex items-center justify-between mb-5">
+                  <h4 className="text-lg font-bold text-slate-700 flex items-center gap-1 group-hover/card:text-primary transition-colors">
+                    {publisher} <span className="material-symbols-outlined text-sm group-hover/card:translate-x-1 transition-transform">chevron_right</span>
+                  </h4>
+                </div>
+                <div className="space-y-0 divide-y divide-slate-50">
+                  {articles.map((article, idx) => (
+                    <a
+                      key={article.id}
+                      href={article.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${idx === 0 ? 'pb-6 pt-1 border-b border-slate-100 block' : 'py-2.5 flex gap-3 items-baseline'} group/item cursor-pointer`}
+                    >
+                      {idx === 0 ? (
+                        <>
+                          <div className="relative w-full aspect-video mb-3 overflow-hidden rounded-xl bg-slate-100">
+                            <img
+                              alt={article.title}
+                              className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-500"
+                              src={article.image_url || DEFAULT_IMAGE}
+                              onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
+                            />
+                            <div className={`absolute top-2 left-2 size-7 ${style.color} text-white flex items-center justify-center font-bold rank-number rounded shadow-md text-xs`}>1</div>
+                          </div>
+                          <h5 className={`text-[14px] font-bold text-slate-900 leading-snug group-hover/item:${style.textColor} transition-colors line-clamp-2`}>
+                            {article.title}
+                          </h5>
+                        </>
+                      ) : (
+                        <>
+                          <span className="rank-number text-xs font-bold text-slate-400 w-4 text-center shrink-0">{idx + 1}</span>
+                          <p className={`text-[12.5px] font-medium text-slate-700 truncate flex-1 group-hover/item:${style.textColor} transition-colors`}>
+                            {article.title}
+                          </p>
+                        </>
+                      )}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default PublisherNewsSection
