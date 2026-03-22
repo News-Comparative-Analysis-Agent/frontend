@@ -5,6 +5,7 @@ export interface MediaView {
   url: string;
   argument_summary: string;
   narrative: string;
+  title?: string;
 }
 
 export interface Contention {
@@ -27,6 +28,7 @@ export interface ClaimCard {
   claim: string;
   evidence: string;
   url: string;
+  title?: string;
 }
 
 export interface IssueAnalysisResponse {

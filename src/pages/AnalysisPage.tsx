@@ -22,6 +22,7 @@ const AnalysisPage = () => {
   const [candidateImages, setCandidateImages] = useState<string[]>([])
   const [imageIndex, setImageIndex] = useState(0)
   const [issueImage, setIssueImage] = useState<string | null>(null)
+  const [sourceArticles, setSourceArticles] = useState<Record<string, any[]>>({})
   
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -47,6 +48,7 @@ const AnalysisPage = () => {
         ])
         
         setAnalysisData(analysisRes)
+        setSourceArticles(newsRes)
         
         // 초안 파싱
         if (analysisRes.pre_generated_draft) {
@@ -106,6 +108,22 @@ const AnalysisPage = () => {
     }
   }
 
+  // 헬퍼: URL로 기사 제목 찾기
+  const findArticleTitle = (url: string, press: string) => {
+    // 1. 해당 언론사 뉴스에서 먼저 찾기
+    const mediaNews = sourceArticles[press] || [];
+    const found = mediaNews.find((a: any) => a.url === url);
+    if (found) return found.title;
+
+    // 2. 전체 뉴스에서 찾기 (혹시 모르니)
+    const allArticles = Object.values(sourceArticles).flat();
+    const foundGlobal = allArticles.find((a: any) => a.url === url);
+    if (foundGlobal) return foundGlobal.title;
+
+    // 3. 대체제: 언론사명 + 원문 기사
+    return `${press} 원문 기사`;
+  };
+
   // 1. pre_generated_draft 기반 데이터 매핑
   const draftOpinions = parsedDraft?.contentions.flatMap(contention => 
     contention.media_views.map((view, idx) => ({
@@ -114,7 +132,10 @@ const AnalysisPage = () => {
       title: view.narrative.split('.')[0] + '.',
       analysisTitle: view.claim,
       description: view.narrative,
-      sources: [{ title: view.claim, url: view.url }]
+      sources: [{ 
+        title: view.title || findArticleTitle(view.url, view.press), 
+        url: view.url 
+      }]
     }))
   ) || []
 
@@ -125,7 +146,10 @@ const AnalysisPage = () => {
     title: card.claim,
     analysisTitle: "보도 내용 및 주장",
     description: card.evidence,
-    sources: [{ title: card.claim, url: card.url }]
+    sources: [{ 
+      title: card.title || findArticleTitle(card.url, card.press), 
+      url: card.url 
+    }]
   }))
 
   // 우선순위: draftOpinions가 있으면 그것을 사용, 없으면 cardOpinions 사용
@@ -188,13 +212,17 @@ const AnalysisPage = () => {
           
           <header className="relative mb-2 min-h-[170px] flex items-center overflow-hidden rounded-3xl bg-slate-50 border border-slate-100 shadow-sm">
             {/* 기사 이미지 영역 (하단 New Feature Area 박스 시작점과 위치 동적 일치) */}
-            <div className={`absolute inset-y-0 right-0 ${analysisData.media_ratio ? 'w-[50%]' : 'w-[25%]'} z-0 h-full bg-white overflow-hidden`}>
+            <div className={`absolute inset-y-0 right-0 ${analysisData.media_ratio ? 'w-[35%]' : 'w-[25%]'} z-0 h-full overflow-hidden`}>
               {issueImage && (
                 <img 
                   src={issueImage} 
                   alt="Issue Visual Context" 
                   onLoad={handleImageLoad}
-                  className="w-full h-full object-contain object-right" 
+                  className="w-full h-full object-cover object-right select-none"
+                  style={{
+                    WebkitMaskImage: 'linear-gradient(to right, transparent, black 40%)',
+                    maskImage: 'linear-gradient(to right, transparent, black 40%)'
+                  }}
                 />
               )}
             </div>
@@ -265,49 +293,45 @@ const AnalysisPage = () => {
           </div>
 
           <section className="mb-2">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between bg-[#F9FAFB] border border-slate-100 rounded-3xl px-8 py-4 mb-2 gap-8">
-              <div className="flex flex-col gap-1.5 text-left flex-1">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between bg-[#F9FAFB] border border-slate-100 rounded-3xl px-8 py-4 mb-2 gap-8 shadow-sm">
+              <div className="flex flex-col gap-1 text-left flex-1">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center size-8 bg-primary rounded-full shadow-sm shadow-primary/20">
+                  <div className="flex items-center justify-center size-8 bg-primary rounded-xl shadow-lg shadow-primary/20">
                     <span className="material-symbols-outlined text-[18px] text-white">newspaper</span>
                   </div>
                   <h3 className="text-[20px] font-bold text-slate-900 tracking-tight whitespace-nowrap">언론사별 주요 논조</h3>
                 </div>
-                <div className="w-full mt-2 bg-white px-5 py-3 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4 text-left">
-                  <p className="text-[15px] text-slate-600 leading-relaxed font-medium">
+                <div className="pl-11">
+                  <p className="text-[14px] text-slate-500 leading-relaxed font-medium">
                     원하는 언론사의 관점만 골라보세요.
                   </p>
                 </div>
               </div>
               
-              <div className="flex flex-col items-start gap-3 bg-white p-3 rounded-xl border border-slate-100 shadow-sm shrink-0">
-                <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-full scroll-smooth overflow-x-auto no-scrollbar max-w-[500px] border border-slate-200/30 shadow-inner">
+              <div className="flex items-center gap-1 p-1 bg-slate-200/50 rounded-2xl border border-slate-200/30 shrink-0">
+                <button
+                  onClick={() => setActiveMedia('all')}
+                  className={`px-5 py-2 rounded-xl text-[14px] font-bold transition-all whitespace-nowrap ${
+                    activeMedia === 'all'
+                      ? 'bg-white text-primary shadow-premium border border-slate-100'
+                      : 'text-slate-500 hover:text-slate-800 hover:bg-white/30'
+                  }`}
+                >
+                  전체
+                </button>
+                {uniqueMediaList.map(media => (
                   <button
-                    onClick={() => setActiveMedia('all')}
-                    className={`px-4 py-1.5 rounded-full text-[15px] font-medium transition-all whitespace-nowrap ${
-                      activeMedia === 'all'
-                        ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
-                        : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
+                    key={media}
+                    onClick={() => setActiveMedia(media)}
+                    className={`px-5 py-2 rounded-xl text-[14px] font-bold transition-all whitespace-nowrap ${
+                      activeMedia === media
+                        ? 'bg-white text-primary shadow-premium border border-slate-100'
+                        : 'text-slate-500 hover:text-slate-800 hover:bg-white/30'
                     }`}
-                    style={activeMedia === 'all' ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
                   >
-                    전체
+                    {media}
                   </button>
-                  {uniqueMediaList.map(media => (
-                    <button
-                      key={media}
-                      onClick={() => setActiveMedia(media)}
-                      className={`px-4 py-1.5 rounded-full text-[15px] font-medium transition-all whitespace-nowrap ${
-                        activeMedia === media
-                          ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
-                          : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
-                      }`}
-                      style={activeMedia === media ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
-                    >
-                      {media}
-                    </button>
-                  ))}
-                </div>
+                ))}
               </div>
             </div>
 
