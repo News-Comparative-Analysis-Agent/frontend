@@ -9,9 +9,9 @@ const Footer = () => {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 grayscale opacity-50 cursor-pointer" onClick={() => navigate('/')}>
             <span className="material-symbols-outlined text-sm font-bold">hub</span>
-            <span className="font-bold">인사이트 허브</span>
+            <span className="font-bold">포커스</span>
           </div>
-          <p className="font-bold">© 2024 Insight Hub Engine. All Rights Reserved.</p>
+          <p className="font-bold">© 2024 FOC-US Engine. All Rights Reserved.</p>
         </div>
         <div className="flex items-center gap-6 uppercase font-bold tracking-tight">
           <a className="hover:text-primary transition-colors" href="#">서비스 약관</a>

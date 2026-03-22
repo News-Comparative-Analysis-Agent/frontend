@@ -8,22 +8,22 @@ import { fetchDailyIssues } from '../api/issues'
 import { NewsArticle } from '../types'
 import { DailyIssuesResponse } from '../types/issues'
 
-// 언론사별 색상 설정 (진한 회색으로 통일)
+// 언론사별 색상 설정 (호버 시 주황색 포인트 복구)
 const PUBLISHER_STYLES: Record<string, { borderColor: string; color: string; textColor: string }> = {
-  '조선일보': { borderColor: 'border-slate-500',   color: 'bg-slate-600',   textColor: 'text-slate-900' },
-  '한겨레':   { borderColor: 'border-slate-500',    color: 'bg-slate-600',    textColor: 'text-slate-900' },
-  '경향신문': { borderColor: 'border-slate-500',  color: 'bg-slate-600',  textColor: 'text-slate-900' },
-  '동아일보': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-slate-900' },
-  '연합뉴스': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-slate-900' },
+  '조선일보': { borderColor: 'border-slate-500',   color: 'bg-slate-600',   textColor: 'text-primary' },
+  '한겨레':   { borderColor: 'border-slate-500',    color: 'bg-slate-600',    textColor: 'text-primary' },
+  '경향신문': { borderColor: 'border-slate-500',  color: 'bg-slate-600',  textColor: 'text-primary' },
+  '동아일보': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
+  '연합뉴스': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
 }
-const DEFAULT_STYLE = { borderColor: 'border-slate-400', color: 'bg-slate-400', textColor: 'text-slate-600' }
+const DEFAULT_STYLE = { borderColor: 'border-slate-400', color: 'bg-slate-400', textColor: 'text-primary' }
 const PUBLISHER_ORDER = ['조선일보', '한겨레', '경향신문', '동아일보', '연합뉴스']
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop'
 
 const MainPage = () => {
   const navigate = useNavigate()
-  const [selectedMedia, setSelectedMedia] = useState<string[]>(['조선일보', '한겨레'])
+  const [selectedMedia, setSelectedMedia] = useState<string[]>(PUBLISHER_ORDER)
   const [activePopularTab, setActivePopularTab] = useState<'integrated' | 'chartout'>('integrated')
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
@@ -101,7 +101,7 @@ const MainPage = () => {
     <Layout>
       <div className="animate-page-in">
         {/* Hero */}
-        <section className="bg-primary h-[180px] flex flex-col justify-center">
+        <section className="bg-primary h-[180px] flex flex-col justify-center relative z-10 hero-depth-shadow">
           <div className="max-w-[1400px] w-full mx-auto px-6 flex items-center justify-between gap-24">
             <div className="flex-1 text-left shrink-0">
               <h2 className="text-4xl font-extrabold text-white tracking-tight leading-[1.3] break-keep">
@@ -109,28 +109,28 @@ const MainPage = () => {
               </h2>
             </div>
             <div className="flex flex-row items-start gap-8 py-6 flex-[2]">
-              <div className="flex flex-col items-start gap-2 flex-1 relative cursor-pointer" onClick={() => navigate('/')}>
+              <div className="flex flex-col items-start gap-2 flex-1 relative">
                 <span className="flex items-center justify-center size-14 rounded-full bg-white text-primary text-2xl font-black shadow-glow ring-4 ring-white/30 shrink-0">1</span>
                 <div className="text-left">
                   <p className="text-[18px] font-black text-white leading-none">주제 선택</p>
                    <p className="text-[13px] text-white mt-1.5 leading-snug font-medium opacity-90">주제를 선택하거나 검색해 보세요.</p>
                 </div>
               </div>
-              <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70 cursor-pointer hover:opacity-100 transition-opacity" onClick={() => navigate('/analysis')}>
+              <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70">
                 <span className="flex items-center justify-center size-10 rounded-full bg-white/20 text-white text-lg font-bold border border-white/30 shrink-0">2</span>
                 <div className="text-left">
                   <p className="text-[16px] font-bold text-white leading-none">심층 분석</p>
                   <p className="text-[12px] text-white/80 mt-2 leading-snug font-normal">진보/보수 관점을 비교 분석합니다.</p>
                 </div>
               </div>
-              <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70 cursor-pointer hover:opacity-100 transition-opacity" onClick={() => navigate('/drafting')}>
+              <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70">
                 <span className="flex items-center justify-center size-10 rounded-full bg-white/20 text-white text-lg font-bold border border-white/30 shrink-0">3</span>
                 <div className="text-left">
                   <p className="text-[16px] font-bold text-white leading-none">초안 작성</p>
                   <p className="text-[12px] text-white/80 mt-2 leading-snug font-normal">AI가 기사 초안을 작성합니다.</p>
                 </div>
               </div>
-              <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70 cursor-pointer hover:opacity-100 transition-opacity -ml-6" onClick={() => navigate('/final-review')}>
+              <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70 -ml-6">
                 <span className="flex items-center justify-center size-10 rounded-full bg-white/20 text-white text-lg font-bold border border-white/30 shrink-0">4</span>
                 <div className="text-left">
                    <p className="text-[16px] font-bold text-white leading-none">최종 검토</p>
@@ -145,9 +145,9 @@ const MainPage = () => {
         <div className="max-w-[1400px] mx-auto px-6 pt-8">
           <div className="flex items-center justify-between border-b-2 border-slate-900/5 pb-6">
             <SectionHeader
-              icon="trending_up"
+              icon="pulse_dot"
               title="오늘의 뉴스 트렌드"
-              description="2026.02.23 14:00 기준 / 1시간마다 업데이트"
+              description="2026.02.23 14:00 기준"
             />
             <div className="relative w-[380px] focus-within:w-[480px] transition-all duration-500 ease-out group">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
@@ -156,7 +156,7 @@ const MainPage = () => {
               <input
                 id="search-input"
                 className="w-full pl-10 pr-10 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all bg-white shadow-sm placeholder:text-slate-400"
-                placeholder="찾는 뉴스가 있으신가요?"
+                placeholder="포커스에서 분석하고 싶은 뉴스를 검색해보세요"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -183,9 +183,9 @@ const MainPage = () => {
 
         {/* 뉴스 본문 */}
         <div className="max-w-[1400px] mx-auto px-6 pb-12 pt-6">
-          <div className="flex flex-col xl:flex-row gap-10 items-start">
+          <div className="flex flex-col xl:flex-row gap-4 items-start">
 
-            <div className="w-full xl:w-[55%] flex flex-col">
+            <div className="w-full xl:w-[54%] flex flex-col">
               <div className="h-[135px] flex flex-col">
                 <div className="flex items-center justify-between h-8 mb-1">
                   <h2 
@@ -200,16 +200,17 @@ const MainPage = () => {
                 </div>
                 <div className="w-full h-px bg-slate-100 mb-2"></div>
 
-                {/* 필터 카테고리 바 - 간격 최적화 및 높이 통일 */}
+                {/* 필터 카테고리 바 - 사용자가 준 사진처럼 스타일 리뉴얼 */}
                 <div className="mt-auto pb-2">
-                  <div className="flex items-center gap-2 p-1.5 bg-slate-300/80 rounded-xl w-full no-scrollbar overflow-x-auto shadow-sm">
+                  <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-full w-full no-scrollbar overflow-x-auto border border-slate-200/50 shadow-inner">
                     <button 
                       onClick={() => handleMediaChange('전체')}
-                      className={`flex-1 min-w-[64px] py-1.5 rounded-lg text-[13px] font-bold transition-all duration-300 ${
+                      className={`flex-1 min-w-[70px] py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${
                         selectedMedia.length === 5 
-                          ? 'bg-white text-slate-900 shadow-sm transform scale-[1.02]' 
-                          : 'text-slate-500 hover:text-slate-700'
+                          ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
+                          : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
                       }`}
+                      style={selectedMedia.length === 5 ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
                     >
                       전체
                     </button>
@@ -217,11 +218,12 @@ const MainPage = () => {
                       <button 
                         key={media}
                         onClick={() => handleMediaChange(media)}
-                        className={`flex-1 min-w-[64px] py-1.5 rounded-lg text-[13px] font-bold transition-all duration-300 ${
+                        className={`flex-1 min-w-[70px] py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${
                           selectedMedia.includes(media) 
-                            ? 'bg-white text-slate-900 shadow-sm transform scale-[1.02]' 
-                            : 'text-slate-500 hover:text-slate-700'
+                            ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100' 
+                            : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
                         }`}
+                        style={selectedMedia.includes(media) ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
                       >
                         {media.replace('신문', '').replace('일보', '')}
                       </button>
@@ -250,16 +252,16 @@ const MainPage = () => {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                   {filteredPublishers.map(publisher => {
                     const articles = newsData[publisher] ?? []
                     const style = PUBLISHER_STYLES[publisher] ?? DEFAULT_STYLE
                     return (
-                      <div key={publisher} className="news-board-card text-left">
-                        <div className={`border-t-[3px] ${style.borderColor} mb-3`}></div>
-                        <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-lg font-bold text-slate-600 flex items-center gap-1">
-                            {publisher} <span className="material-symbols-outlined text-sm">chevron_right</span>
+                      <div key={publisher} className="shadow-premium-card p-6 transition-all duration-300 group/card">
+                        <div className={`border-t-[3px] ${style.borderColor} mb-5`}></div>
+                        <div className="flex items-center justify-between mb-5">
+                          <h4 className="text-lg font-bold text-slate-700 flex items-center gap-1 group-hover/card:text-primary transition-colors">
+                            {publisher} <span className="material-symbols-outlined text-sm group-hover/card:translate-x-1 transition-transform">chevron_right</span>
                           </h4>
                         </div>
                         <div className="space-y-0 divide-y divide-slate-50">
@@ -269,30 +271,27 @@ const MainPage = () => {
                               href={article.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className={`${idx === 0 ? 'pb-6 pt-1 border-b border-slate-100 block' : 'py-2.5 flex gap-3 items-baseline'} group cursor-pointer`}
+                              className={`${idx === 0 ? 'pb-6 pt-1 border-b border-slate-100 block' : 'py-2.5 flex gap-3 items-baseline'} group/item cursor-pointer`}
                             >
                               {idx === 0 ? (
                                 <>
                                   <div className="relative w-full aspect-video mb-3 overflow-hidden rounded-xl bg-slate-100">
                                     <img
                                       alt={article.title}
-                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                      className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-500"
                                       src={article.image_url || DEFAULT_IMAGE}
                                       onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
                                     />
-                                    <div className={`absolute top-2 left-2 size-7 ${style.color} text-white flex items-center justify-center font-bold rank-number rounded shadow-md`}>1</div>
+                                    <div className={`absolute top-2 left-2 size-7 ${style.color} text-white flex items-center justify-center font-bold rank-number rounded shadow-md text-xs`}>1</div>
                                   </div>
-                                  <h5 className={`text-[15px] font-bold text-slate-900 leading-snug group-hover:${style.textColor} transition-colors`}>
+                                  <h5 className={`text-[14px] font-bold text-slate-900 leading-snug group-hover/item:${style.textColor} transition-colors line-clamp-2`}>
                                     {article.title}
                                   </h5>
-                                  {article.reporter && (
-                                    <p className="text-[11px] text-slate-400 mt-1">{article.reporter} 기자</p>
-                                  )}
                                 </>
                               ) : (
                                 <>
                                   <span className="rank-number text-xs font-bold text-slate-400 w-4 text-center shrink-0">{idx + 1}</span>
-                                  <p className={`text-[13px] font-medium text-slate-700 truncate flex-1 group-hover:${style.textColor}`}>
+                                  <p className={`text-[12.5px] font-medium text-slate-700 truncate flex-1 group-hover/item:${style.textColor} transition-colors`}>
                                     {article.title}
                                   </p>
                                 </>
@@ -307,7 +306,7 @@ const MainPage = () => {
               )}
             </div>
 
-            <div className="xl:flex-1 min-w-0 border-l border-slate-100 pl-10 flex flex-col text-left">
+            <div className="xl:flex-1 min-w-0 border-l border-slate-100 pl-4 flex flex-col text-left">
               <div className="h-[135px] flex flex-col">
                 <div className="flex items-center justify-between h-8 mb-1">
                   <h2 
@@ -323,29 +322,31 @@ const MainPage = () => {
                 </div>
                 <div className="w-full h-px bg-slate-100 mb-2"></div>
                 
-                {/* Popular Tabs - 간격 최적화 및 높이 통일 */}
+                {/* Popular Tabs - 리뉴얼 스타일 적용 */}
                 <div className="mt-auto pb-2">
-                  <div className="flex items-center gap-2 p-1.5 bg-slate-300/80 rounded-xl w-full shadow-sm">
+                  <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-full w-full border border-slate-200/50 shadow-inner">
                     <button 
                       onClick={() => setActivePopularTab('integrated')}
-                      className={`flex-1 py-1.5 rounded-lg text-[13px] font-bold transition-all duration-300 ${
+                      className={`flex-1 py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${
                         activePopularTab === 'integrated' 
-                          ? 'bg-white text-slate-900 shadow-md transform scale-[1.02]' 
-                          : 'text-slate-500 hover:text-slate-700'
-                      }`}
+                          ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
+                            : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
+                        }`}
+                        style={activePopularTab === 'integrated' ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
                     >
                       실시간 통합 순위
                     </button>
                       <button 
                         onClick={() => setActivePopularTab('chartout')}
-                        className={`flex-1 py-1.5 rounded-lg text-[13px] font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                        className={`flex-1 py-2 rounded-full text-[14px] font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                           activePopularTab === 'chartout' 
-                            ? 'bg-white text-slate-900 shadow-md transform scale-[1.02]' 
-                            : 'text-slate-500 hover:text-slate-700'
+                            ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100' 
+                            : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
                         }`}
+                        style={activePopularTab === 'chartout' ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
                       >
                         차트아웃
-                        <span className="px-1.5 py-0.5 bg-orange-500 text-white text-[9px] rounded-full font-black animate-pulse">OUT</span>
+                        <span className={`px-1.5 py-0.5 text-[9px] rounded-full font-black animate-pulse ${activePopularTab === 'chartout' ? 'bg-white text-orange-500' : 'bg-orange-500 text-white'}`}>OUT</span>
                       </button>
                   </div>
                 </div>
@@ -369,11 +370,11 @@ const MainPage = () => {
                         {/* 통합 인기 1위 */}
                         {dailyIssues.top_issues.length > 0 && (
                           <div 
-                            className="news-board-card group cursor-pointer w-full mb-3" 
+                            className="shadow-premium-card p-6 group cursor-pointer w-full mb-6" 
                             onClick={() => navigate(`/analysis?id=${dailyIssues.top_issues[0].id}`)}
                           >
-                            <div className="border-t-[3px] border-primary"></div>
-                            <div className="flex items-center justify-between mt-3 mb-3">
+                            <div className="border-t-[3px] border-primary mb-5"></div>
+                            <div className="flex items-center justify-between mb-4">
                               <h4 className="text-lg font-bold text-primary flex items-center gap-1 tracking-tight">통합 인기 1위</h4>
                             </div>
                             <div className="pb-4 pt-1 group cursor-pointer border-b border-slate-100">

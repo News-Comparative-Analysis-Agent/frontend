@@ -39,6 +39,7 @@ export interface IssueAnalysisResponse {
   pre_generated_draft: string; // JSON String
   created_at: string;
   claim_cards: ClaimCard[];
+  image_urls?: string[];
 }
 
 /** 초안 작성 페이지 좌측 사이드바의 인용구 카드에 사용되는 타입입니다. */

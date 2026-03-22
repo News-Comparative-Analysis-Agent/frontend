@@ -18,7 +18,11 @@ interface ChatMessage {
 
 const DraftingPage = () => {
   const navigate = useNavigate()
-  const { title, content, setTitle, setContent, saveDraft, lastSaved } = useDraftStore()
+  const { 
+    currentIssueId, title, content, sidebarQuotes, 
+    setIssueId, setTitle, setContent, setSidebarQuotes, 
+    saveDraft, lastSaved 
+  } = useDraftStore()
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true)
   const [chatbotWidth, setChatbotWidth] = useState(320)
   const [isResizing, setIsResizing] = useState(false)
@@ -28,7 +32,6 @@ const DraftingPage = () => {
   ])
   const [inputMessage, setInputMessage] = useState('')
   const [isChatLoading, setIsChatLoading] = useState(false)
-  const [sidebarQuotes, setSidebarQuotes] = useState<SidebarQuote[]>([])
   const [searchParams] = useSearchParams()
   const issueId = searchParams.get('id') || '1'
   
@@ -42,77 +45,90 @@ const DraftingPage = () => {
   }, [messages])
 
   // 실제 데이터 로드 및 본문 생성
-  useEffect(() => {
-    const loadDraft = async () => {
+  const loadingRef = useRef<string | null>(null)
+
+  const loadDraft = useCallback(async () => {
+    if (!issueId || loadingRef.current === issueId) return
+    loadingRef.current = issueId
+
+    try {
+      const data = await fetchIssueDraft(issueId)
+      if (loadingRef.current !== issueId) return
+
+      const cards = data.claim_cards ?? []
+      let draft: PreGeneratedDraft | null = null
       try {
-        const data = await fetchIssueDraft(issueId)
-        
-        if (!data.pre_generated_draft) return
-
-        let draft: PreGeneratedDraft
-        try {
+        if (data.pre_generated_draft) {
           draft = JSON.parse(data.pre_generated_draft)
-        } catch {
-          console.error('초안 JSON 파싱 실패')
-          return
-        }
-
-        setTitle(draft.title)
-        
-        // 0. 언론사별 통합 색상 맵 생성 (사이드바와 본문 동기화용)
-        const cards = data.claim_cards ?? []
-        const allMedia = [
-          ...cards.map(c => c.press),
-          ...draft.contentions.flatMap(c => c.media_views.map(v => v.press))
-        ]
-        const mediaColorMap = buildMediaColorMap(allMedia)
-        
-        // 1. 사이드바 인용구 매핑
-        const mappedQuotes: SidebarQuote[] = cards.map((card) => {
-          const scheme = mediaColorMap[card.press]
-          return {
-            id: card.id,
-            media: card.press,
-            bg: scheme.bg,
-            textColor: scheme.text,
-            borderColor: scheme.border,
-            text: card.claim,
-            evidence: card.evidence,
-            links: [card.url]
-          }
-        })
-        setSidebarQuotes(mappedQuotes)
-        
-        // 2. HTML 본문 생성
-        let html = `<p class="mb-4">${draft.introduction}</p>`
-        
-        draft.contentions.forEach(contention => {
-          html += `<h4 class="font-bold text-slate-900 mt-8 mb-4">${contention.contention_title}</h4>`
-          html += `<p class="mb-4">${contention.conflict_summary}</p>`
-          
-          contention.media_views.forEach(view => {
-            const scheme = mediaColorMap[view.press]
-            const hlClass = scheme ? scheme.hl : 'hl-neutral'
-            html += `<p class="mb-3"><span class="${hlClass}">${view.press}</span>은(는) "${view.claim}"라고 주장하며, "${view.narrative}"라고 전했습니다.</p>`
-          })
-        })
-        
-        html += `<p class="mt-8 pt-4 border-t border-slate-100">${draft.summary}</p>`
-        
-        const safeHtml = DOMPurify.sanitize(html)
-        setContent(safeHtml)
-        if (editorRef.current) {
-          editorRef.current.innerHTML = safeHtml
         }
       } catch (e) {
-        console.error('Failed to load draft:', e)
+        console.error('JSON Parse Error:', e)
       }
-    }
-    
-    loadDraft()
-  }, [issueId, setTitle, setContent])
 
-  // 초기 본문 설정 (store의 content가 있을 때 반영)
+      const allMedia = [
+        ...cards.map(c => c.press),
+        ...(draft?.contentions?.flatMap(c => c.media_views?.map(v => v.press)) || [])
+      ].filter(Boolean)
+      const mediaColorMap = buildMediaColorMap(allMedia)
+      
+      const mappedQuotes: SidebarQuote[] = cards.map((card) => {
+        const scheme = mediaColorMap[card.press] || { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-300', hl: 'hl-neutral' }
+        return {
+          id: card.id,
+          media: card.press,
+          bg: scheme.bg,
+          textColor: scheme.text,
+          borderColor: scheme.border,
+          text: card.claim,
+          evidence: card.evidence,
+          links: [card.url]
+        }
+      })
+      
+      setSidebarQuotes(mappedQuotes)
+
+      if (draft) {
+        setTitle(draft.title || '')
+        let html = `<p class="mb-4">${draft.introduction || ''}</p>`
+        draft.contentions?.forEach(contention => {
+          html += `<h4 class="font-bold text-slate-900 mt-8 mb-4">${contention.contention_title || ''}</h4>`
+          html += `<p class="mb-4">${contention.conflict_summary || ''}</p>`
+          contention.media_views?.forEach(view => {
+            const scheme = mediaColorMap[view.press]
+            const hlClass = scheme ? scheme.hl : 'hl-neutral'
+            html += `<p class="mb-3"><span class="${hlClass}">${view.press || ''}</span>은(는) "${view.claim || ''}"라고 주장하며, "${view.narrative || ''}"라고 전했습니다.</p>`
+          })
+        })
+        html += `<p class="mt-8 pt-4 border-t border-slate-100">${draft.summary || ''}</p>`
+        const safeHtml = DOMPurify.sanitize(html)
+        setContent(safeHtml)
+      }
+    } catch (e) {
+      console.error('Failed to load draft:', e)
+    } finally {
+      loadingRef.current = null
+    }
+  }, [issueId, setSidebarQuotes, setTitle, setContent])
+
+  // 1. 이슈 ID 변경 감지 및 스토어 리셋
+  useEffect(() => {
+    if (issueId !== currentIssueId) {
+      setIssueId(issueId)
+      setTitle('')
+      setContent('')
+      setSidebarQuotes([])
+      loadingRef.current = null
+    }
+  }, [issueId, currentIssueId, setIssueId, setTitle, setContent, setSidebarQuotes])
+
+  // 2. 데이터가 없는 경우 페칭 실행
+  useEffect(() => {
+    if (issueId === currentIssueId && !content && !title && sidebarQuotes.length === 0) {
+      loadDraft()
+    }
+  }, [issueId, currentIssueId, content, title, sidebarQuotes, loadDraft])
+
+  // 3. 스토어의 content와 실제 에디터 DOM 동기화
   useEffect(() => {
     if (editorRef.current && content && editorRef.current.innerHTML !== content) {
       editorRef.current.innerHTML = content
@@ -332,63 +348,33 @@ const DraftingPage = () => {
                   title="사이드바 접기"
                 />
               </div>
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
+              <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
                 {sidebarQuotes.map(quote => (
-                  <div key={quote.id} className={`bg-white border-l-4 ${quote.borderColor} rounded shadow-sm overflow-hidden group px-3 py-2.5`}>
-                    <details className="source-details group/details text-left">
-                      <summary className="source-summary list-none outline-none cursor-pointer mb-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className={`text-[12px] font-bold ${quote.textColor} px-1.5 py-0.5 ${quote.bg} rounded`}>
-                              {quote.media}
-                            </span>
-                            <div className="flex items-center gap-0.5 text-[11px] font-bold text-slate-400 group-hover/details:text-primary transition-colors">
-                              <span className="material-symbols-outlined text-[12px]">link</span>
-                              <span>{quote.links.length}개 출처</span>
-                              <span className="material-symbols-outlined text-[12px] source-arrow transition-transform">chevron_right</span>
-                            </div>
-                          </div>
-                        </div>
-                      </summary>
-                      <div className="bg-slate-50 rounded-lg p-2.5 mb-3 border border-slate-100 text-left">
-                        <p className="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-tight flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[10px]">list_alt</span>
-                          참조 근거 및 원문 기사
-                        </p>
-                        <div className="space-y-2 mb-3">
-                          <p className="text-[12px] text-slate-600 leading-relaxed bg-white p-2 rounded border border-slate-100">{quote.evidence}</p>
-                        </div>
-                        <div className="space-y-2">
-                          {quote.links.map((link: string, idx: number) => (
-                             <div key={idx} className="flex items-start gap-2 text-[12px] text-slate-600 hover:text-primary leading-tight transition-colors cursor-pointer" onClick={() => window.open(link, '_blank')}>
-                              <span className="material-symbols-outlined text-[12px] mt-0.5 opacity-40 shrink-0">open_in_new</span>
-                              <span className="truncate w-full">{link}</span>
-                            </div>
-                          ))}
-                        </div>
+                  <div 
+                    key={quote.id} 
+                    className={`bg-white border-l-4 ${quote.borderColor || 'border-slate-300'} rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden px-4 py-3.5 cursor-pointer`}
+                    onClick={() => quote.links?.[0] && window.open(quote.links[0], '_blank')}
+                  >
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <span className={`text-[10px] font-black uppercase tracking-wider ${quote.textColor || 'text-slate-600'} px-2 py-0.5 ${quote.bg || 'bg-slate-50'} rounded-md border ${quote.borderColor?.replace('border-', 'border-') || 'border-slate-200'} opacity-80`}>
+                        {quote.media}
+                      </span>
+                      <div className="flex items-center gap-0.5 text-[10px] font-bold text-slate-400 hover:text-primary transition-colors">
+                        <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                        <span>원문 보기</span>
                       </div>
-                    </details>
-                    <p className="text-[13px] leading-relaxed text-slate-700 font-medium line-clamp-3 text-left">{quote.text}</p>
+                    </div>
+                    <h4 className="text-[13.5px] leading-relaxed text-slate-700 font-bold transition-colors line-clamp-3 text-left">
+                      {quote.text}
+                    </h4>
                   </div>
                 ))}
                 {sidebarQuotes.length === 0 && (
-                  <div className="py-10 text-center text-slate-400 text-sm">
-                    인용할 수 있는 핵심 정보가 없습니다.
+                  <div className="py-20 flex flex-col items-center justify-center text-slate-300 gap-3">
+                    <span className="material-symbols-outlined text-[40px]">format_quote</span>
+                    <p className="text-sm font-medium">인용할 수 있는 핵심 정보가 없습니다.</p>
                   </div>
                 )}
-              </div>
-              <div className="p-5 border-t border-slate-200 bg-white text-left">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-xs uppercase tracking-widest flex items-center gap-2 text-slate-600">
-                    <span className="material-symbols-outlined text-primary text-lg">content_paste_search</span>
-                    실시간 표절률
-                  </h3>
-                  <span className="text-sm font-bold text-primary">5%</span>
-                </div>
-                <div className="w-full bg-slate-100 rounded-full h-1.5 mb-4 overflow-hidden">
-                  <div className="bg-primary h-full rounded-full transition-all duration-500" style={{ width: '5%' }}></div>
-                </div>
-                <p className="text-xs text-slate-400 leading-tight">다양한 언론사의 보도문을 참고하여 심층적인 기사가 작성되었습니다.</p>
               </div>
             </div>
           </aside>
@@ -414,10 +400,10 @@ const DraftingPage = () => {
                   className="absolute left-8 right-8 h-1 bg-primary rounded-full z-50 pointer-events-none shadow-[0_0_10px_rgba(242,127,13,0.5)] transition-all duration-75"
                   style={{ 
                     top: dropIndicator.index === 0 
-                      ? `${dropIndicator.rect.top - 12 + editorRef.current!.parentElement!.scrollTop - editorRef.current!.parentElement!.getBoundingClientRect().top}px` 
-                      : dropIndicator.index < Array.from(editorRef.current!.children).length
-                        ? `${Array.from(editorRef.current!.children)[dropIndicator.index].getBoundingClientRect().top - 12 + editorRef.current!.parentElement!.scrollTop - editorRef.current!.parentElement!.getBoundingClientRect().top}px`
-                        : `${Array.from(editorRef.current!.children)[dropIndicator.index-1].getBoundingClientRect().bottom + 12 + editorRef.current!.parentElement!.scrollTop - editorRef.current!.parentElement!.getBoundingClientRect().top}px`
+                      ? `${dropIndicator.rect.top - 12 + (editorRef.current?.parentElement?.scrollTop || 0) - (editorRef.current?.parentElement?.getBoundingClientRect().top || 0)}px` 
+                      : dropIndicator.index < Array.from(editorRef.current?.children || []).length
+                        ? `${Array.from(editorRef.current?.children || [])[dropIndicator.index].getBoundingClientRect().top - 12 + (editorRef.current?.parentElement?.scrollTop || 0) - (editorRef.current?.parentElement?.getBoundingClientRect().top || 0)}px`
+                        : `${Array.from(editorRef.current?.children || [])[dropIndicator.index-1].getBoundingClientRect().bottom + 12 + (editorRef.current?.parentElement?.scrollTop || 0) - (editorRef.current?.parentElement?.getBoundingClientRect().top || 0)}px`
                   }}
                 />
               )}
@@ -425,20 +411,12 @@ const DraftingPage = () => {
               <div className="group relative mb-10 w-full">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Article Title</span>
-                  <div className="flex items-center bg-orange-50 border border-orange-100 rounded-lg shadow-sm hover:bg-orange-100 transition-colors group/regen overflow-hidden">
-                    <div className="px-2 py-1.5 border-r border-orange-200 flex items-center justify-center bg-white/50">
-                      <span className="material-symbols-outlined text-[18px] text-primary group-hover/regen:rotate-90 transition-transform duration-500">auto_awesome</span>
-                    </div>
-                    <button className="flex items-center gap-1.5 px-3 py-1.5 text-primary">
-                      <span className="text-xs font-bold whitespace-nowrap">제목 다시 생성</span>
-                    </button>
-                  </div>
                 </div>
                 <textarea 
                   className="w-full bg-transparent border-none text-[28px] font-bold focus:ring-0 resize-none p-0 placeholder-slate-200 leading-snug overflow-hidden" 
                   placeholder="제목을 입력하세요..." 
                   rows={2}
-                  value={title}
+                  value={title || ''}
                   onChange={(e) => setTitle(e.target.value)}
                 />
               </div>
@@ -450,27 +428,10 @@ const DraftingPage = () => {
                 onInput={handleEditorInput}
               >
                 {!content && (
-                  <>
-                    <p className="font-bold text-slate-900 border-b border-slate-100 pb-2 mb-4">[미디어스=고성욱 기자]</p>
-                    <p>
-                      정청래 더불어민주당 대표의 갑작스러운 조국혁신당 합당 추진이 당내 갈등만 남기고 중단됐다. <span className="hl-neutral">주요 일간지들</span>은 명분 없이 절차까지 무시한 정 대표의 불통·독단적 리더십이 불러온 당연한 결과라고 입을 모았다.
-                    </p>
-                    <p>
-                      정 대표는 11일 저녁 비공개 최고위원회의 종료 후 “오늘 민주당 긴급 최고위와 함께 지방선거 전 합당 논의를 중단하기로 결정했다"고 밝혔다. <span className="hl-progressive">경향신문</span>은 이에 대해 "합당 같은 중대사를 충분한 내부 소통과 공감·명분 축적 없이 밀어붙인 데 따른 당연한 결과"라며 비판의 목소리를 높였습니다.
-                    </p>
-                    <p className="relative group">
-                      <span className="hl-conservative">중앙일보</span>는 이번 합당 무산 "정략에 골몰한 정청래의 예고된 결말"이라고 짚으며, 합당 제안이 여권 내 '명·청 갈등'을 수면 위로 부상시키는 부작용만 낳았다고 지적했습니다. 특히 정 대표가 합당을 자신의 당대표 연임을 위한 정치적 입지 강화 수단으로 사용하려 했다는 의혹이 제기되며 당내 신뢰 위기가 극에 달한 점을 꼬집었습니다.
-                    </p>
-                    <p className="relative group">
-                      <span className="hl-progressive">경향신문</span>은 이번 합당 논의 중단 사태를 두고 정청래 법사위원장의 독단적인 의사 결정이 부른 '예고된 참사'라고 규정했습니다. 충분한 당내 합의 과정 없이 추진된 합당 제안이 민주주의 절차를 훼손하고 당내 분열을 야기했다는 비판입니다.
-                    </p>
-                    <p className="relative group">
-                      <span className="hl-conservative">조선일보</span>는 이번 사태의 본질을 <span className="wavy-underline">단순한 해프닝<span className="analysis-tooltip"><span className="block font-bold mb-1 text-primary">윤리 검증 알림</span>당내 '권력 투쟁'의 본질을 희석시킬 수 있는 가벼운 용어입니다. 사안의 중대성을 고려한 표현이 권장됩니다.</span></span>이 아닌 '내부 권력 투쟁'으로 규정했습니다. 8월 전당대회를 앞두고 차기 당권과 공천권을 확보하려는 계파 간 이해관계가 충돌하며 발생한 소모적 이전투구라는 분석입니다.
-                    </p>
-                    <p>
-                      결론적으로 이번 사태는 독단적으로 당을 운영해 온 <span className="wavy-underline">정청래식 리더십<span className="analysis-tooltip"><span className="block font-bold mb-1 text-primary">윤리 검증 알림</span>특정 인물의 리더십 스타일을 비판적인 프레임으로 규정하는 표현입니다. 사실 관계 중심의 서술이 필요합니다.</span></span>이 중대 고비에 직면했음을 상징합니다. 민생 현안이 산적한 가운데 불필요한 내홍으로 국정 동력을 소모했다는 비판을 피하기 어려워 보입니다.
-                    </p>
-                  </>
+                  <div className="flex flex-col items-center justify-center py-20 text-slate-300">
+                    <span className="material-symbols-outlined text-[48px] mb-4 animate-pulse">article</span>
+                    <p className="text-sm font-medium">초안 데이터를 불러오고 있습니다...</p>
+                  </div>
                 )}
               </div>
 
@@ -622,7 +583,7 @@ const DraftingPage = () => {
               <span>임시저장</span>
             </Button>
             <Button 
-              onClick={() => navigate('/final-review')}
+              onClick={() => navigate(`/final-review?id=${issueId}`)}
               size="lg"
               className="px-10"
             >

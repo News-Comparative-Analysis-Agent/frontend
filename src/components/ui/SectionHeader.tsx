@@ -34,18 +34,28 @@ const SectionHeader = ({
           {badge}
         </div>
       )}
-      <div className={`flex items-center gap-2.5 ${isCenter ? 'justify-center' : ''} ${description ? 'mb-2' : ''}`}>
-        {icon && <span className="material-symbols-outlined text-primary text-[28px] font-bold">{icon}</span>}
+      <div className={`flex items-start gap-1.5 ${isCenter ? 'justify-center' : ''} ${description ? 'mb-1' : ''}`}>
+        {icon && (
+          <div className="w-6 shrink-0 flex items-center justify-center pt-1.5">
+            {icon === 'pulse_dot' ? (
+              <div className="size-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_12px_rgba(var(--primary),0.8)] relative after:absolute after:inset-0 after:rounded-full after:animate-ping after:bg-primary/40"></div>
+            ) : (
+              <span className="material-symbols-outlined text-primary text-[22px] font-bold">{icon}</span>
+            )}
+          </div>
+        )}
         <h2 className={`${
           isPageTitle ? 'text-[24px] md:text-[30px]' 
           : titleSize === 'sm' ? 'text-base'
-          : 'text-xl'
-        } font-black text-slate-900 tracking-tight leading-tight`}>{title}</h2>
+          : 'text-[24px]'
+        } font-bold text-slate-900 tracking-tight leading-tight`}>{title}</h2>
       </div>
       {description && (
-        <div className={`flex items-center gap-2 ${isCenter ? 'justify-center' : ''} pl-0`}>
-          {!isCenter && <div className="size-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)] ml-1"></div>}
-          <p className="text-[13px] text-slate-400 font-medium">{description}</p>
+        <div className={`flex items-start gap-1.5 ${isCenter ? 'justify-center' : ''}`}>
+          <div className="w-6 shrink-0 flex items-center justify-center pt-1.5">
+            {!isCenter && <div className="size-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>}
+          </div>
+          <p className="text-[13px] text-slate-400 font-medium leading-relaxed">{description}</p>
         </div>
       )}
     </header>

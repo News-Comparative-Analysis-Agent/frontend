@@ -7,7 +7,7 @@ interface OpinionCardProps {
   title: string
   analysisTitle: string
   description: string
-  sources: string[]
+  sources: { title: string; url: string }[]
 }
 
 /**
@@ -38,11 +38,17 @@ const OpinionCard = ({ media, color = 'slate', title, analysisTitle, description
           <span className="material-symbols-outlined toggle-icon text-[16px]">chevron_right</span>
           <span>관련 원문 기사</span>
         </summary>
-        <div className="notion-toggle-content">
+        <div className="notion-toggle-content px-2">
           {sources.map((source, idx) => (
-            <a key={idx} className="source-link" href="#">
-              <span className="text-[13.5px] font-semibold flex-1 truncate">{source}</span>
-              <span className="material-symbols-outlined text-[14px] opacity-40">open_in_new</span>
+            <a 
+              key={idx} 
+              className="source-link group/link flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-white hover:border-primary/30 transition-all mb-2" 
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="text-[13.5px] font-bold text-slate-700 flex-1 truncate group-hover/link:text-primary transition-colors">{source.title}</span>
+              <span className="material-symbols-outlined text-[16px] text-slate-400 group-hover/link:text-primary">open_in_new</span>
             </a>
           ))}
         </div>

@@ -34,7 +34,7 @@ const DraftListSection = () => {
               </div>
             </div>
             <button
-              onClick={() => navigate('/drafting')}
+              onClick={() => navigate(`/drafting?id=${draft.id}`)}
               className="px-4 py-2 text-slate-600 hover:text-primary hover:bg-primary/5 border border-slate-200 hover:border-primary/20 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all whitespace-nowrap"
             >
               이어서 쓰기{' '}

@@ -14,8 +14,8 @@ const LoginPage: React.FC = () => {
             <div className="size-12 text-primary flex items-center justify-center mb-2">
               <span className="material-symbols-outlined text-4xl font-bold">hub</span>
             </div>
-            <h1 className="text-slate-900 text-xl font-bold tracking-tight">인사이트 허브</h1>
-            <p className="text-slate-400 text-xs font-medium">Insight Hub</p>
+            <h1 className="text-slate-900 text-xl font-bold tracking-tight">포커스</h1>
+            <p className="text-slate-400 text-xs font-medium">FOC-US</p>
           </div>
 
           <form action="#" className="space-y-4" onSubmit={(e) => { e.preventDefault(); navigate('/'); }}>

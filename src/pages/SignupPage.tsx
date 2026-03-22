@@ -15,7 +15,7 @@ const SignupPage: React.FC = () => {
               <span className="material-symbols-outlined text-4xl font-bold">hub</span>
             </div>
             <h1 className="text-slate-900 text-xl font-bold tracking-tight">회원가입</h1>
-            <p className="text-slate-400 text-xs font-medium">Join Insight Hub</p>
+            <p className="text-slate-400 text-xs font-medium">Join FOC-US</p>
           </div>
 
           <form action="#" className="space-y-4" onSubmit={(e) => { e.preventDefault(); navigate('/'); }}>

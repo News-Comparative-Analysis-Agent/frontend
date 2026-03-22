@@ -21,13 +21,29 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
 
   return (
     <header className={`h-16 flex items-center justify-between border-b ${isWhite ? 'border-slate-100 bg-white' : 'border-white/10 bg-primary'} px-4 md:px-8 py-4 shrink-0 sticky top-0 z-[100] relative overflow-hidden`}>
-      <div onClick={() => navigate('/')} className="flex items-center gap-3 w-1/4 cursor-pointer">
-        <div className={`size-8 md:size-9 ${isWhite ? 'bg-primary/10 text-primary' : 'bg-white text-primary'} flex items-center justify-center rounded-xl shadow-sm`}>
-          <span className="material-symbols-outlined text-xl md:text-2xl font-bold">center_focus_strong</span>
+      <div className="flex items-center gap-4 w-1/4">
+        <div onClick={() => navigate('/')} className="flex items-center gap-3 cursor-pointer group">
+          <div className={`size-8 md:size-9 ${isWhite ? 'bg-primary/10 text-primary' : 'bg-white text-primary'} flex items-center justify-center rounded-xl shadow-sm group-hover:scale-110 transition-transform`}>
+            <span className="material-symbols-outlined text-xl md:text-2xl font-bold">center_focus_strong</span>
+          </div>
+          <div>
+            <h1 className={`${isWhite ? 'text-slate-900' : 'text-white'} text-base md:text-lg font-bold leading-tight tracking-tight`}>FOC-US</h1>
+          </div>
         </div>
-        <div>
-          <h1 className={`${isWhite ? 'text-slate-900' : 'text-white'} text-base md:text-lg font-bold leading-tight tracking-tight`}>foc-us</h1>
-        </div>
+        
+        {activeStep && activeStep > 1 && (
+          <button 
+            onClick={() => navigate(-1)}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all ${
+              isWhite 
+                ? 'border-slate-200 text-slate-600 hover:bg-slate-50' 
+                : 'border-white/20 text-white/90 hover:bg-white/10'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span className="text-xs font-bold">뒤로</span>
+          </button>
+        )}
       </div>
 
       <nav className="hidden lg:flex flex-1 justify-center items-center">
@@ -37,8 +53,9 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
             {steps.map((step) => (
               <div 
                 key={step.id} 
-                className="flex items-center gap-2 bg-white px-3 z-10 cursor-pointer" 
-                onClick={() => navigate(step.path)}
+                className={`flex items-center gap-2 bg-white px-3 z-10 transition-all ${
+                  activeStep === step.id ? 'opacity-100' : 'opacity-60'
+                }`}
               >
                 <span className={`flex items-center justify-center size-7 rounded-full text-xs font-bold transition-all ${
                   activeStep === step.id 
@@ -60,15 +77,7 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
         )}
       </nav>
 
-      <div className="flex items-center justify-end gap-3 md:gap-6 w-1/4">
-        {activeStep === 3 && (
-          <button 
-            className="flex items-center gap-2 px-2 md:px-3 py-1.5 bg-orange-50 text-primary border border-orange-200 rounded-lg hover:bg-orange-100 transition-all duration-200 active:scale-95 group"
-          >
-            <span className="material-symbols-outlined text-[18px] group-hover:rotate-180 transition-transform duration-500">refresh</span>
-            <span className="text-[10px] md:text-xs font-bold whitespace-nowrap">초안 다시 생성</span>
-          </button>
-        )}
+      <div className="flex items-center gap-2 md:gap-4 w-1/4 justify-end">
 
         <div 
           className="flex items-center gap-2 md:gap-3 cursor-pointer group"

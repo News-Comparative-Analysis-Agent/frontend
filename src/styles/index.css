@@ -321,3 +321,18 @@ details[open] .source-arrow {
 .shadow-premium {
   box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.05);
 }
+
+.shadow-premium-card {
+  @apply bg-white rounded-[24px];
+  box-shadow: 8px 12px 30px rgba(0, 0, 0, 0.04), 2px 4px 10px rgba(0, 0, 0, 0.02);
+  transition: all 0.4s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.shadow-premium-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 12px 18px 40px rgba(0, 0, 0, 0.06), 4px 8px 15px rgba(0, 0, 0, 0.03);
+}
+
+.hero-depth-shadow {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+}
