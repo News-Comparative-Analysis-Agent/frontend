@@ -34,7 +34,7 @@ const ProfileSection = () => {
         <div className="flex-1 grid grid-cols-2 gap-x-8 gap-y-6">
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">이름</label>
-            <p className="text-lg font-bold text-slate-800">{user?.name ?? '-'}</p>
+            <p className="text-lg font-bold text-slate-800">{user?.nickname ?? '-'}</p>
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">소속 / 직책</label>
