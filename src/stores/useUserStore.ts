@@ -2,23 +2,33 @@ import { create } from 'zustand';
 
 interface UserState {
   isLoggedIn: boolean;
+  accessToken: string | null;
   user: {
-    name: string;
+    nickname: string;
     email: string;
-    role: string;
+    id: number;
+    created_at?: string;
+    role?: string;
     avatar?: string;
   } | null;
-  login: () => void;
+  login: (userData: any, token: string) => void;
   logout: () => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
-  isLoggedIn: true, // 초기 기획안에 맞춰 로그인된 상태로 시작
-  user: {
-    name: '김태현 기자',
-    email: 'politics_editor@insight-hub.com',
-    role: '정치부 차장',
+  isLoggedIn: false,
+  accessToken: null,
+  user: null,
+  login: (userData, token) => {
+    localStorage.setItem('accessToken', token);
+    set({ 
+      isLoggedIn: true,
+      accessToken: token,
+      user: userData
+    });
   },
-  login: () => set({ isLoggedIn: true }),
-  logout: () => set({ isLoggedIn: false, user: null }),
+  logout: () => {
+    localStorage.removeItem('accessToken');
+    set({ isLoggedIn: false, accessToken: null, user: null });
+  },
 }));

@@ -9,7 +9,7 @@ interface HeaderProps {
 const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { user } = useUserStore()
+  const { user, isLoggedIn } = useUserStore()
 
   const issueId = searchParams.get('id') || '1'
   const isWhite = variant === 'white'
@@ -38,7 +38,7 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
   }
 
   return (
-    <header className={`h-16 flex items-center justify-between border-b ${isWhite ? 'border-slate-100 bg-white' : 'border-white/10 bg-primary'} px-4 md:px-8 py-4 shrink-0 sticky top-0 z-[100] relative overflow-hidden`}>
+    <header className={`h-16 flex items-center justify-between ${isWhite ? 'border-b border-slate-100 bg-white' : 'bg-primary'} px-4 md:px-8 py-4 shrink-0 sticky top-0 z-[100] relative overflow-hidden`}>
       <div className="flex items-center gap-4 w-1/4">
         <div onClick={() => navigate('/')} className="flex items-center gap-3 cursor-pointer group">
           <div className={`size-8 md:size-9 ${isWhite ? 'bg-primary/10 text-primary' : 'bg-white text-primary'} flex items-center justify-center rounded-xl shadow-sm group-hover:scale-110 transition-transform`}>
@@ -96,25 +96,39 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
       </nav>
 
       <div className="flex items-center gap-2 md:gap-4 w-1/4 justify-end">
-
-        <div 
-          className="flex items-center gap-2 md:gap-3 cursor-pointer group"
-          onClick={() => navigate('/mypage')}
-        >
-          <div className="text-right hidden sm:block">
-            <p className={`text-[11px] md:text-xs font-bold ${isWhite ? 'text-slate-700' : 'text-white'} group-hover:text-primary transition-colors`}>{user?.name}</p>
-            <p className={`text-[9px] md:text-[10px] ${isWhite ? 'text-slate-400' : 'text-white/60'} font-medium`}>{user?.role}</p>
+        {isLoggedIn ? (
+          <div 
+            className="flex items-center gap-2 md:gap-3 cursor-pointer group"
+            onClick={() => navigate('/mypage')}
+          >
+            <div className="text-right hidden sm:block">
+              <p className={`text-[11px] md:text-xs font-bold ${isWhite ? 'text-slate-700' : 'text-white'} group-hover:text-primary transition-colors`}>{user?.nickname}</p>
+              <p className={`text-[9px] md:text-[10px] ${isWhite ? 'text-slate-400' : 'text-white/60'} font-medium`}>{user?.role || '사용자'}</p>
+            </div>
+            <div className={`size-8 md:size-9 rounded-full ${isWhite ? 'bg-slate-100 border-slate-200' : 'bg-white/20 border-white/10'} overflow-hidden group-hover:border-primary transition-all shadow-sm`}>
+              {user?.avatar ? (
+                <img alt="Profile" className="w-full h-full object-cover" src={user.avatar} />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary">
+                  <span className="material-symbols-outlined">person</span>
+                </div>
+              )}
+            </div>
           </div>
-          <div className={`size-8 md:size-9 rounded-full ${isWhite ? 'bg-slate-100 border-slate-200' : 'bg-white/20 border-white/10'} overflow-hidden group-hover:border-primary transition-all shadow-sm`}>
-            {user?.avatar ? (
-              <img alt="Profile" className="w-full h-full object-cover" src={user.avatar} />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary">
-                <span className="material-symbols-outlined">person</span>
-              </div>
-            )}
+        ) : (
+          <div className="flex items-center gap-2 md:gap-3">
+            <button 
+              onClick={() => navigate('/login')}
+              className={`text-xs md:text-sm font-bold px-5 py-2.5 rounded-xl transition-all ${
+                isWhite 
+                  ? 'text-white bg-slate-900 hover:bg-slate-800 shadow-md shadow-slate-900/10' 
+                  : 'text-primary bg-white hover:bg-white/90 shadow-md shadow-white/10'
+              }`}
+            >
+              로그인
+            </button>
           </div>
-        </div>
+        )}
       </div>
     </header>
   )
