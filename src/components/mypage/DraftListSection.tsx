@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { draftItems } from '../../mocks/mypageData'
 
+/**
+ * 임시 저장 초안 목록 섹션입니다.
+ * TODO: 백엔드 API 연동 후 실제 초안 목록을 불러옵니다.
+ */
 const DraftListSection = () => {
   const navigate = useNavigate()
 
@@ -14,34 +17,19 @@ const DraftListSection = () => {
         </a>
       </div>
 
-      <div className="divide-y divide-slate-100 border-t border-slate-50">
-        {draftItems.map((draft) => (
-          <div
-            key={draft.id}
-            className="py-5 flex items-center justify-between group"
-          >
-            <div className="flex items-center gap-4">
-              <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-primary/5 transition-colors">
-                <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">
-                  description
-                </span>
-              </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-700 group-hover:text-primary transition-colors">
-                  {draft.title}
-                </h4>
-                <p className="text-[12px] text-slate-400 mt-0.5 italic">{draft.lastModified}</p>
-              </div>
-            </div>
-            <button
-              onClick={() => navigate(`/drafting?id=${draft.id}`)}
-              className="px-4 py-2 text-slate-600 hover:text-primary hover:bg-primary/5 border border-slate-200 hover:border-primary/20 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all whitespace-nowrap"
-            >
-              이어서 쓰기{' '}
-              <span className="material-symbols-outlined text-lg">trending_flat</span>
-            </button>
-          </div>
-        ))}
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="size-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-4">
+          <span className="material-symbols-outlined text-slate-300 text-4xl">edit_note</span>
+        </div>
+        <p className="text-slate-500 font-bold mb-1">저장된 초안이 없습니다</p>
+        <p className="text-sm text-slate-400 mb-6">작성 중인 초안을 임시 저장하면 여기에 표시됩니다.</p>
+        <button
+          onClick={() => navigate('/')}
+          className="px-4 py-2 text-slate-600 hover:text-primary hover:bg-primary/5 border border-slate-200 hover:border-primary/20 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all"
+        >
+          새 기사 작성하기{' '}
+          <span className="material-symbols-outlined text-lg">trending_flat</span>
+        </button>
       </div>
     </section>
   )

@@ -1,4 +1,3 @@
-import React from 'react'
 import Button from './Button'
 
 interface ConfirmModalProps {
@@ -12,6 +11,11 @@ interface ConfirmModalProps {
   variant?: 'danger' | 'primary'
 }
 
+const VARIANT_STYLES = {
+  danger: { bg: 'bg-red-50 text-red-500', icon: 'warning' },
+  primary: { bg: 'bg-orange-50 text-primary', icon: 'info' },
+} as const
+
 const ConfirmModal = ({
   isOpen,
   title,
@@ -23,6 +27,8 @@ const ConfirmModal = ({
   variant = 'primary'
 }: ConfirmModalProps) => {
   if (!isOpen) return null
+
+  const { bg, icon } = VARIANT_STYLES[variant]
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -36,11 +42,9 @@ const ConfirmModal = ({
       <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="p-8">
           <div className="flex items-start gap-4 mb-6">
-            <div className={`size-12 rounded-2xl flex items-center justify-center shrink-0 ${
-              variant === 'danger' ? 'bg-red-50 text-red-500' : 'bg-orange-50 text-primary'
-            }`}>
+            <div className={`size-12 rounded-2xl flex items-center justify-center shrink-0 ${bg}`}>
               <span className="material-symbols-outlined text-[28px]">
-                {variant === 'danger' ? 'warning' : 'info'}
+                {icon}
               </span>
             </div>
             <div>

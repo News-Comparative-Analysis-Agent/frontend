@@ -1,10 +1,19 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useUserStore } from '../stores/useUserStore'
+import StepNavigation from '../components/ui/StepNavigation'
+import UserAvatar from '../components/ui/UserAvatar'
 
 interface HeaderProps {
   variant?: 'primary' | 'white'
   activeStep?: 1 | 2 | 3 | 4
 }
+
+const STEPS = [
+  { id: 1, label: '주제 선택', path: '/' },
+  { id: 2, label: '심층 분석', path: '/analysis' },
+  { id: 3, label: '초안 작성', path: '/drafting' },
+  { id: 4, label: '최종 검토', path: '/final-review' },
+] as const
 
 const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
   const navigate = useNavigate()
@@ -14,21 +23,13 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
   const issueId = searchParams.get('id') || '1'
   const isWhite = variant === 'white'
 
-  const steps = [
-    { id: 1, label: '주제 선택', path: '/' },
-    { id: 2, label: '심층 분석', path: '/analysis' },
-    { id: 3, label: '초안 작성', path: '/drafting' },
-    { id: 4, label: '최종 검토', path: '/final-review' },
-  ]
-
   const handleBack = () => {
     if (!activeStep || activeStep === 1) {
       navigate('/')
       return
     }
     
-    // 현재 단계보다 하나 앞의 단계를 찾습니다.
-    const prevStep = steps.find(s => s.id === activeStep - 1)
+    const prevStep = STEPS.find(s => s.id === activeStep - 1)
     if (prevStep) {
       const targetPath = prevStep.id === 1 ? '/' : `${prevStep.path}?id=${issueId}`
       navigate(targetPath)
@@ -66,32 +67,7 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
 
       <nav className="hidden lg:flex flex-1 justify-center items-center">
         {activeStep && (
-          <div className="relative flex items-center gap-6 xl:gap-12">
-            <div className={`absolute h-0.5 ${isWhite ? 'bg-slate-100' : 'bg-white/20'} top-1/2 left-0 right-0 -z-10`}></div>
-            {steps.map((step) => (
-              <div 
-                key={step.id} 
-                className={`flex items-center gap-2 bg-white px-3 z-10 transition-all ${
-                  activeStep === step.id ? 'opacity-100' : 'opacity-60'
-                }`}
-              >
-                <span className={`flex items-center justify-center size-7 rounded-full text-xs font-bold transition-all ${
-                  activeStep === step.id 
-                    ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                    : 'bg-slate-100 text-slate-400'
-                }`}>
-                  {step.id}
-                </span>
-                <span className={`text-sm transition-all ${
-                  activeStep === step.id 
-                    ? 'font-bold text-primary' 
-                    : 'font-medium text-slate-400'
-                }`}>
-                  {step.label}
-                </span>
-              </div>
-            ))}
-          </div>
+          <StepNavigation steps={[...STEPS]} activeStep={activeStep} />
         )}
       </nav>
 
@@ -105,15 +81,11 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
               <p className={`text-[11px] md:text-xs font-bold ${isWhite ? 'text-slate-700' : 'text-white'} group-hover:text-primary transition-colors`}>{user?.nickname}</p>
               <p className={`text-[9px] md:text-[10px] ${isWhite ? 'text-slate-400' : 'text-white/60'} font-medium`}>{user?.role || '사용자'}</p>
             </div>
-            <div className={`size-8 md:size-9 rounded-full ${isWhite ? 'bg-slate-100 border-slate-200' : 'bg-white/20 border-white/10'} overflow-hidden group-hover:border-primary transition-all shadow-sm`}>
-              {user?.avatar ? (
-                <img alt="Profile" className="w-full h-full object-cover" src={user.avatar} />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary">
-                  <span className="material-symbols-outlined">person</span>
-                </div>
-              )}
-            </div>
+            <UserAvatar
+              avatar={user?.avatar}
+              size="sm"
+              className={`${isWhite ? 'bg-slate-100 border-slate-200' : 'bg-white/20 border-white/10'} group-hover:border-primary transition-all shadow-sm border`}
+            />
           </div>
         ) : (
           <div className="flex items-center gap-2 md:gap-3">

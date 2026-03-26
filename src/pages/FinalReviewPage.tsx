@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import Layout from '../layouts/Layout'
 import Button from '../components/ui/Button'
 import SectionHeader from '../components/ui/SectionHeader'
 import { useDraftStore } from '../stores/useDraftStore'
+import { useUserStore } from '../stores/useUserStore'
 import DOMPurify from 'dompurify'
 
 const FinalReviewPage = () => {
@@ -11,11 +12,7 @@ const FinalReviewPage = () => {
   const [searchParams] = useSearchParams()
   const issueId = searchParams.get('id') || '1'
   const { title, content } = useDraftStore()
-  const [highlightedId, setHighlightedId] = useState<string | null>(null)
-
-  const highlightTarget = (id: string | null) => {
-    setHighlightedId(id)
-  }
+  const { user } = useUserStore()
 
   // 데이터가 없으면 작성 페이지로 이동
   useEffect(() => {
@@ -60,8 +57,8 @@ const FinalReviewPage = () => {
               <div className="flex items-center justify-between py-4 border-y border-slate-100">
                 <div className="flex items-center gap-4">
                   <div className="flex flex-col text-left">
-                    <span className="text-xs font-bold text-slate-800">김태현 기자</span>
-                    <span className="text-[11px] text-slate-400">editor@foc-us.com</span>
+                    <span className="text-xs font-bold text-slate-800">{user?.nickname ?? '기자'}</span>
+                    <span className="text-[11px] text-slate-400">{user?.email ?? 'editor@foc-us.com'}</span>
                   </div>
                 </div>
                 <div className="text-right">
