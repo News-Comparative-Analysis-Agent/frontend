@@ -7,6 +7,7 @@ import DraftingLeftSidebar from '../components/drafting/DraftingLeftSidebar'
 import DraftingEditorArea from '../components/drafting/DraftingEditorArea'
 import DraftingChatbot from '../components/drafting/DraftingChatbot'
 import DraftingFooterActions from '../components/drafting/DraftingFooterActions'
+import ConfirmModal from '../components/ui/ConfirmModal'
 
 /**
  * 초안 작성 페이지
@@ -27,8 +28,19 @@ const DraftingPage = () => {
     handleEditorInput, handleMouseDown,
     handleDragStart, handleDragOver, handleDragLeave, handleDrop,
     handleSendMessage, applyModifiedContent,
-    navigate
+    navigate,
+    blocker,
+    temporarySave
   } = useDraftingPage()
+
+  const handleLeaveWithoutSaving = () => {
+    blocker.proceed?.()
+  }
+
+  const handleSaveAndLeave = async () => {
+    await temporarySave()
+    blocker.proceed?.()
+  }
 
   return (
     <Layout variant="white" activeStep={3} hideFooter>
@@ -87,6 +99,18 @@ const DraftingPage = () => {
          saveDraft={saveDraft}
          onFinalReview={() => navigate(`/final-review?id=${issueId}`)}
          formatLastSaved={formatLastSaved}
+      />
+
+      {/* 이탈 방지 확인 모달 */}
+      <ConfirmModal 
+        isOpen={blocker.state === 'blocked'}
+        title="작성 중인 내용이 있습니다"
+        description="저장하지 않고 이동하시겠습니까? 이동하면 작업한 내용이 손실될 수 있습니다."
+        cancelLabel="나가기"
+        confirmLabel="임시저장하기"
+        variant="danger"
+        onCancel={handleLeaveWithoutSaving}
+        onConfirm={handleSaveAndLeave}
       />
     </Layout>
   )

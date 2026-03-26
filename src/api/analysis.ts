@@ -5,7 +5,7 @@
  * TODO: 백엔드 API 명세 확정 후 실제 엔드포인트와 연동 필요
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
+import { API_BASE_URL } from './config';
 
 export interface IssueBackground {
   summary: string;

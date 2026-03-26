@@ -70,7 +70,7 @@ export const useAnalysisPageData = (issueId: string | null) => {
         setCandidateImages(candidates)
         setImageIndex(0)
         setIssueImage(candidates[0] || null)
-        
+
       } catch (err) {
         console.error('Failed to fetch analysis data:', err)
         setError('데이터를 불러오는 중 오류가 발생했습니다.')

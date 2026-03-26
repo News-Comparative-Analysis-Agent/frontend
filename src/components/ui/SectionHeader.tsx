@@ -34,13 +34,15 @@ const SectionHeader = ({
           {badge}
         </div>
       )}
-      <div className={`flex items-start gap-1.5 ${isCenter ? 'justify-center' : ''} ${description ? 'mb-1' : ''}`}>
+      <div className={`flex items-center gap-2 ${isCenter ? 'justify-center' : ''} ${description ? 'mb-1' : ''}`}>
         {icon && (
-          <div className="w-6 shrink-0 flex items-center justify-center pt-1.5">
+          <div className="w-8 shrink-0 flex items-center justify-center">
             {icon === 'pulse_dot' ? (
-              <div className="size-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_12px_rgba(var(--primary),0.8)] relative after:absolute after:inset-0 after:rounded-full after:animate-ping after:bg-primary/40"></div>
+              <div className="size-3 rounded-full bg-primary animate-pulse shadow-[0_0_12px_rgba(var(--primary),0.8)] relative after:absolute after:inset-0 after:rounded-full after:animate-ping after:bg-primary/40"></div>
             ) : (
-              <span className="material-symbols-outlined text-primary text-[22px] font-bold">{icon}</span>
+              <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary text-[18px] font-bold">{icon}</span>
+              </div>
             )}
           </div>
         )}
@@ -51,9 +53,9 @@ const SectionHeader = ({
         } font-bold text-slate-900 tracking-tight leading-tight`}>{title}</h2>
       </div>
       {description && (
-        <div className={`flex items-start gap-1.5 ${isCenter ? 'justify-center' : ''}`}>
-          <div className="w-6 shrink-0 flex items-center justify-center pt-1.5">
-            {!isCenter && <div className="size-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>}
+        <div className={`flex items-center gap-2 ${isCenter ? 'justify-center' : ''}`}>
+          <div className="w-8 shrink-0 flex items-center justify-center">
+            {!isCenter && <div className="size-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>}
           </div>
           <p className="text-[13px] text-slate-400 font-medium leading-relaxed">{description}</p>
         </div>

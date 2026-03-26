@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, useBlocker } from 'react-router-dom'
 import { useDraftStore } from '../stores/useDraftStore'
 import { chatWithAI } from '../api/drafting'
 import { fetchIssueDraft } from '../api/issues'
@@ -21,8 +21,25 @@ export const useDraftingPage = () => {
   const { 
     currentIssueId, title, content, sidebarQuotes, 
     setIssueId, setTitle, setContent, setSidebarQuotes, 
-    saveDraft, lastSaved 
+    saveDraft, lastSaved, isDirty, setIsDirty
   } = useDraftStore()
+
+  // 브라우저 끄기/새로고침 방지
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isDirty])
+
+  // 내부 라우팅 차단
+  const blocker = useBlocker(({ nextLocation }) => {
+    return isDirty && !nextLocation.pathname.startsWith('/drafting')
+  })
 
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true)
   const [chatbotWidth, setChatbotWidth] = useState(320)
@@ -46,9 +63,12 @@ export const useDraftingPage = () => {
 
   const handleEditorInput = useCallback(() => {
     if (editorRef.current) {
-      setContent(editorRef.current.innerHTML)
+      const newContent = editorRef.current.innerHTML
+      if (newContent !== content) {
+        setContent(newContent)
+      }
     }
-  }, [setContent])
+  }, [setContent, content])
 
   const loadDraft = useCallback(async () => {
     if (!issueId || loadingRef.current === issueId) return
@@ -285,7 +305,8 @@ export const useDraftingPage = () => {
     try {
       const response = await chatWithAI({
         message: userMsg,
-        current_content: content
+        current_content: content,
+        issue_id: Number(issueId)
       })
 
       setMessages(prev => [...prev, { 
@@ -312,6 +333,19 @@ export const useDraftingPage = () => {
     if (!lastSaved) return '저장되지 않음'
     const date = new Date(lastSaved)
     return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')} 저장됨`
+  }
+
+  const temporarySave = async () => {
+    console.log('--- [임시저장 API 연동 준비] ---')
+    console.log('이슈 ID:', issueId)
+    console.log('제목:', title)
+    console.log('본문 내용 (HTML):', content)
+    console.log('사이드바 인용구 개수:', sidebarQuotes.length)
+    console.log('발생 시간:', new Date().toISOString())
+    console.log('-------------------------------')
+    
+    // 실제 저장 로직 호출
+    await saveDraft()
   }
 
   return {
@@ -344,6 +378,10 @@ export const useDraftingPage = () => {
     handleDrop,
     handleSendMessage,
     applyModifiedContent,
-    navigate
+    navigate,
+    isDirty,
+    setIsDirty,
+    blocker,
+    temporarySave
   }
 }

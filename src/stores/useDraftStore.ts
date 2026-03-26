@@ -14,31 +14,39 @@ export const useDraftStore = create<DraftState>()(
       content: '', 
       sidebarQuotes: [],
       lastSaved: null,
+      isDirty: false,
 
       // 기본 상태 변경 액션
-      setIssueId: (currentIssueId) => set({ currentIssueId }),
-      setTitle: (title) => set({ title }),
-      setContent: (content) => set({ content }),
-      setSidebarQuotes: (sidebarQuotes) => set({ sidebarQuotes }),
+      setIssueId: (currentIssueId) => set({ currentIssueId, isDirty: false }),
+      setTitle: (title) => set({ title, isDirty: true }),
+      setContent: (content) => set({ content, isDirty: true }),
+      setSidebarQuotes: (sidebarQuotes) => set({ sidebarQuotes, isDirty: true }),
       
       // 기사 인용구 관리 전용 액션 (로직 중앙화)
       addSidebarQuote: (quote) => set((state) => ({
-        sidebarQuotes: [...state.sidebarQuotes, quote]
+        sidebarQuotes: [...state.sidebarQuotes, quote],
+        isDirty: true
       })),
       
       removeSidebarQuote: (quoteId) => set((state) => ({
-        sidebarQuotes: state.sidebarQuotes.filter(q => q.id !== quoteId)
+        sidebarQuotes: state.sidebarQuotes.filter(q => q.id !== quoteId),
+        isDirty: true
       })),
 
       // 저장 및 리셋
-      saveDraft: () => set({ lastSaved: new Date().toISOString() }),
+      saveDraft: async () => {
+        // 실제 API 연동 시 이곳에서 비동기 작업 수행
+        set({ lastSaved: new Date().toISOString(), isDirty: false })
+      },
       resetDraft: () => set({ 
         currentIssueId: null, 
         title: '', 
         content: '', 
         sidebarQuotes: [], 
-        lastSaved: null 
+        lastSaved: null,
+        isDirty: false
       }),
+      setIsDirty: (isDirty) => set({ isDirty }),
     }),
     {
       name: 'draft-storage',

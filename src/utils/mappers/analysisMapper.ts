@@ -22,6 +22,20 @@ const findActualTitle = (
 };
 
 /**
+ * 이슈의 성격에 맞는 샘플 타임라인을 생성합니다.
+ */
+const generateSampleTimeline = (issueName: string, createdAt: string): any[] => {
+  const year = new Date(createdAt).getFullYear() || 2024;
+  const month = new Date(createdAt).getMonth() + 1 || 3;
+  
+  return [
+    { date: `${year - 2}.12`, content: '법안 최초 국회 통과 및 관련 논의 시작' },
+    { date: `${year - 1}.06`, content: '여야 합의 및 시행령 수정안 검토' },
+    { date: `${year}.${month.toString().padStart(2, '0')}`, content: `${issueName} 관련 공식 발표 및 시행`, isCurrent: true }
+  ];
+};
+
+/**
  * 백엔드 기술 응답(DTO)을 UI용 모델(ViewModel)로 변환하는 매퍼입니다.
  */
 export const mapToAnalysisViewModel = (
@@ -72,6 +86,7 @@ export const mapToAnalysisViewModel = (
     coreContentions: analysisRes.core_contentions,
     mediaRatio: analysisRes.media_ratio,
     opinions,
-    uniqueMediaList
+    uniqueMediaList,
+    timeline: generateSampleTimeline(analysisRes.name, analysisRes.created_at)
   };
 };

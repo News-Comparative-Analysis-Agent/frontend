@@ -31,7 +31,7 @@ const OpinionCard = ({ media, color = 'slate', title, analysisTitle, description
       <h4 className="text-[20px] font-bold text-slate-900 leading-[1.3] mb-6" dangerouslySetInnerHTML={{ __html: title }}></h4>
       <div className={`inner-analysis-box ${innerBoxStyles[color]}`}>
         <div className="font-bold text-slate-900 text-[16px] mb-2">{analysisTitle}</div>
-        <p className="text-[14.5px] text-slate-600 leading-relaxed font-medium">{description}</p>
+        <p className="text-[15px] text-slate-600 leading-relaxed font-medium">{description}</p>
       </div>
       <details className="notion-toggle w-full">
         <summary className="notion-toggle-header">

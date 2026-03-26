@@ -23,7 +23,7 @@ const MainSearchHeader = ({ searchQuery, setSearchQuery, onSearch }: MainSearchH
           <input
             id="search-input"
             className="w-full pl-10 pr-10 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all bg-white shadow-sm placeholder:text-slate-400"
-            placeholder="포커스에서 분석하고 싶은 뉴스를 검색해보세요"
+            placeholder="찾는 뉴스가 있으신가요?"
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

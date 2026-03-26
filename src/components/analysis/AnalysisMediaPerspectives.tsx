@@ -31,14 +31,15 @@ const AnalysisMediaPerspectives = ({
           </div>
         </div>
         
-        <div className="flex items-center gap-1 p-1 bg-slate-200/50 rounded-2xl border border-slate-200/30 shrink-0">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-full border border-slate-200/50 shadow-inner shrink-0 no-scrollbar overflow-x-auto">
           <button
             onClick={() => setActiveMedia('all')}
-            className={`px-5 py-2 rounded-xl text-[14px] font-bold transition-all whitespace-nowrap ${
+            className={`px-5 py-2 rounded-full text-[14px] transition-all duration-300 whitespace-nowrap ${
               activeMedia === 'all'
-                ? 'bg-white text-primary shadow-premium border border-slate-100'
-                : 'text-slate-500 hover:text-slate-800 hover:bg-white/30'
+                ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
             }`}
+            style={activeMedia === 'all' ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
           >
             전체
           </button>
@@ -46,11 +47,12 @@ const AnalysisMediaPerspectives = ({
             <button
               key={media}
               onClick={() => setActiveMedia(media)}
-              className={`px-5 py-2 rounded-xl text-[14px] font-bold transition-all whitespace-nowrap ${
+              className={`px-5 py-2 rounded-full text-[14px] transition-all duration-300 whitespace-nowrap ${
                 activeMedia === media
-                  ? 'bg-white text-primary shadow-premium border border-slate-100'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-white/30'
+                  ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
               }`}
+              style={activeMedia === media ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
             >
               {media}
             </button>

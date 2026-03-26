@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import MainPage from '../pages/MainPage'
 import AnalysisPage from '../pages/AnalysisPage'
 import DraftingPage from '../pages/DraftingPage'
@@ -8,19 +8,13 @@ import LoginPage from '../pages/LoginPage'
 import SignupPage from '../pages/SignupPage'
 import MyPage from '../pages/MyPage'
 
-const AppRouter = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<MainPage />} />
-      <Route path="/analysis" element={<AnalysisPage />} />
-      <Route path="/drafting" element={<DraftingPage />} />
-      <Route path="/final-review" element={<FinalReviewPage />} />
-      <Route path="/search" element={<SearchResultsPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/mypage" element={<MyPage />} />
-    </Routes>
-  )
-}
-
-export default AppRouter
+export const router = createBrowserRouter([
+  { path: "/", element: <MainPage /> },
+  { path: "/analysis", element: <AnalysisPage /> },
+  { path: "/drafting", element: <DraftingPage /> },
+  { path: "/final-review", element: <FinalReviewPage /> },
+  { path: "/search", element: <SearchResultsPage /> },
+  { path: "/login", element: <LoginPage /> },
+  { path: "/signup", element: <SignupPage /> },
+  { path: "/mypage", element: <MyPage /> },
+])

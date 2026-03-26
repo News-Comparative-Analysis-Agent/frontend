@@ -6,14 +6,16 @@ export interface DraftState {
   content: string;
   sidebarQuotes: SidebarQuote[];
   lastSaved: string | null;
+  isDirty: boolean;
   
   // Actions
   setIssueId: (id: string | null) => void;
   setTitle: (title: string) => void;
   setContent: (content: string) => void;
   setSidebarQuotes: (quotes: SidebarQuote[]) => void;
-  saveDraft: () => void;
+  saveDraft: () => Promise<void>;
   resetDraft: () => void;
+  setIsDirty: (isDirty: boolean) => void;
   
   // Advanced Actions (Logic Migration)
   addSidebarQuote: (quote: SidebarQuote) => void;

@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router-dom'
 import Layout from '../layouts/Layout'
 import Button from '../components/ui/Button'
 import { useAnalysisPageData } from '../hooks/useAnalysisPageData'
+import Loader from '../components/ui/Loader'
 
 // 하위 컴포넌트 임포트
 import AnalysisHeader from '../components/analysis/AnalysisHeader'
@@ -34,8 +35,11 @@ const AnalysisPage = () => {
   if (loading) return (
     <Layout variant="white" activeStep={2} hideFooter>
       <div className="flex flex-col items-center justify-center h-screen bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-        <p className="text-slate-500 font-medium">심층 분석 데이터를 불러오는 중...</p>
+        <Loader 
+          size="lg" 
+          text="이슈 심층 분석 중..." 
+          subText="잠시만 기다려주시면 얽힌 쟁점들을 깔끔하게 요약해 드릴게요"
+        />
       </div>
     </Layout>
   )
@@ -81,6 +85,7 @@ const AnalysisPage = () => {
             background={viewModel.background}
             coreContentions={viewModel.coreContentions}
             mediaRatio={viewModel.mediaRatio}
+            timeline={viewModel.timeline}
           />
 
           {/* 3. 언론사별 주요 논조 (필터 및 카드 목록) */}

@@ -92,7 +92,7 @@ const FinalReviewPage = () => {
         {/* Quality Review Sidebar */}
         <aside className="w-full lg:w-[420px] border-t lg:border-t-0 lg:border-l border-slate-200 bg-white p-5 pb-24 shrink-0 h-full overflow-y-hidden select-none text-left">
           <SectionHeader 
-            icon="analytics" 
+            icon="fact_check" 
             title="최종 품질 검토 리포트" 
             className="mb-4"
             titleSize="sm"
@@ -103,19 +103,21 @@ const FinalReviewPage = () => {
             {/* Ethics Card */}
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
               <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-green-600 text-xl">gavel</span>
+                <div className="flex items-center gap-3">
+                  <div className="size-8 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-green-600 text-[18px] font-bold">gavel</span>
+                  </div>
                   <h4 className="font-bold text-sm text-slate-800 tracking-tight">윤리 가이드라인 검증</h4>
                 </div>
               </div>
               <div className="p-4 space-y-2 text-left">
-                <div className="flex items-center gap-3 text-xs font-medium text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                  <span className="material-symbols-outlined text-green-500 text-xl font-bold">check_circle</span>
-                  혐오 표현 및 차별적 서술 없음 (검증 완료)
+                <div className="flex items-center gap-2.5 text-xs font-medium text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="material-symbols-outlined text-green-500 text-[18px] font-bold">check_circle</span>
+                  <span className="flex-1 pt-0.5">혐오 표현 및 차별적 서술 없음 (검증 완료)</span>
                 </div>
-                <div className="flex items-center gap-3 text-xs font-medium text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                  <span className="material-symbols-outlined text-green-500 text-xl font-bold">check_circle</span>
-                  부적절한 형용사 및 편향적 단어 배제됨
+                <div className="flex items-center gap-2.5 text-xs font-medium text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <span className="material-symbols-outlined text-green-500 text-[18px] font-bold">check_circle</span>
+                  <span className="flex-1 pt-0.5">부적절한 형용사 및 편향적 단어 배제됨</span>
                 </div>
               </div>
             </div>
@@ -123,16 +125,18 @@ const FinalReviewPage = () => {
             {/* AI Opinion Card - Black Theme */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
               <div className="px-5 py-4 border-b border-slate-800 bg-slate-900 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-xl">psychology</span>
+                <div className="flex items-center gap-3">
+                  <div className="size-8 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-primary text-[18px] font-bold">psychology</span>
+                  </div>
                   <h4 className="font-bold text-sm text-white tracking-tight">AI 최종 종합 의견</h4>
                 </div>
               </div>
               <div className="px-5 py-3">
                 <div className="bg-white/5 rounded-xl p-4 border border-white/5 text-left">
                   <p className="text-[12px] text-slate-300 leading-[1.7] font-medium">
-                    <span className="flex items-center gap-1.5 mb-2 text-primary font-bold">
-                      <span className="material-symbols-outlined text-base">magic_button</span>
+                    <span className="flex items-center gap-1.5 mb-2 text-primary font-bold text-[13px]">
+                      <span className="material-symbols-outlined text-[16px]">verified</span>
                       품질 검증이 완료되었습니다
                     </span>
                     기사의 인용 근거와 팩트 체크가 시스템적으로 검증되었습니다. 각 언론사의 다양한 시각을 균형 있게 반영하고 있으며, 최종 발행이 가능한 수준의 품질이 확보되었습니다.

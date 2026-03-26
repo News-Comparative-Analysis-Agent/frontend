@@ -8,6 +8,12 @@ export interface SourceLink {
   url: string;
 }
 
+export interface TimelineItem {
+  date: string;
+  content: string;
+  isCurrent?: boolean;
+}
+
 export interface OpinionItem {
   media: string;
   color: 'indigo' | 'violet' | 'emerald' | 'cyan' | 'slate';
@@ -26,4 +32,5 @@ export interface AnalysisViewModel {
   mediaRatio: any | null;
   opinions: OpinionItem[];
   uniqueMediaList: string[];
+  timeline?: TimelineItem[];
 }

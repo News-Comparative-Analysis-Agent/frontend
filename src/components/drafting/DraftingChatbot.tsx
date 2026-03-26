@@ -1,4 +1,5 @@
 import React, { RefObject } from 'react'
+import Loader from '../ui/Loader'
 
 interface ChatMessage {
   role: 'user' | 'ai';
@@ -82,12 +83,8 @@ const DraftingChatbot = ({
                 <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-white text-[14px]">smart_toy</span>
                 </div>
-                <div className="bg-slate-100 p-3 rounded-xl rounded-tl-none">
-                  <div className="flex gap-1">
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                    <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
-                  </div>
+                <div className="bg-slate-100 p-3 rounded-xl rounded-tl-none flex items-center justify-center">
+                  <Loader size="sm" className="scale-75" />
                 </div>
               </div>
             )}

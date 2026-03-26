@@ -34,10 +34,10 @@ const Button = ({
   
   // 사이즈별 스타일
   const sizes = {
-    sm: 'px-4 py-1.5 rounded-lg text-[12px]',
-    md: 'px-6 py-2.5 rounded-xl text-sm',
-    lg: 'px-8 py-3 rounded-xl text-base',
-    icon: 'size-11 rounded-xl'
+    sm: 'px-4 py-1.5 rounded-full text-[12px]',
+    md: 'px-6 py-2.5 rounded-full text-sm',
+    lg: 'px-8 py-3 rounded-full text-base',
+    icon: 'size-11 rounded-full'
   }
 
   const combinedClassName = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`

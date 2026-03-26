@@ -29,6 +29,7 @@ export interface SavedDraft {
 export interface ChatRequest {
   message: string;
   current_content: string;
+  issue_id: number;
 }
 
 export interface ChatResponse {

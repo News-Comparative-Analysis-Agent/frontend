@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useUserStore } from '../stores/useUserStore'
 
 interface HeaderProps {
@@ -8,8 +8,10 @@ interface HeaderProps {
 
 const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { user } = useUserStore()
 
+  const issueId = searchParams.get('id') || '1'
   const isWhite = variant === 'white'
 
   const steps = [
@@ -18,6 +20,22 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
     { id: 3, label: '초안 작성', path: '/drafting' },
     { id: 4, label: '최종 검토', path: '/final-review' },
   ]
+
+  const handleBack = () => {
+    if (!activeStep || activeStep === 1) {
+      navigate('/')
+      return
+    }
+    
+    // 현재 단계보다 하나 앞의 단계를 찾습니다.
+    const prevStep = steps.find(s => s.id === activeStep - 1)
+    if (prevStep) {
+      const targetPath = prevStep.id === 1 ? '/' : `${prevStep.path}?id=${issueId}`
+      navigate(targetPath)
+    } else {
+      navigate(-1)
+    }
+  }
 
   return (
     <header className={`h-16 flex items-center justify-between border-b ${isWhite ? 'border-slate-100 bg-white' : 'border-white/10 bg-primary'} px-4 md:px-8 py-4 shrink-0 sticky top-0 z-[100] relative overflow-hidden`}>
@@ -33,7 +51,7 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
         
         {activeStep && activeStep > 1 && (
           <button 
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all ${
               isWhite 
                 ? 'border-slate-200 text-slate-600 hover:bg-slate-50' 
