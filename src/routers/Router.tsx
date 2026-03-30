@@ -7,6 +7,7 @@ import SearchResultsPage from '../pages/SearchResultsPage'
 import LoginPage from '../pages/LoginPage'
 import SignupPage from '../pages/SignupPage'
 import MyPage from '../pages/MyPage'
+import AuthCallbackPage from '../pages/AuthCallbackPage'
 
 export const router = createBrowserRouter([
   { path: "/", element: <MainPage /> },
@@ -17,4 +18,5 @@ export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
   { path: "/signup", element: <SignupPage /> },
   { path: "/mypage", element: <MyPage /> },
+  { path: "/auth/callback", element: <AuthCallbackPage /> },
 ])

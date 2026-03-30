@@ -1,5 +1,5 @@
-import { IssueAnalysisResponse, PreGeneratedDraft } from '../../types/analysis';
-import { AnalysisViewModel, OpinionItem } from '../../types/models/analysis';
+import { IssueAnalysisResponse, PreGeneratedDraft, IssueTimelineResponse } from '../../types/analysis';
+import { AnalysisViewModel, OpinionItem, TimelineItem } from '../../types/models/analysis';
 import { getColorKeyByIndex } from '../mediaColors';
 
 /**
@@ -22,17 +22,36 @@ const findActualTitle = (
 };
 
 /**
- * 이슈의 성격에 맞는 샘플 타임라인을 생성합니다.
+ * 백엔드 타임라인 데이터를 UI용 모델로 변환합니다.
  */
-const generateSampleTimeline = (issueName: string, createdAt: string): any[] => {
-  const year = new Date(createdAt).getFullYear() || 2024;
-  const month = new Date(createdAt).getMonth() + 1 || 3;
-  
-  return [
-    { date: `${year - 2}.12`, content: '법안 최초 국회 통과 및 관련 논의 시작' },
-    { date: `${year - 1}.06`, content: '여야 합의 및 시행령 수정안 검토' },
-    { date: `${year}.${month.toString().padStart(2, '0')}`, content: `${issueName} 관련 공식 발표 및 시행`, isCurrent: true }
-  ];
+const mapTimeline = (
+  timelineData: IssueTimelineResponse | null,
+  currentIssueId: number,
+  fallbackName: string,
+  fallbackDate: string
+): TimelineItem[] => {
+  if (!timelineData || !timelineData.timeline || timelineData.timeline.length === 0) {
+    const dateObj = new Date(fallbackDate);
+    const month = dateObj.getMonth() + 1;
+    const day = dateObj.getDate();
+    return [{ 
+      date: `${month}.${day}`, 
+      content: fallbackName,
+      isCurrent: true 
+    }];
+  }
+
+  return timelineData.timeline.map(event => {
+    const dateObj = new Date(event.created_at);
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    const day = dateObj.getDate().toString().padStart(2, '0');
+    
+    return {
+      date: `${month}.${day}`,
+      content: event.name,
+      isCurrent: event.id === currentIssueId
+    };
+  });
 };
 
 /**
@@ -41,7 +60,8 @@ const generateSampleTimeline = (issueName: string, createdAt: string): any[] => 
 export const mapToAnalysisViewModel = (
   analysisRes: IssueAnalysisResponse,
   parsedDraft: PreGeneratedDraft | null,
-  sourceArticles: Record<string, any[]>
+  sourceArticles: Record<string, any[]>,
+  timelineData?: IssueTimelineResponse | null
 ): AnalysisViewModel => {
   
   // 1. 초안(Draft) 기반으로 의견 목록 생성
@@ -87,6 +107,6 @@ export const mapToAnalysisViewModel = (
     mediaRatio: analysisRes.media_ratio,
     opinions,
     uniqueMediaList,
-    timeline: generateSampleTimeline(analysisRes.name, analysisRes.created_at)
+    timeline: mapTimeline(timelineData || null, analysisRes.id, analysisRes.name, analysisRes.created_at)
   };
 };

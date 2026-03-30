@@ -17,8 +17,18 @@ export async function fetchWithTimeout<T>(
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
+    const token = localStorage.getItem('accessToken');
+    const headers = {
+      ...(options?.headers || {}),
+    } as Record<string, string>;
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       ...options,
+      headers,
       signal: controller.signal,
     });
 

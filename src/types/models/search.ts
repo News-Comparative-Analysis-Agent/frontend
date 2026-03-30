@@ -9,10 +9,23 @@ export interface NlpSearchArticle {
   matching_keywords: string[];
 }
 
+export interface NlpSearchTopic {
+  id: number;
+  title: string;
+  content: string;
+  related_articles: string[];
+}
+
+export interface NlpSearchStructured {
+  intro: string;
+  topics: NlpSearchTopic[];
+}
+
 export interface NlpSearchData {
   original_query: string;
   generated_keywords: string[];
   ai_summary: string;
+  ai_summary_structured?: NlpSearchStructured;
   total_results: number;
   articles: NlpSearchArticle[];
   by_source: Record<string, number>;

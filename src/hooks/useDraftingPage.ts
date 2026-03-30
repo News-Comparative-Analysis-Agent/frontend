@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDraftStore } from '../stores/useDraftStore'
-import { fetchIssueDraft } from '../api/issues'
-import { PreGeneratedDraft, SidebarQuote } from '../types/analysis'
+import { fetchIssueDraft, fetchDraftImages } from '../api/issues'
+import { PreGeneratedDraft, SidebarQuote, DraftImage } from '../types/analysis'
 import { buildMediaColorMap } from '../utils/mediaColors'
 import { buildDraftHtml } from '../utils/buildDraftHtml'
 
@@ -27,6 +27,7 @@ export const useDraftingPage = () => {
   const { panelWidth: chatbotWidth, isResizing, handleResizeStart: handleMouseDown } = usePanelResize()
 
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true)
+  const [draftImages, setDraftImages] = useState<DraftImage[]>([])
   const editorRef = useRef<HTMLDivElement>(null)
   const loadingRef = useRef<string | null>(null)
 
@@ -100,6 +101,17 @@ export const useDraftingPage = () => {
       loadingRef.current = null
     }
   }, [issueId, setSidebarQuotes, setTitle, setContent])
+  
+  // --- 이미지 로딩 ---
+  const loadImages = useCallback(async () => {
+    if (!issueId) return
+    try {
+      const images = await fetchDraftImages(issueId)
+      setDraftImages(images)
+    } catch (e) {
+      console.error('Failed to load draft images:', e)
+    }
+  }, [issueId])
 
   // --- 이슈 전환 감지 ---
   useEffect(() => {
@@ -117,7 +129,10 @@ export const useDraftingPage = () => {
     if (issueId === currentIssueId && !content && !title && sidebarQuotes.length === 0) {
       loadDraft()
     }
-  }, [issueId, currentIssueId, content, title, sidebarQuotes, loadDraft])
+    if (issueId === currentIssueId && draftImages.length === 0) {
+      loadImages()
+    }
+  }, [issueId, currentIssueId, content, title, sidebarQuotes, draftImages.length, loadDraft, loadImages])
 
   // --- 에디터 DOM 동기화 ---
   useEffect(() => {
@@ -155,6 +170,7 @@ export const useDraftingPage = () => {
     lastSaved,
     saveDraft,
     formatLastSaved,
+    draftImages,
     isLeftSidebarOpen,
     setIsLeftSidebarOpen,
     chatbotWidth,

@@ -31,7 +31,7 @@ const ProfileSection = () => {
         {/* 회원 정보 */}
         <div className="flex-1 grid grid-cols-2 gap-x-8 gap-y-6">
           <ProfileInfoField label="이름" value={user?.nickname} />
-          <ProfileInfoField label="소속 / 직책" value={user?.role} />
+          {/* 소속 / 직책 필드 제거됨 */}
           <ProfileInfoField label="이메일 주소" colSpan={2}>
             <div className="flex items-center justify-between">
               <p className="text-lg font-medium text-slate-600">{user?.email ?? '-'}</p>

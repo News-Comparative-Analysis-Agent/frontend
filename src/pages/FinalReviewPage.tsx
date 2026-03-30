@@ -22,7 +22,7 @@ const FinalReviewPage = () => {
   }, [title, content, navigate, issueId])
 
   const safeContent = DOMPurify.sanitize(content)
-
+  
   return (
     <Layout variant="white" activeStep={4} hideFooter>
       <div className="bg-white border-b border-slate-50 px-4 md:px-8 py-3 shrink-0">

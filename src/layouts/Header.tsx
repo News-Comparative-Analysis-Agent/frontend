@@ -18,7 +18,7 @@ const STEPS = [
 const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { user, isLoggedIn } = useUserStore()
+  const { user, isLoggedIn, logout } = useUserStore()
 
   const issueId = searchParams.get('id') || '1'
   const isWhite = variant === 'white'
@@ -73,19 +73,33 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
 
       <div className="flex items-center gap-2 md:gap-4 w-1/4 justify-end">
         {isLoggedIn ? (
-          <div 
-            className="flex items-center gap-2 md:gap-3 cursor-pointer group"
-            onClick={() => navigate('/mypage')}
-          >
-            <div className="text-right hidden sm:block">
-              <p className={`text-[11px] md:text-xs font-bold ${isWhite ? 'text-slate-700' : 'text-white'} group-hover:text-primary transition-colors`}>{user?.nickname}</p>
-              <p className={`text-[9px] md:text-[10px] ${isWhite ? 'text-slate-400' : 'text-white/60'} font-medium`}>{user?.role || '사용자'}</p>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button 
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
+              className={`text-[10px] md:text-[11px] font-bold px-3 py-1.5 rounded-lg border transition-all ${
+                isWhite 
+                  ? 'border-slate-200 text-slate-500 hover:bg-slate-50' 
+                  : 'border-white/20 text-white/90 hover:bg-white/10'
+              }`}
+            >
+              로그아웃
+            </button>
+            <div 
+              className="flex items-center gap-2 md:gap-3 cursor-pointer group"
+              onClick={() => navigate('/mypage')}
+            >
+              <div className="text-right hidden sm:block">
+                <p className={`text-[11px] md:text-xs font-bold ${isWhite ? 'text-slate-700' : 'text-white'} group-hover:text-primary transition-colors`}>{user?.nickname}</p>
+              </div>
+              <UserAvatar
+                avatar={user?.avatar}
+                size="sm"
+                className={`${isWhite ? 'bg-slate-100 border-slate-200' : 'bg-white/20 border-white/10'} group-hover:border-primary transition-all shadow-sm border`}
+              />
             </div>
-            <UserAvatar
-              avatar={user?.avatar}
-              size="sm"
-              className={`${isWhite ? 'bg-slate-100 border-slate-200' : 'bg-white/20 border-white/10'} group-hover:border-primary transition-all shadow-sm border`}
-            />
           </div>
         ) : (
           <div className="flex items-center gap-2 md:gap-3">

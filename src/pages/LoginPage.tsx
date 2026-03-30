@@ -1,20 +1,45 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../api/config'
+import { useUserStore } from '../stores/useUserStore'
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
+  const { isLoggedIn, login } = useUserStore()
+
+  // 이미 로그인된 상태라면 메인 페이지로 자동 이동
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/')
+    }
+  }, [isLoggedIn, navigate])
 
   const handleSocialLogin = (provider: 'google' | 'kakao') => {
-    // TODO: 실제 API 연동 시 아래 정보를 프로젝트 환경 변수로 설정하세요.
-    // Google Client ID: [YOUR_GOOGLE_CLIENT_ID]
-    // Kakao App Key: [YOUR_KAKAO_APP_KEY]
-    // Redirect URI: http://localhost:5173/auth/callback
+    // 1. 현재 브라우저의 주소(localhost 또는 배포주소)를 가져와 리다이렉트 주소 생성
+    const redirectUri = `${window.location.origin}/auth/callback`;
     
-    console.log(`${provider} 로그인 시도...`);
-    alert(`${provider} 로그인 API 연동이 준비되었습니다. 실제 API 키를 설정하면 연동이 완료됩니다.`);
+    // 2. 서버의 인증 엔드포인트로 이동 (redirect_uri 파라미터를 포함하여 서버가 다시 보내줄 위치를 알림)
+    // 서버 엔드포인트는 일반적인 관례에 따라 /api/auth/{provider}로 가정합니다.
+    const loginUrl = `${API_BASE_URL}/api/auth/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}`;
     
-    // 임시로 로그인 상태로 전환 (테스트용)
-    // navigate('/');
+    console.log(`${provider} 로그인 시도... -> ${loginUrl}`);
+    
+    // 실제 서버 주소로 이동 (OAuth 댄스 시작)
+    window.location.href = loginUrl;
+  };
+
+  const handleDevLogin = () => {
+    // 가짜 유저 정보와 토큰으로 즉시 로그인 처리
+    const dummyUser = {
+      nickname: 'Guest 개발자',
+      email: 'dev@test.com',
+      id: 0,
+      avatar: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+    };
+    const dummyToken = 'dev_mock_token_12345';
+    
+    // 스토어의 login 함수를 호출하여 상태 변경 (useEffect가 감지하여 리다이렉트함)
+    login(dummyUser, dummyToken);
   };
 
   return (
@@ -89,13 +114,20 @@ const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-8 text-center flex flex-col items-center gap-3">
           <div className="flex items-center justify-center gap-2 opacity-30">
             <span className="size-1 bg-emerald-500 rounded-full"></span>
             <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">
               System Secure
             </span>
           </div>
+          
+          <button 
+            onClick={handleDevLogin}
+            className="px-4 py-1.5 rounded-full border border-slate-200 text-slate-400 text-[10px] font-bold hover:bg-slate-50 hover:text-primary transition-all shadow-sm"
+          >
+            [개발자용] 로그인 건너뛰기
+          </button>
         </div>
       </main>
     </div>

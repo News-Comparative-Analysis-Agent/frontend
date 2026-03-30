@@ -1,4 +1,5 @@
 import React, { RefObject } from 'react'
+import { DraftImage } from '../../types/analysis'
 
 interface DraftingEditorAreaProps {
   title: string
@@ -11,12 +12,27 @@ interface DraftingEditorAreaProps {
   handleDrop: (e: React.DragEvent) => void
   dropIndicator: { index: number; rect: DOMRect | null }
   handleDragStart: (e: React.DragEvent, url: string, media: string) => void
+  draftImages: DraftImage[]
 }
 
 const DraftingEditorArea = ({
   title, setTitle, content, editorRef, handleEditorInput,
-  handleDragOver, handleDragLeave, handleDrop, dropIndicator, handleDragStart
+  handleDragOver, handleDragLeave, handleDrop, dropIndicator, handleDragStart,
+  draftImages
 }: DraftingEditorAreaProps) => {
+
+  const handleEditorClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    const deleteBtn = target.closest('.editor-delete-btn');
+    if (deleteBtn) {
+      const wrapper = deleteBtn.closest('.relative.group');
+      if (wrapper) {
+        wrapper.remove();
+        handleEditorInput();
+      }
+    }
+  };
+
   return (
     <section 
       className="flex-1 overflow-y-auto custom-scrollbar bg-white relative min-h-0 text-left"
@@ -53,9 +69,10 @@ const DraftingEditorArea = ({
 
         <div 
           ref={editorRef}
-          className="space-y-6 text-[16px] leading-[1.8] text-slate-700 focus:outline-none" 
+          className="space-y-6 text-[16px] leading-[1.8] text-slate-700 focus:outline-none drafting-editor" 
           contentEditable="true"
           onInput={handleEditorInput}
+          onClick={handleEditorClick}
         >
           {!content && (
             <div className="flex flex-col items-center justify-center py-20 text-slate-300">
@@ -78,25 +95,27 @@ const DraftingEditorArea = ({
               <p className="text-[11px] font-bold text-primary">이미지를 본문에 드래그하여 삽입하세요</p>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-3">
-            {[
-              { id: 1, media: '연합뉴스', url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDY33rzUtzizNkambfkpf7PrbmaCPi3Vs2XhrFST7J9j0Auo6ROoJdI99n39p8kX3QyEEUtTFw75VImv0O4NvrIXq7CP2ZKyO8NbkqCkZWvxbEuti95lCCVBtBSHUVRbhJUC4-VdAA96qxNc_KRHTo_MGtnkhEZxjymY8608LA8RGNGJcovh3J3VhAUB4vyUA2L3SC7YvAK7EHrW114yDftkTUpbD47aXsHvTyjTFWeLDGYtAqFdkUtvQPbmkio8Z-MJGKA70SaKR0' },
-              { id: 2, media: '중앙일보', url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBTH5_zsN3VhlYXQHLzSA4rz7aZsg6BXywdnp0NYxbkOQW4PfhG40NpXDK_1E6ntCfOKi4r1xLsVm4LUxsqmKonCtXh4rDGb7KimC_I6NTWdLcs6UsQWcjSOHTnltFP2d-k9gf8Evx70u0OHENUSXbBX1IUZpYQWIf8OF-E8Wod_Fm0MRpIc3UwhtkQVncU9vsD-crZolcZLknAz2J5iQfPf6G3_12I-SP2_NjCaE-OxIwSJabTA0G70XPIBAp7IfYEGw1RSetfVCo' },
-              { id: 3, media: '조선일보', url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBAC0PIARJCfi-y5DtCzhSV5jKG_I---yFnHfW5SVJkciM1xPymzoAyCbzw0RJ7aloMzdE4LYl5onPqs_MDKhj5AJTb05YP4T9H88YU01Z4kwwSRPjNRVdwCbRRokdmiT7hFF2x-Si9uEpkfIKAviXLJ6vGD4YZYbxPLKEvEszOq7FyZUPmLmmzoMyCcEn_CGlXP3XVrOPd9ooVbspDGvCNpHo_f5Jti3UzFgkC-iPY0oJUtEOQJn3TWlqN8of-rnmPrIAatz5lqWs' },
-              { id: 4, media: '동아일보', url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBtS6C_-dLN1_nRN01H5ykacQWw1aodmT40-cBvVmRYo-qePP6GDRoqk0n8DtVAytgpnrEj_smAjDoLHOlu3bAgKBwu3mxNRzzjuEXSIkL7jv-NZGJNwqEG2D5WClXcR--GctBEgjWyH2sGST9IbaogAkiVxJ5fvETk3IzEu6GLS7Y_b8maxHTv-_7zFMA50dX-cRq485TWPGoMJ1nze-Hchrr39fMeE1mhTXm1BaBldHVQ8EqIv5dAhE7YAr5XOQbwVe6HVwL18Xc' }
-            ].map(item => (
+            <div className="flex flex-nowrap gap-4 overflow-x-auto custom-scrollbar-h pb-4 -mx-1 px-1">
+            {draftImages.map((item, idx) => (
               <div 
-                key={item.id} 
-                className="group relative flex flex-col gap-2 cursor-grab active:cursor-grabbing"
+                key={`${item.url}-${idx}`} 
+                className="group relative flex flex-col gap-2 cursor-grab active:cursor-grabbing flex-shrink-0 w-44"
                 draggable="true"
-                onDragStart={(e) => handleDragStart(e, item.url, item.media)}
+                onDragStart={(e) => handleDragStart(e, item.url, item.publisher)}
               >
                 <div className="aspect-video rounded-lg overflow-hidden border border-slate-200 bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
-                  <img alt={item.media} className="w-full h-full object-cover" src={item.url} />
+                  <img alt={item.publisher} className="w-full h-full object-cover" src={item.url} />
                 </div>
-                <span className="text-[10px] font-medium text-slate-500 text-center">{item.media}</span>
+                <span className="text-[10px] font-medium text-slate-500 text-center truncate px-1" title={item.title}>
+                  {item.publisher}
+                </span>
               </div>
             ))}
+            {draftImages.length === 0 && (
+              <div className="w-full py-8 text-center text-slate-300 text-xs font-medium bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                표시할 관련 미디어가 없습니다.
+              </div>
+            )}
           </div>
         </div>
         

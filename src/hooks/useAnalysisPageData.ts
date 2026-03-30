@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { fetchIssueAnalysis, fetchDailyIssues } from '../api/issues'
+import { fetchIssueAnalysis, fetchDailyIssues, fetchIssueTimeline } from '../api/issues'
 import { fetchTopNewsByPublisher } from '../api/news'
-import { IssueAnalysisResponse, PreGeneratedDraft } from '../types/analysis'
+import { IssueAnalysisResponse, PreGeneratedDraft, IssueTimelineResponse } from '../types/analysis'
 import { mapToAnalysisViewModel } from '../utils/mappers/analysisMapper'
 import { AnalysisViewModel } from '../types/models/analysis'
 
 export const useAnalysisPageData = (issueId: string | null) => {
   const navigate = useNavigate()
   const [analysisData, setAnalysisData] = useState<IssueAnalysisResponse | null>(null)
+  const [timelineData, setTimelineData] = useState<IssueTimelineResponse | null>(null)
   const [parsedDraft, setParsedDraft] = useState<PreGeneratedDraft | null>(null)
   const [sourceArticles, setSourceArticles] = useState<Record<string, any[]>>({})
   
@@ -31,14 +32,16 @@ export const useAnalysisPageData = (issueId: string | null) => {
     const loadData = async () => {
       try {
         setLoading(true)
-        const [analysisRes, issuesRes, newsRes] = await Promise.all([
+        const [analysisRes, issuesRes, newsRes, timelineRes] = await Promise.all([
           fetchIssueAnalysis(issueId),
           fetchDailyIssues(),
-          fetchTopNewsByPublisher()
+          fetchTopNewsByPublisher(),
+          fetchIssueTimeline(issueId)
         ])
         
         setAnalysisData(analysisRes)
         setSourceArticles(newsRes)
+        setTimelineData(timelineRes)
         
         if (analysisRes.pre_generated_draft) {
           try {
@@ -85,8 +88,8 @@ export const useAnalysisPageData = (issueId: string | null) => {
   // 매퍼를 사용하여 ViewModel 생성
   const viewModel: AnalysisViewModel | null = useMemo(() => {
     if (!analysisData) return null;
-    return mapToAnalysisViewModel(analysisData, parsedDraft, sourceArticles);
-  }, [analysisData, parsedDraft, sourceArticles]);
+    return mapToAnalysisViewModel(analysisData, parsedDraft, sourceArticles, timelineData);
+  }, [analysisData, parsedDraft, sourceArticles, timelineData]);
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;

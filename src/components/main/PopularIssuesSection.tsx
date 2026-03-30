@@ -271,10 +271,8 @@ const PopularIssuesSection = ({
         )}
       </div>
 
-      <div className="flex justify-end mt-12">
-        <Button variant="outline" size="sm" icon="tune">
-          필터 및 매체 설정
-        </Button>
+      <div className="mt-8">
+        {/* 필터 및 매체 설정 버튼 제거됨 */}
       </div>
     </div>
   )

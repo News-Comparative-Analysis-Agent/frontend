@@ -21,6 +21,7 @@ const DraftingPage = () => {
     content,
     sidebarQuotes,
     lastSaved, saveDraft, formatLastSaved,
+    draftImages,
     isLeftSidebarOpen, setIsLeftSidebarOpen,
     chatbotWidth, isResizing,
     messages, inputMessage, setInputMessage, isChatLoading,
@@ -76,6 +77,7 @@ const DraftingPage = () => {
           handleDrop={handleDrop}
           dropIndicator={dropIndicator}
           handleDragStart={handleDragStart}
+          draftImages={draftImages}
         />
 
         {/* 3. 우측 챗봇 사이드바: AI 어시스턴트 및 리사이징 핸들 */}

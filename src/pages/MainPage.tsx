@@ -52,8 +52,7 @@ const MainPage = () => {
         nickname: '영호',
         email: 'ajk6068@gmail.com',
         id: 1,
-        created_at: '2026-03-03T14:07:55.116938',
-        role: '정치 분석가'
+        created_at: '2026-03-03T14:07:55.116938'
       };
       
       login(mockUser, token);
