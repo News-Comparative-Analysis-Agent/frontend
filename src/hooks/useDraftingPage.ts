@@ -19,7 +19,8 @@ export const useDraftingPage = () => {
   const {
     currentIssueId, title, content, sidebarQuotes,
     setIssueId, setTitle, setContent, setSidebarQuotes,
-    saveDraft, lastSaved, isDirty, setIsDirty
+    saveDraft, lastSaved, isDirty, setIsDirty,
+    undo, pushHistory
   } = useDraftStore()
 
   // --- 분리된 훅 조합 ---
@@ -30,20 +31,35 @@ export const useDraftingPage = () => {
   const [draftImages, setDraftImages] = useState<DraftImage[]>([])
   const editorRef = useRef<HTMLDivElement>(null)
   const loadingRef = useRef<string | null>(null)
+  const historyTimeoutRef = useRef<any>(null)
 
+  // 수동 입력 시: 상태는 즉시 업데이트, 히스토리는 1초간 멈췄을 때만 기록 (단축키용)
   const handleEditorInput = useCallback(() => {
     if (editorRef.current) {
       const newContent = editorRef.current.innerHTML
       if (newContent !== content) {
         setContent(newContent)
+
+        // 1초간 입력이 없으면 현재 상태를 히스토리에 기록 (Ctrl+Z용 스냅샷)
+        if (historyTimeoutRef.current) clearTimeout(historyTimeoutRef.current)
+        historyTimeoutRef.current = setTimeout(() => {
+          pushHistory()
+        }, 1000)
       }
     }
-  }, [setContent, content])
+  }, [setContent, content, pushHistory])
 
   const {
     messages, inputMessage, setInputMessage, isChatLoading,
-    chatEndRef, handleSendMessage, applyModifiedContent
-  } = useDraftChat({ issueId, content, editorRef: editorRef as React.RefObject<HTMLDivElement>, setContent })
+    chatEndRef, handleSendMessage, applyModifiedContent, undoApply
+  } = useDraftChat({ 
+    issueId, 
+    content, 
+    editorRef: editorRef as React.RefObject<HTMLDivElement>, 
+    setContent,
+    pushHistory,
+    undo
+  })
 
   const {
     dropIndicator, handleDragStart, handleDrop, handleDragOver, handleDragLeave
@@ -93,14 +109,15 @@ export const useDraftingPage = () => {
       if (draft) {
         setTitle(draft.title || '')
         const safeHtml = buildDraftHtml(draft, mediaColorMap)
-        setContent(safeHtml)
+        setContent(safeHtml, true) // 로딩 시에는 isDirty를 켜지 않음
       }
     } catch (e) {
       console.error('Failed to load draft:', e)
     } finally {
       loadingRef.current = null
+      setIsDirty(false) // 로딩 완료 후 최종적으로 수정되지 않은 상태로 설정
     }
-  }, [issueId, setSidebarQuotes, setTitle, setContent])
+  }, [issueId, setSidebarQuotes, setTitle, setContent, setIsDirty])
   
   // --- 이미지 로딩 ---
   const loadImages = useCallback(async () => {
@@ -141,22 +158,40 @@ export const useDraftingPage = () => {
     }
   }, [content])
 
+  const temporarySave = useCallback(async () => {
+    console.log('--- [저장 단축키 트리거] ---')
+    await saveDraft()
+  }, [saveDraft])
+
+  // --- 키보드 단축키 (Undo/Save) ---
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+
+      const key = e.key.toLowerCase();
+      
+      // Ctrl + S (저장)
+      if (key === 's') {
+        e.preventDefault();
+        temporarySave();
+      }
+      
+      // Ctrl + Z (타이핑 되돌리기)
+      if (key === 'z') {
+        e.preventDefault();
+        undo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, temporarySave]);
+
   // --- 저장 관련 ---
   const formatLastSaved = () => {
     if (!lastSaved) return '저장되지 않음'
     const date = new Date(lastSaved)
     return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')} 저장됨`
-  }
-
-  const temporarySave = async () => {
-    console.log('--- [임시저장 API 연동 준비] ---')
-    console.log('이슈 ID:', issueId)
-    console.log('제목:', title)
-    console.log('본문 내용 (HTML):', content)
-    console.log('사이드바 인용구 개수:', sidebarQuotes.length)
-    console.log('발생 시간:', new Date().toISOString())
-    console.log('-------------------------------')
-    await saveDraft()
   }
 
   return {
@@ -190,6 +225,7 @@ export const useDraftingPage = () => {
     handleDrop,
     handleSendMessage,
     applyModifiedContent,
+    undoApply,
     navigate,
     isDirty,
     setIsDirty,

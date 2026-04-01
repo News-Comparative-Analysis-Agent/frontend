@@ -5,6 +5,7 @@ interface ChatMessage {
   role: 'user' | 'ai';
   content: string;
   modifiedContent?: string;
+  isApplied?: boolean;
 }
 
 interface DraftingChatbotProps {
@@ -15,14 +16,15 @@ interface DraftingChatbotProps {
   setInputMessage: (msg: string) => void
   isChatLoading: boolean
   handleSendMessage: () => void
-  applyModifiedContent: (modifiedContent: string) => void
+  applyModifiedContent: (modifiedContent: string, index: number) => void
+  undoApply: (index: number) => void
   chatEndRef: RefObject<HTMLDivElement>
   onMouseDown: (e: React.MouseEvent) => void
 }
 
 const DraftingChatbot = ({
   width, isResizing, messages, inputMessage, setInputMessage,
-  isChatLoading, handleSendMessage, applyModifiedContent, chatEndRef, onMouseDown
+  isChatLoading, handleSendMessage, applyModifiedContent, undoApply, chatEndRef, onMouseDown
 }: DraftingChatbotProps) => {
   return (
     <>
@@ -52,30 +54,47 @@ const DraftingChatbot = ({
                     <span className="material-symbols-outlined text-white text-[14px]">smart_toy</span>
                   </div>
                 )}
-                <div className={`flex flex-col gap-2 max-w-[85%] ${msg.role === 'user' ? 'items-end' : ''}`}>
-                  <div className={`p-3 rounded-xl leading-relaxed ${
-                    msg.role === 'user' 
-                      ? 'bg-orange-50 border border-orange-100 text-slate-800 rounded-tr-none' 
-                      : 'bg-slate-100 text-slate-700 rounded-tl-none'
-                  }`}>
-                    {msg.content}
-                  </div>
-                  
-                  {msg.modifiedContent && (
-                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col gap-2">
-                      <div className="flex items-center gap-1.5 text-primary">
-                        <span className="material-symbols-outlined text-[16px]">edit_note</span>
-                        <span className="text-[11px] font-bold">AI의 수정 제안이 있습니다</span>
-                      </div>
-                      <button 
-                        onClick={() => applyModifiedContent(msg.modifiedContent!)}
-                        className="w-full py-1.5 bg-primary text-white text-[11px] font-bold rounded-lg hover:bg-orange-600 transition-colors shadow-sm"
-                      >
-                        본문에 반영하기
-                      </button>
-                    </div>
-                  )}
-                </div>
+        <div className={`flex flex-col gap-2 max-w-[85%] ${msg.role === 'user' ? 'items-end' : ''}`}>
+          <div className={`p-3 rounded-xl leading-relaxed ${
+            msg.role === 'user' 
+              ? 'bg-orange-50 border border-orange-100 text-slate-800 rounded-tr-none' 
+              : 'bg-slate-100 text-slate-700 rounded-tl-none'
+          }`}>
+            {msg.content}
+          </div>
+          
+          {msg.modifiedContent && (
+            <div className={`rounded-xl p-3 flex flex-col gap-2 border transition-all ${
+              msg.isApplied ? 'bg-slate-50 border-slate-200' : 'bg-primary/5 border-primary/20'
+            }`}>
+              <div className={`flex items-center gap-1.5 ${msg.isApplied ? 'text-slate-500' : 'text-primary'}`}>
+                <span className="material-symbols-outlined text-[16px]">
+                  {msg.isApplied ? 'task_alt' : 'edit_note'}
+                </span>
+                <span className="text-[11px] font-bold">
+                  {msg.isApplied ? '본문에 반영되었습니다' : 'AI의 수정 제안이 있습니다'}
+                </span>
+              </div>
+              
+              {!msg.isApplied ? (
+                <button 
+                  onClick={() => applyModifiedContent(msg.modifiedContent!, idx)}
+                  className="w-full py-1.5 bg-primary text-white text-[11px] font-bold rounded-lg hover:bg-orange-600 transition-colors shadow-sm active:scale-95"
+                >
+                  본문에 반영하기
+                </button>
+              ) : (
+                <button 
+                  onClick={() => undoApply(idx)}
+                  className="w-full py-1.5 bg-white border border-slate-200 text-slate-600 text-[11px] font-bold rounded-lg hover:bg-slate-50 transition-colors shadow-sm active:scale-95 flex items-center justify-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[14px]">undo</span>
+                  되돌리기 (Undo)
+                </button>
+              )}
+            </div>
+          )}
+        </div>
               </div>
             ))}
             {isChatLoading && (

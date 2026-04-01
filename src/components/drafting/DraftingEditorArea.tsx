@@ -5,7 +5,7 @@ interface DraftingEditorAreaProps {
   title: string
   setTitle: (title: string) => void
   content: string
-  editorRef: RefObject<HTMLDivElement>
+  editorRef: React.RefObject<HTMLDivElement>
   handleEditorInput: () => void
   handleDragOver: (e: React.DragEvent) => void
   handleDragLeave: (e: React.DragEvent) => void
@@ -55,7 +55,7 @@ const DraftingEditorArea = ({
         )}
 
         <div className="group relative mb-10 w-full">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Article Title</span>
           </div>
           <textarea 

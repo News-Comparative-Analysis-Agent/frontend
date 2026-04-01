@@ -12,17 +12,63 @@ export const useDraftStore = create<DraftState>()(
       currentIssueId: null,
       title: '',
       content: '', 
+      pastContent: [],
+      futureContent: [],
       sidebarQuotes: [],
       lastSaved: null,
       isDirty: false,
 
       // 기본 상태 변경 액션
-      setIssueId: (currentIssueId) => set({ currentIssueId, isDirty: false }),
+      setIssueId: (currentIssueId) => set({ currentIssueId, isDirty: false, pastContent: [], futureContent: [] }),
       setTitle: (title) => set({ title, isDirty: true }),
-      setContent: (content) => set({ content, isDirty: true }),
+      
+      setContent: (newContent, skipDirty = false) => set((state) => {
+        if (state.content === newContent) return state;
+        return { 
+          content: newContent, 
+          isDirty: skipDirty ? state.isDirty : true 
+        };
+      }),
+
       setSidebarQuotes: (sidebarQuotes) => set({ sidebarQuotes, isDirty: true }),
       
-      // 기사 인용구 관리 전용 액션 (로직 중앙화)
+      // History 액션 (챗봇 전용으로 활용 예정)
+      undo: () => set((state) => {
+        if (state.pastContent.length === 0) return state;
+        
+        const previous = state.pastContent[state.pastContent.length - 1];
+        const newPast = state.pastContent.slice(0, -1);
+        
+        return {
+          content: previous,
+          pastContent: newPast,
+          futureContent: [state.content, ...state.futureContent],
+          isDirty: true
+        };
+      }),
+
+      redo: () => set((state) => {
+        if (state.futureContent.length === 0) return state;
+        
+        const next = state.futureContent[0];
+        const newFuture = state.futureContent.slice(1);
+        
+        return {
+          content: next,
+          pastContent: [...state.pastContent, state.content],
+          futureContent: newFuture,
+          isDirty: true
+        };
+      }),
+
+      // 명시적으로 히스토리에 현재 상태 기록 (챗봇 반영 직전 호출용)
+      pushHistory: () => set((state) => {
+        const newPast = [...state.pastContent, state.content];
+        if (newPast.length > 20) newPast.shift();
+        return { pastContent: newPast, futureContent: [] };
+      }),
+      
+      // 기사 인용구 관리 전용 액션
       addSidebarQuote: (quote) => set((state) => ({
         sidebarQuotes: [...state.sidebarQuotes, quote],
         isDirty: true

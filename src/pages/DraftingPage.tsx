@@ -28,7 +28,7 @@ const DraftingPage = () => {
     dropIndicator, editorRef, chatEndRef,
     handleEditorInput, handleMouseDown,
     handleDragStart, handleDragOver, handleDragLeave, handleDrop,
-    handleSendMessage, applyModifiedContent,
+    handleSendMessage, applyModifiedContent, undoApply,
     navigate,
     blocker,
     temporarySave
@@ -80,7 +80,7 @@ const DraftingPage = () => {
           draftImages={draftImages}
         />
 
-        {/* 3. 우측 챗봇 사이드바: AI 어시스턴트 및 리사이징 핸들 */}
+        {/* 3. 우측 챗봇 사이드바: AI 어시스턴트 및 리라이징 핸들 */}
         <DraftingChatbot 
           width={chatbotWidth}
           isResizing={isResizing}
@@ -90,6 +90,7 @@ const DraftingPage = () => {
           isChatLoading={isChatLoading}
           handleSendMessage={handleSendMessage}
           applyModifiedContent={applyModifiedContent}
+          undoApply={undoApply}
           chatEndRef={chatEndRef}
           onMouseDown={handleMouseDown}
         />

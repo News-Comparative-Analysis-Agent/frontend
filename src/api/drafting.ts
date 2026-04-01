@@ -26,8 +26,13 @@ export interface SavedDraft {
   last_saved: string;
 }
 
+export interface ChatMessage {
+  role: 'user' | 'ai';
+  content: string;
+}
+
 export interface ChatRequest {
-  message: string;
+  messages: ChatMessage[];
   current_content: string;
   issue_id: number;
 }
