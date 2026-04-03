@@ -10,7 +10,7 @@ interface ChatMessage {
 
 const INITIAL_MESSAGE: ChatMessage = {
   role: 'ai',
-  content: '안녕하세요! 기사의 문장력을 높이거나 특정 논조를 강화하고 싶으시면 말씀해주세요.',
+  content: '안녕하세요!\n기사 작성을 돕는 AI 챗봇입니다.\n다음과 같은 작업을 요청하실 수 있습니다:\n\n• 문장 교정: 맞춤법 검사 및 비문/오탈자 정밀 수정\n• 분량 조절: 특정 자수나 문단 길이에 맞춘 내용 최적화\n• 스타일 전환: 스트레이트, 사설, 기획 기사 등 톤 변경\n• 헤드라인 추천: 클릭을 유도하는 매력적인 제목 제안\n• 데이터 요약: 복잡한 원문 내용을 핵심 한 줄로 브리핑\n\n무엇을 도와드릴까요? 아래 입력창에 내용을 적어주세요!',
 }
 
 interface UseDraftChatOptions {
@@ -59,7 +59,16 @@ export const useDraftChat = ({
       const realTimeContent = editorRef.current?.innerHTML || content;
 
       const response = await chatWithAI({
-        messages: currentMessages.map(({ role, content }) => ({ role, content })),
+        messages: currentMessages.map((msg, idx) => {
+          // 마지막 질문(사용자 메시지)에 현재 본문 컨텍스트를 강력하게 주입하여 AI가 인지하게 함
+          if (idx === currentMessages.length - 1 && msg.role === 'user') {
+            return {
+              role: 'user',
+              content: `### 현재 기사 초안 상태 ###\n${realTimeContent}\n\n### 기자의 요청 ###\n${msg.content}`
+            };
+          }
+          return { role: msg.role, content: msg.content };
+        }),
         current_content: realTimeContent,
         issue_id: Number(issueId),
       })

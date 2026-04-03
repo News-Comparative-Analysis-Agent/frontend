@@ -13,12 +13,13 @@ interface DraftingEditorAreaProps {
   dropIndicator: { index: number; rect: DOMRect | null }
   handleDragStart: (e: React.DragEvent, url: string, media: string) => void
   draftImages: DraftImage[]
+  isCrossCheckMode: boolean
 }
 
 const DraftingEditorArea = ({
   title, setTitle, content, editorRef, handleEditorInput,
   handleDragOver, handleDragLeave, handleDrop, dropIndicator, handleDragStart,
-  draftImages
+  draftImages, isCrossCheckMode
 }: DraftingEditorAreaProps) => {
 
   const handleEditorClick = (e: React.MouseEvent) => {
@@ -35,12 +36,12 @@ const DraftingEditorArea = ({
 
   return (
     <section 
-      className="flex-1 overflow-y-auto custom-scrollbar bg-white relative min-h-0 text-left"
+      className="flex-1 overflow-y-auto custom-scrollbar bg-white relative min-h-0 text-left transition-all duration-500"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div className="max-w-3xl mx-auto py-12 px-8 relative">
+      <div className="max-w-3xl px-8 mx-auto py-12 relative">
         {dropIndicator.index !== -1 && dropIndicator.rect && (
           <div 
             className="absolute left-8 right-8 h-1 bg-primary rounded-full z-50 pointer-events-none shadow-[0_0_10px_rgba(242,127,13,0.5)] transition-all duration-75"
@@ -76,8 +77,10 @@ const DraftingEditorArea = ({
         >
           {!content && (
             <div className="flex flex-col items-center justify-center py-20 text-slate-300">
-              <span className="material-symbols-outlined text-[48px] mb-4 animate-pulse">article</span>
-              <p className="text-sm font-medium">초안 데이터를 불러오고 있습니다...</p>
+              <div className="size-16 rounded-full bg-slate-50 flex items-center justify-center mb-4 transition-all duration-300 group-hover:bg-slate-100">
+                <span className="material-symbols-outlined text-slate-200 text-[32px] animate-pulse">article</span>
+              </div>
+              <p className="text-sm font-medium italic">초안 데이터를 불러오고 있습니다...</p>
             </div>
           )}
         </div>
@@ -85,13 +88,15 @@ const DraftingEditorArea = ({
         <div className="mt-16 pt-8 border-t border-slate-100" contentEditable="false">
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-[12px] uppercase tracking-widest flex items-center gap-2 text-slate-600">
-                <span className="material-symbols-outlined text-primary text-lg">perm_media</span>
+              <h3 className="font-bold text-[14.5px] tracking-tight flex items-center gap-2.5 text-slate-800">
+                <div className="size-8 rounded-full bg-primary text-white flex items-center justify-center shadow-sm">
+                  <span className="material-symbols-outlined icon-md">perm_media</span>
+                </div>
                 관련 뉴스 미디어
               </h3>
             </div>
             <div className="bg-orange-50/50 border border-dashed border-orange-200 rounded-lg p-2.5 mb-4 flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined text-primary text-[18px]">drag_pan</span>
+              <span className="material-symbols-outlined text-primary icon-md">drag_pan</span>
               <p className="text-[11px] font-bold text-primary">이미지를 본문에 드래그하여 삽입하세요</p>
             </div>
           </div>
@@ -119,8 +124,10 @@ const DraftingEditorArea = ({
           </div>
         </div>
         
-        <div className="mt-8 flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200/60 font-medium">
-          <span className="material-symbols-outlined text-slate-400 text-lg">info</span>
+        <div className="mt-8 flex items-start gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-200/60 font-medium">
+          <div className="size-8 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0">
+            <span className="material-symbols-outlined text-slate-400 icon-md">info</span>
+          </div>
           <p className="text-xs text-slate-500 leading-relaxed text-left">
             <span className="font-bold text-slate-700">AI 생성 고지:</span> 본 기사는 생성형 AI 기술을 활용하여 작성된 초안을 바탕으로 기자의 최종 편집 및 검수를 거쳤습니다.
           </p>

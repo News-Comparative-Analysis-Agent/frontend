@@ -7,9 +7,20 @@ import { useBlocker } from 'react-router-dom'
  * - 내부 라우팅: react-router useBlocker로 차단
  */
 export const useUnsavedChangesGuard = (isDirty: boolean) => {
-  // 브라우저 새로고침/닫기 방지는 사용자 요청으로 제거 (커스텀 버튼 표시 불가 문제)
+  // 브라우저 새로고침/닫기 방지 (변경사항 발생 시에만)
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = ''; // 브라우저 표준 안내창을 띄우기 위해 필요
+      }
+    };
 
-  // 내부 라우팅 차단
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
+  // 내부 라우팅 차단 (SPA 내부 이동 시)
   const blocker = useBlocker(({ nextLocation }) => {
     return isDirty && !nextLocation.pathname.startsWith('/drafting')
   })

@@ -28,6 +28,7 @@ export const useDraftingPage = () => {
   const { panelWidth: chatbotWidth, isResizing, handleResizeStart: handleMouseDown } = usePanelResize()
 
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true)
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true)
   const [draftImages, setDraftImages] = useState<DraftImage[]>([])
   const editorRef = useRef<HTMLDivElement>(null)
   const loadingRef = useRef<string | null>(null)
@@ -183,9 +184,21 @@ export const useDraftingPage = () => {
       }
     };
 
+    // 브라우저 새로고침/닫기 시 자동 저장 시도
+    const handleBeforeUnload = () => {
+      if (isDirty) {
+        saveDraft(); // 변경사항이 있다면 저장 처리
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [undo, temporarySave]);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [undo, temporarySave, isDirty, saveDraft]);
 
   // --- 저장 관련 ---
   const formatLastSaved = () => {
@@ -193,6 +206,17 @@ export const useDraftingPage = () => {
     const date = new Date(lastSaved)
     return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')} 저장됨`
   }
+
+  // --- 비교 모드 (Comparison Mode) 전환 ---
+  const setComparisonLayout = useCallback((enable: boolean) => {
+    if (enable) {
+      setIsLeftSidebarOpen(false)
+      setIsRightSidebarOpen(false)
+    } else {
+      setIsLeftSidebarOpen(true)
+      setIsRightSidebarOpen(true)
+    }
+  }, [])
 
   return {
     issueId,
@@ -208,6 +232,9 @@ export const useDraftingPage = () => {
     draftImages,
     isLeftSidebarOpen,
     setIsLeftSidebarOpen,
+    isRightSidebarOpen,
+    setIsRightSidebarOpen,
+    setComparisonLayout,
     chatbotWidth,
     isResizing,
     messages,
