@@ -51,15 +51,21 @@ const DraftingPage = () => {
 
   const openArticlePopup = (url: string) => {
     if (!url) return;
-    const popupWidth = 800;
+    
+    // 💡 사용자의 현재 화면 해상도를 감지하여 정확히 절반(50%) 너비로 설정
+    // 이렇게 하면 윈도우 스냅(Win + 방향키) 사용 시 여백 없이 두 창이 딱 붙게 됩니다.
     const screenWidth = window.screen.availWidth;
     const screenHeight = window.screen.availHeight;
+    const popupWidth = Math.floor(screenWidth / 2);
+    
     try {
+      // 메인 창을 팝업창 너비만큼 오른쪽으로 밀고 리사이징 시도
       window.moveTo(popupWidth, 0);
       window.resizeTo(screenWidth - popupWidth, screenHeight);
     } catch (e) {
       console.warn("Main window control limited by browser policy");
     }
+    
     const features = `width=${popupWidth},height=${screenHeight},left=0,top=0,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`;
     window.open(url, 'CrossCheckArticle', features);
   };
@@ -86,9 +92,9 @@ const DraftingPage = () => {
       <Breadcrumb items={['심층 분석', '초안 작성']} />
 
       <main className="flex-1 flex overflow-hidden min-h-0 relative">
-        {/* 💡 기사 비교 가이드 배너 (최상위 레이어) */}
+        {/* 💡 기사 비교 가이드 배너 (팝업창이 왼쪽 50%를 가리므로, 오른쪽 50% 영역의 중앙인 75% 지점으로 배치) */}
         {showGuide && isCrossCheckMode && selectedQuote && (
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[100] animate-bounce-subtle pointer-events-none">
+          <div className="absolute top-6 left-[75%] -translate-x-1/2 z-[100] animate-bounce-subtle pointer-events-none">
             <div className="bg-slate-900/95 backdrop-blur-md text-white px-8 py-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col gap-3 border border-white/20 pointer-events-auto min-w-[450px]">
               <div className="flex items-center gap-5">
                 <div className="size-10 rounded-full bg-primary/20 text-primary flex items-center justify-center shadow-inner">
@@ -163,6 +169,7 @@ const DraftingPage = () => {
                   onClick={() => {
                     setSelectedQuote(media);
                     setIsCrossCheckMode(true);
+                    setIsRightSidebarOpen(false); // 💡 아이콘 클릭 시 우측 챗봇도 자동으로 닫기
                     openArticlePopup(media.links?.[0]);
                   }}
                   className={`h-9 px-4 rounded-full flex items-center justify-center font-black text-[12px] border-2 transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm whitespace-nowrap ${

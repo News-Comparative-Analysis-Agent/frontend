@@ -1,5 +1,8 @@
-import React, { RefObject } from 'react'
+import React, { RefObject, useEffect } from 'react'
 import { DraftImage } from '../../types/analysis'
+import { useDraftStore } from '../../stores/useDraftStore'
+import { generateDiff } from '../../utils/diffText'
+import { splitToBlocks, findBestMatchIndex, getPatchedHtml } from '../../utils/patchUtils'
 
 interface DraftingEditorAreaProps {
   title: string
@@ -21,6 +24,46 @@ const DraftingEditorArea = ({
   handleDragOver, handleDragLeave, handleDrop, dropIndicator, handleDragStart,
   draftImages, isCrossCheckMode
 }: DraftingEditorAreaProps) => {
+  const { pendingDiff, setPendingDiff, setContent, pushHistory } = useDraftStore();
+  const isReviewMode = !!pendingDiff;
+
+  // 💡 리뷰 모드 탈출 시 (Undo/Reject/Accept) 에디터 본문을 원상복구하거나 갱신
+  useEffect(() => {
+    if (!isReviewMode && editorRef.current) {
+      editorRef.current.innerHTML = content;
+    }
+  }, [isReviewMode, content, editorRef]);
+
+  // 💡 Diff HTML 생성: 전체 문맥을 유지하며 타겟 문단만 Diff 적용
+  const getDiffHtml = () => {
+    if (!pendingDiff) return content;
+    const blocks = splitToBlocks(content);
+    const targetIndex = findBestMatchIndex(blocks, pendingDiff);
+
+    return blocks.map((block, idx) => {
+      if (idx === targetIndex) {
+        // 하이라이트된 문단만 Diff 생성
+        const diffParts = generateDiff(block.replace(/<[^>]*>?/gm, ''), pendingDiff);
+        const innerHtml = diffParts.map(part => {
+          if (part.removed) {
+            return `<span class="bg-red-100 text-red-700 line-through decoration-red-400 mx-0.5 px-0.5 rounded-sm">${part.value}</span>`;
+          }
+          if (part.added) {
+            return `<span class="bg-green-100 text-green-800 font-medium mx-0.5 px-0.5 rounded-sm underline decoration-green-300 decoration-2">${part.value}</span>`;
+          }
+          return part.value;
+        }).join('');
+
+        // 기존 태그를 유지하며 내용물만 교체 (h4 혹은 p)
+        const tagMatch = block.match(/^(<[^>]+>)/);
+        const tagStart = tagMatch ? tagMatch[1] : '<p class="mb-4">';
+        const tagEnd = tagStart.startsWith('<h4') ? '</h4>' : '</p>';
+        return `${tagStart}${innerHtml}${tagEnd}`;
+      }
+      // 나머지 문단은 그대로 렌더링
+      return block;
+    }).join('');
+  };
 
   const handleEditorClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -68,16 +111,27 @@ const DraftingEditorArea = ({
           />
         </div>
 
-        <div 
-          ref={editorRef}
-          className="space-y-6 text-[16px] leading-[1.8] text-slate-700 focus:outline-none drafting-editor" 
-          contentEditable="true"
-          onInput={handleEditorInput}
-          onClick={handleEditorClick}
-        >
-          {!content && (
-            <div className="flex flex-col items-center justify-center py-20 text-slate-300">
-              <div className="size-16 rounded-full bg-slate-50 flex items-center justify-center mb-4 transition-all duration-300 group-hover:bg-slate-100">
+        <div className="relative">
+          {isReviewMode ? (
+            <div 
+              ref={editorRef}
+              className="space-y-6 text-[16px] leading-[1.8] text-slate-700 focus:outline-none drafting-editor opacity-90" 
+              contentEditable={false}
+              dangerouslySetInnerHTML={{ __html: getDiffHtml() }}
+            />
+          ) : (
+            <div 
+              ref={editorRef}
+              className="space-y-6 text-[16px] leading-[1.8] text-slate-700 focus:outline-none drafting-editor min-h-[400px]" 
+              contentEditable="true"
+              onInput={handleEditorInput}
+              onClick={handleEditorClick}
+            />
+          )}
+
+          {!content && !isReviewMode && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center py-20 text-slate-300 pointer-events-none">
+              <div className="size-16 rounded-full bg-slate-50 flex items-center justify-center mb-4 transition-all duration-300">
                 <span className="material-symbols-outlined text-slate-200 text-[32px] animate-pulse">article</span>
               </div>
               <p className="text-sm font-medium italic">초안 데이터를 불러오고 있습니다...</p>

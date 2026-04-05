@@ -1,5 +1,7 @@
-import React, { RefObject } from 'react'
+import React, { RefObject, useEffect } from 'react'
 import Loader from '../ui/Loader'
+import { useDraftStore } from '../../stores/useDraftStore'
+import { splitToBlocks, findBestMatchIndex, getPatchedHtml } from '../../utils/patchUtils'
 
 interface ChatMessage {
   role: 'user' | 'ai';
@@ -24,10 +26,36 @@ interface DraftingChatbotProps {
   onMouseDown: (e: React.MouseEvent) => void
 }
 
+import DiffViewer from './DiffViewer'
+
 const DraftingChatbot = ({
   isOpen, setIsOpen, width, isResizing, messages, inputMessage, setInputMessage,
   isChatLoading, handleSendMessage, applyModifiedContent, undoApply, chatEndRef, onMouseDown
 }: DraftingChatbotProps) => {
+  const { pendingDiff, setPendingDiff, content, setContent, pushHistory } = useDraftStore()
+
+  // 💡 수락(Accept) 핸들러: 챗봇에서 바로 본문에 패치
+  const handleAccept = (modifiedContent: string) => {
+    const blocks = splitToBlocks(content);
+    const targetIndex = findBestMatchIndex(blocks, modifiedContent);
+    
+    pushHistory();
+    const newFullContent = getPatchedHtml(blocks, modifiedContent, targetIndex);
+    setContent(newFullContent);
+    setPendingDiff(null);
+  };
+
+  // 💡 자동 동기화: AI로부터 새로운 수정 제안이 오면 즉시 에디터의 pendingDiff로 전달
+  useEffect(() => {
+    if (messages.length === 0) return;
+    
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage.role === 'ai' && lastMessage.modifiedContent) {
+      setPendingDiff(lastMessage.modifiedContent);
+    }
+  }, [messages, setPendingDiff]);
+
+
   return (
     <>
       <div 
@@ -83,21 +111,59 @@ const DraftingChatbot = ({
                   {msg.isApplied ? 'task_alt' : 'edit_note'}
                 </span>
                 <span className="text-[11px] font-bold">
-                  {msg.isApplied ? '본문에 반영되었습니다' : 'AI의 수정 제안이 있습니다'}
+                  {msg.isApplied ? '본문에 반영되었습니다' : '≡ 에디터에 AI의 제안이 표시되었습니다'}
                 </span>
               </div>
               
               {!msg.isApplied ? (
-                <button 
-                  onClick={() => applyModifiedContent(msg.modifiedContent!, idx)}
-                  className="w-full py-1.5 bg-primary text-white text-[11px] font-bold rounded-lg hover:bg-orange-600 transition-colors shadow-sm active:scale-95"
-                >
-                  본문에 반영하기
-                </button>
+                <div className="flex flex-col gap-1.5">
+                  {pendingDiff === msg.modifiedContent ? (
+                    <div className="flex flex-col gap-2">
+                      <button 
+                        onClick={() => setPendingDiff(null)}
+                        className="w-full py-1.5 bg-slate-100 text-slate-600 text-[11px] font-bold rounded-full hover:bg-slate-200 transition-colors shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">close</span>
+                        리뷰 취소 (Close)
+                      </button>
+                      
+                      {/* 💡 사용자가 요청한 [✓ Accept] 및 [✕ Reject] 버튼 추가 */}
+                      <div className="grid grid-cols-2 gap-1.5 pt-1">
+                        <button 
+                          onClick={() => handleAccept(msg.modifiedContent!)}
+                          className="flex items-center justify-center gap-1.5 py-1.5 bg-green-600 text-white text-[10px] font-black rounded-full hover:bg-green-700 transition-all active:scale-95 shadow-md shadow-green-200"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">done</span>
+                          ACCEPT
+                        </button>
+                        <button 
+                          onClick={() => {
+                            setPendingDiff(null);
+                          }}
+                          className="flex items-center justify-center gap-1.5 py-1.5 bg-slate-200 text-slate-700 text-[10px] font-black rounded-full hover:bg-slate-300 transition-all active:scale-95"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">close</span>
+                          REJECT
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button 
+                      onClick={() => setPendingDiff(msg.modifiedContent!)}
+                      className="w-full py-1.5 bg-primary text-white text-[11px] font-bold rounded-full hover:bg-orange-600 transition-colors shadow-sm active:scale-95 flex items-center justify-center gap-1.5 border border-primary/20"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">visibility</span>
+                      제안 다시보기 (View)
+                    </button>
+                  )}
+                </div>
               ) : (
                 <button 
-                  onClick={() => undoApply(idx)}
-                  className="w-full py-1.5 bg-white border border-slate-200 text-slate-600 text-[11px] font-bold rounded-lg hover:bg-slate-50 transition-colors shadow-sm active:scale-95 flex items-center justify-center gap-1"
+                  onClick={() => {
+                    undoApply(idx);
+                    setPendingDiff(null);
+                  }}
+                  className="w-full py-1.5 bg-white border border-slate-200 text-slate-600 text-[11px] font-bold rounded-full hover:bg-slate-50 transition-colors shadow-sm active:scale-95 flex items-center justify-center gap-1"
                 >
                   <span className="material-symbols-outlined icon-sm">undo</span>
                   되돌리기 (Undo)

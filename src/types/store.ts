@@ -27,4 +27,8 @@ export interface DraftState {
   // Advanced Actions (Logic Migration)
   addSidebarQuote: (quote: SidebarQuote) => void;
   removeSidebarQuote: (quoteId: number) => void;
+
+  // 💡 인라인 Diff 리뷰 모드 관련 상태 및 액션
+  pendingDiff: string | null;
+  setPendingDiff: (content: string | null) => void;
 }

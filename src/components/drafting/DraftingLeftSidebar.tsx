@@ -27,11 +27,12 @@ const DraftingLeftSidebar = ({
   const openArticlePopup = (url: string) => {
     if (!url) return;
     
-    const popupWidth = 800;
+    // 💡 사용자의 현재 화면 해상도를 감지하여 정확히 절반(50%) 너비로 설정
     const screenWidth = window.screen.availWidth;
     const screenHeight = window.screen.availHeight;
+    const popupWidth = Math.floor(screenWidth / 2);
 
-    // 1. 메인 창 제어 시도 (현재 창을 오른쪽 800px 지점으로 밀고 남은 너비를 채움)
+    // 1. 메인 창 제어 시도 (현재 창을 오른쪽 50% 지점으로 밀고 남은 너비를 채움)
     try {
       window.moveTo(popupWidth, 0);
       window.resizeTo(screenWidth - popupWidth, screenHeight);
@@ -39,7 +40,7 @@ const DraftingLeftSidebar = ({
       console.warn("Main window control limited by browser policy");
     }
     
-    // 2. 팝업창 열기 (왼쪽 끝 0,0 지점에 800px 너비로 배치)
+    // 2. 팝업창 열기 (왼쪽 끝 0,0 지점에 화면 절반 너비로 배치)
     const features = `width=${popupWidth},height=${screenHeight},left=0,top=0,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`;
     window.open(url, 'CrossCheckArticle', features);
   };
@@ -98,7 +99,7 @@ const DraftingLeftSidebar = ({
                   onClick={() => {
                     setSelectedQuote(quote);
                     setIsCrossCheckMode(true);
-                    setIsOpen(false); // 기사 선택 시 사이드바 자동 닫기
+                    setComparisonLayout(true); // 💡 기사 선택 시 좌/우 사이드바 자동 모두 닫기 (비교 모드 최적화)
                     openArticlePopup(quote.links?.[0]);
                   }}
                 >
