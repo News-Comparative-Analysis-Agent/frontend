@@ -20,7 +20,7 @@ export const useDraftingPage = () => {
     currentIssueId, title, content, sidebarQuotes,
     setIssueId, setTitle, setContent, setSidebarQuotes,
     saveDraft, lastSaved, isDirty, setIsDirty,
-    undo, pushHistory, pendingDiff
+    undo, pushHistory
   } = useDraftStore()
 
   // --- 분리된 훅 조합 ---
@@ -36,7 +36,6 @@ export const useDraftingPage = () => {
 
   // 수동 입력 시: 상태는 즉시 업데이트, 히스토리는 1초간 멈췄을 때만 기록 (단축키용)
   const handleEditorInput = useCallback(() => {
-    if (pendingDiff) return // 💡 리뷰 모드 중에는 본문 오염을 막기 위해 저장을 차단합니다.
     if (editorRef.current) {
       const newContent = editorRef.current.innerHTML
       if (newContent !== content) {
@@ -53,7 +52,7 @@ export const useDraftingPage = () => {
 
   const {
     messages, inputMessage, setInputMessage, isChatLoading,
-    chatEndRef, handleSendMessage, applyModifiedContent, undoApply
+    chatEndRef, handleSendMessage
   } = useDraftChat({ 
     issueId, 
     content, 
@@ -252,8 +251,6 @@ export const useDraftingPage = () => {
     handleDragLeave,
     handleDrop,
     handleSendMessage,
-    applyModifiedContent,
-    undoApply,
     navigate,
     isDirty,
     setIsDirty,

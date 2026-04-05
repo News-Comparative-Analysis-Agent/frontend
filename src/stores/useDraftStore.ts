@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { DraftState } from '../types/store';
-import { stripDiffTags } from '../utils/patchUtils';
 
 /**
  * 초안 작성 및 기사 분석 상태를 관리하는 전역 스토어입니다.
@@ -24,11 +23,9 @@ export const useDraftStore = create<DraftState>()(
       setTitle: (title) => set({ title, isDirty: true }),
       
       setContent: (newContent, skipDirty = false) => set((state) => {
-        // 💡 저장 전 하이라이트 태그 오염 여부를 체크하고 세척합니다.
-        const cleanedContent = stripDiffTags(newContent);
-        if (state.content === cleanedContent) return state;
+        if (state.content === newContent) return state;
         return { 
-          content: cleanedContent, 
+          content: newContent, 
           isDirty: skipDirty ? state.isDirty : true 
         };
       }),
@@ -96,18 +93,9 @@ export const useDraftStore = create<DraftState>()(
         isDirty: false
       }),
       setIsDirty: (isDirty) => set({ isDirty }),
-
-      // 💡 인라인 Diff 리뷰 모드 상태 및 액션 구현
-      pendingDiff: null,
-      setPendingDiff: (pendingDiff) => set({ pendingDiff }),
     }),
     {
       name: 'draft-storage',
-      // 💡 pendingDiff는 일시적인 UI 상태이므로 로컬 스토리지 저장 대상에서 제외합니다.
-      partialize: (state) => {
-        const { pendingDiff, ...rest } = state;
-        return rest;
-      },
     }
   )
 );

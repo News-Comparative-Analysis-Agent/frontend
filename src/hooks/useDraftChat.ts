@@ -89,40 +89,12 @@ export const useDraftChat = ({
     }
   }, [inputMessage, isChatLoading, content, issueId, messages, editorRef])
 
-  const applyModifiedContent = useCallback((modifiedContent: string, index: number) => {
-    if (editorRef.current) {
-      // 1. 반영 전 현재 상태를 히스토리에 기록
-      pushHistory()
-      
-      // 2. 본문에 내용 반영
-      editorRef.current.innerHTML = modifiedContent
-      setContent(modifiedContent)
-
-      // 3. 해당 메시지를 '반영됨' 상태로 변경
-      setMessages(prev => prev.map((msg, i) => 
-        i === index ? { ...msg, isApplied: true } : msg
-      ))
-    }
-  }, [editorRef, setContent, pushHistory])
-
-  const undoApply = useCallback((index: number) => {
-    // 1. 스토어의 전체 Undo 실행 (직전에 pushHistory 했으므로 정확히 그 시점으로 복구됨)
-    storeUndo()
-
-    // 2. 해당 메시지를 '미반영' 상태로 복구
-    setMessages(prev => prev.map((msg, i) => 
-      i === index ? { ...msg, isApplied: false } : msg
-    ))
-  }, [storeUndo])
-
   return {
     messages,
     inputMessage,
     setInputMessage,
     isChatLoading,
     chatEndRef,
-    handleSendMessage,
-    applyModifiedContent,
-    undoApply
+    handleSendMessage
   }
 }
