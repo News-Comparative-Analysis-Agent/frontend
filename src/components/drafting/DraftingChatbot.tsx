@@ -1,7 +1,6 @@
 import React, { RefObject, useEffect } from 'react'
 import Loader from '../ui/Loader'
 import { useDraftStore } from '../../stores/useDraftStore'
-import { splitToBlocks, findBestMatchIndex, getPatchedHtml } from '../../utils/patchUtils'
 
 interface ChatMessage {
   role: 'user' | 'ai';

@@ -31,7 +31,7 @@ const DraftingPage = () => {
     dropIndicator, editorRef, chatEndRef,
     handleEditorInput, handleMouseDown,
     handleDragStart, handleDragOver, handleDragLeave, handleDrop,
-    handleSendMessage, applyModifiedContent, undoApply,
+    handleSendMessage,
     navigate,
     blocker,
     temporarySave
@@ -213,8 +213,6 @@ const DraftingPage = () => {
           setInputMessage={setInputMessage}
           isChatLoading={isChatLoading}
           handleSendMessage={handleSendMessage}
-          applyModifiedContent={applyModifiedContent}
-          undoApply={undoApply}
           chatEndRef={chatEndRef}
           onMouseDown={handleMouseDown}
         />
