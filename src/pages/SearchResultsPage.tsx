@@ -171,15 +171,6 @@ const SearchResultsPage = () => {
                         검색하신 <strong className="text-primary font-bold underline underline-offset-4 decoration-primary/30 text-[17px]">'{query}'</strong>과 관련하여, 가장 많이 거론되는 뉴스들을 모았습니다.
                       </p>
                     </div>
-                    <div className="h-px md:h-8 w-full md:w-px bg-primary/10 mx-2"></div>
-                    <div className="flex items-center gap-2.5 animate-in fade-in slide-in-from-right duration-700">
-                      <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-[18px] text-primary">touch_app</span>
-                      </div>
-                      <p className="text-[14px] font-bold text-slate-600">
-                        분석할 기사의 <span className="text-primary underline underline-offset-2">체크 버튼</span>을 눌러보세요!
-                      </p>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -356,15 +347,11 @@ const SearchResultsPage = () => {
       </section>
 
       {/* 하단 고정 액션 바 (상시 노출 및 선택 유도) */}
-      <div className="fixed bottom-0 left-0 right-0 z-[1000] bg-white/95 backdrop-blur-xl border-t border-slate-200 px-8 py-5 flex items-center justify-between shadow-[0_-15px_50px_rgba(0,0,0,0.12)]">
+      <div className="fixed bottom-0 left-0 right-0 z-[1000] bg-[#FEF6F1]/95 backdrop-blur-xl border-t border-orange-100/30 px-8 py-5 flex items-center justify-between shadow-[0_-15px_50px_rgba(0,0,0,0.1)]">
         <div className="flex items-center gap-4 flex-1 min-w-0 mr-10">
-          <div className={`size-11 rounded-full flex items-center justify-center shrink-0 transition-colors ${
-            (selectedArticle || selectedTopic) ? 'bg-orange-100' : 'bg-slate-100'
-          }`}>
-            <span className={`material-symbols-outlined text-[24px] ${
-              (selectedArticle || selectedTopic) ? 'text-primary' : 'text-slate-400'
-            }`}>
-              {(selectedArticle || selectedTopic) ? 'check_circle' : 'info'}
+          <div className={`size-11 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${(selectedArticle || selectedTopic) ? 'bg-orange-100' : 'bg-orange-200/20 animate-pulse'}`}>
+            <span className={`material-symbols-outlined text-[24px] ${(selectedArticle || selectedTopic) ? 'text-primary' : 'text-primary'}`}>
+              {(selectedArticle || selectedTopic) ? 'check_circle' : 'touch_app'}
             </span>
           </div>
           <div className="flex flex-col min-w-0">
@@ -378,10 +365,9 @@ const SearchResultsPage = () => {
                 </h3>
               </>
             ) : (
-              <>
-                <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-0.5">분석 준비</span>
-                <h3 className="text-slate-500 font-medium text-[15px]">분석할 기사를 위 요약문이나 아래 목록에서 선택해 주세요.</h3>
-              </>
+              <h3 className="text-slate-800 font-bold text-[18px] md:text-[20px] tracking-tight animate-in fade-in slide-in-from-bottom-2 duration-500">
+                분석할 기사의 <span className="text-primary underline underline-offset-8 decoration-primary/30">체크 버튼</span>을 눌러주세요!
+              </h3>
             )}
           </div>
         </div>
@@ -391,7 +377,10 @@ const SearchResultsPage = () => {
             <Button 
               variant="outline" 
               className="px-6 rounded-xl border-slate-200 text-slate-500 hover:bg-slate-50 transition-all font-bold h-12 animate-in fade-in duration-300"
-              onClick={() => setSelectedArticleId(null)}
+              onClick={() => {
+                setSelectedArticleId(null);
+                setSelectedTopicId(null);
+              }}
             >
               선택 해제
             </Button>

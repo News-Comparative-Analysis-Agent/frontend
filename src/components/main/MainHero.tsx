@@ -5,7 +5,7 @@ const MainHero = () => {
     <section className="bg-primary min-h-[200px] py-8 md:py-0 md:h-[220px] flex flex-col justify-center relative z-10 hero-depth-shadow">
       <div className="max-w-[1400px] w-full mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 lg:gap-24">
         <div className="flex-1 text-center md:text-left shrink-0">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-[1.3] break-keep">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-[1.3] break-keep text-3d-premium">
             기사 작성의 모든 과정,<br className="hidden sm:block" /> 실시간으로 도와드립니다.
           </h2>
         </div>

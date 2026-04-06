@@ -95,7 +95,7 @@ const PublisherNewsSection = ({
                 const articles = newsData[publisher] ?? [];
                 const style = PUBLISHER_STYLES[publisher] ?? DEFAULT_STYLE;
                 return (
-                  <div key={publisher} className="shadow-premium-card p-3 sm:p-4 transition-all duration-300 group/card">
+                  <div key={publisher} className="shadow-premium-card p-4 transition-all duration-300 group/card">
                     <div className={`border-t-[3px] ${style.borderColor} mb-4`}></div>
                     <div className="flex items-center justify-between mb-5">
                       <h4 className="text-lg font-bold text-slate-700 flex items-center gap-1 group-hover/card:text-primary transition-colors">

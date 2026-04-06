@@ -77,10 +77,10 @@ const PopularIssuesSection = ({
               <>
                 {dailyIssues.top_issues.length > 0 && (
                   <div 
-                    className="shadow-premium-card p-6 group cursor-pointer w-full mb-6" 
+                    className="shadow-premium-card p-4 group cursor-pointer w-full mb-6" 
                     onClick={() => onNavigateToAnalysis(dailyIssues.top_issues[0].id)}
                   >
-                    <div className="border-t-[3px] border-primary mb-5"></div>
+                    <div className="border-t-[3px] border-primary mb-4"></div>
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="text-lg font-bold text-primary flex items-center gap-1 tracking-tight">통합 인기 1위</h4>
                     </div>
@@ -180,41 +180,39 @@ const PopularIssuesSection = ({
                 }
 
                 return (
-                  <div className="flex flex-col h-[780px] overflow-hidden">
+                  <div className="flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-2 duration-500">
                     <div className="flex-1 flex flex-col min-h-0">
                       {currentPage > 1 && (
-                        <div className="px-1 py-1.5 border-t-[3px] border-slate-200 mb-2 shrink-0 animate-fade-in text-left">
-                          <h3 className="text-[17px] font-bold text-slate-600 flex items-center gap-1">
+                        <div className="mt-4 px-0 py-0 border-t-[3px] border-slate-200 mb-4 shrink-0 text-left">
+                          <h3 className="text-[17px] font-bold text-slate-600 flex items-center gap-1 pt-4">
                             차트아웃 목록 <span className="material-symbols-outlined text-sm">chevron_right</span>
                           </h3>
                         </div>
                       )}
-                      <div className={`flex-1 ${currentPage === 1 ? 'space-y-3' : 'space-y-0 divide-y divide-slate-50'} overflow-hidden`}>
-                        {currentItems.map((item, idx) => (
-                          item.is_chart_out && currentPage === 1 && idx === 0 ? (
-                            <div key={idx} className="bg-white rounded-3xl border border-slate-100 p-1 mb-4 shadow-sm overflow-hidden group hover:shadow-xl transition-all duration-500 shrink-0" onClick={() => onNavigateToAnalysis(item.id)}>
-                              <div className="p-5">
-                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-[17px] font-bold text-slate-800">최근 차트아웃 이슈</h3>
-                                 </div>
-                                 <div className="relative w-full aspect-[21/9] mb-5 overflow-hidden rounded-2xl bg-slate-100">
-                                    <img 
-                                      alt={item.name} 
-                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" 
-                                      src={(item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : DEFAULT_IMAGE}
-                                      onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
-                                    />
-                                    <div className="absolute top-3 left-3 px-2 py-1 bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-black rounded-lg flex items-center justify-center tracking-tighter">
-                                       OUT
-                                     </div>
-                                 </div>
-                                 <h4 className="text-[18px] font-black text-slate-900 leading-tight mb-3 group-hover:text-primary transition-colors break-keep line-clamp-2">
-                                   {item.name}
-                                 </h4>
-                                 <div className="flex items-center justify-between">
-                                    <p className="text-[12px] text-slate-400 font-medium">최고 {item.peak_rank}위 / {item.chart_out_minutes}분 전 차트아웃</p>
-                                 </div>
+                      
+                      <div className={`flex-1 ${currentPage === 1 ? 'space-y-3' : 'space-y-0 divide-y divide-slate-50'}`}>
+                        {currentItems.map((item, idx) => {
+                          const formatTime = (min: number) => min < 60 ? `${min}분 전` : `${Math.floor(min / 60)}시간 전`;
+                          
+                          return item.is_chart_out && currentPage === 1 && idx === 0 ? (
+                            <div key={idx} className="shadow-premium-card p-4 mb-4 transition-all duration-300 group/card cursor-pointer shrink-0" onClick={() => onNavigateToAnalysis(item.id)}>
+                              <div className="border-t-[3px] border-slate-200 mb-4"></div>
+                              <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-[17px] font-bold text-slate-800">최근 차트아웃 이슈</h3>
                               </div>
+                              <div className="relative w-full aspect-[21/9] mb-4 overflow-hidden rounded-xl bg-slate-100">
+                                <img 
+                                  alt={item.name} 
+                                  className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-1000" 
+                                  src={(item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : DEFAULT_IMAGE}
+                                  onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
+                                />
+                                <div className="absolute top-2 left-2 px-2 py-1 bg-slate-900/80 backdrop-blur-sm text-white text-[9px] font-black rounded-lg flex items-center justify-center tracking-tighter">OUT</div>
+                              </div>
+                              <h4 className="text-[17px] font-black text-slate-900 leading-tight mb-2 group-hover/card:text-primary transition-colors break-keep line-clamp-2">
+                                {item.name}
+                              </h4>
+                              <p className="text-[11px] text-slate-400 font-medium">최고 {item.peak_rank}위 / {formatTime(item.chart_out_minutes ?? 0)} 차트아웃</p>
                             </div>
                           ) : (
                             <div key={idx} className={`${currentPage === 1 ? 'py-3 px-1 rounded-xl hover:bg-slate-50 border-b border-slate-50 last:border-0' : 'py-2.5 px-1 hover:bg-slate-50'} flex items-center justify-between transition-all group cursor-pointer shrink-0`} onClick={() => onNavigateToAnalysis(item.id)}>
@@ -222,13 +220,13 @@ const PopularIssuesSection = ({
                                 <span className="px-2 py-0.5 border border-slate-200 text-slate-400 text-[9px] font-black rounded-lg shrink-0 group-hover:border-primary/30 group-hover:text-primary transition-colors">OUT</span>
                                 <div className="min-w-0">
                                    <p className="text-[14px] font-bold text-slate-800 truncate mb-1 group-hover:text-primary transition-colors">{item.name}</p>
-                                   <p className="text-[11px] text-slate-400 font-medium">최고 {item.peak_rank}위 / {item.chart_out_minutes}분 전 차트아웃</p>
+                                   <p className="text-[11px] text-slate-400 font-medium">최고 {item.peak_rank}위 / {formatTime(item.chart_out_minutes ?? 0)} 차트아웃</p>
                                 </div>
                               </div>
                               <span className="material-symbols-outlined text-slate-300 text-[18px] group-hover:text-primary transition-colors">chevron_right</span>
                             </div>
-                          )
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
 

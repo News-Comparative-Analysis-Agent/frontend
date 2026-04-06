@@ -11,7 +11,7 @@ interface DraftingEditorAreaProps {
   handleDragOver: (e: React.DragEvent) => void
   handleDragLeave: (e: React.DragEvent) => void
   handleDrop: (e: React.DragEvent) => void
-  dropIndicator: { index: number; rect: DOMRect | null }
+  dropIndicator: { index: number; rect: DOMRect | null; position: 'top' | 'bottom'; range?: Range | null }
   handleDragStart: (e: React.DragEvent, url: string, media: string) => void
   draftImages: DraftImage[]
   isCrossCheckMode: boolean
@@ -37,6 +37,19 @@ const DraftingEditorArea = ({
     }
   };
 
+  // 유도선 좌표 계산 보정
+  const getIndicatorTop = () => {
+    if (!dropIndicator.rect || !editorRef.current) return '0px';
+    const container = editorRef.current.parentElement?.parentElement; // max-w-3xl div
+    if (!container) return '0px';
+    
+    const containerRect = container.getBoundingClientRect();
+    const targetY = dropIndicator.position === 'top' ? dropIndicator.rect.top : dropIndicator.rect.bottom;
+    
+    // 💡 뷰포트 상대 좌표 차이를 이용해 컨테이너 내부의 정확한 absolute top 계산
+    return `${targetY - containerRect.top}px`;
+  };
+
   return (
     <section 
       className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-white relative min-h-0 min-w-[400px] text-left transition-all duration-500"
@@ -45,16 +58,10 @@ const DraftingEditorArea = ({
       onDrop={handleDrop}
     >
       <div className="max-w-3xl px-4 sm:px-8 mx-auto py-12 relative">
-        {dropIndicator.index !== -1 && dropIndicator.rect && (
+        {(dropIndicator.index !== -1 || dropIndicator.range) && dropIndicator.rect && (
           <div 
             className="absolute left-8 right-8 h-1 bg-primary rounded-full z-50 pointer-events-none shadow-[0_0_10px_rgba(242,127,13,0.5)] transition-all duration-75"
-            style={{ 
-              top: dropIndicator.index === 0 
-                ? `${dropIndicator.rect.top - 12 + (editorRef.current?.parentElement?.scrollTop || 0) - (editorRef.current?.parentElement?.getBoundingClientRect().top || 0)}px` 
-                : dropIndicator.index < Array.from(editorRef.current?.children || []).length
-                  ? `${Array.from(editorRef.current?.children || [])[dropIndicator.index].getBoundingClientRect().top - 12 + (editorRef.current?.parentElement?.scrollTop || 0) - (editorRef.current?.parentElement?.getBoundingClientRect().top || 0)}px`
-                  : `${Array.from(editorRef.current?.children || [])[dropIndicator.index-1].getBoundingClientRect().bottom + 12 + (editorRef.current?.parentElement?.scrollTop || 0) - (editorRef.current?.parentElement?.getBoundingClientRect().top || 0)}px`
-            }}
+            style={{ top: getIndicatorTop() }}
           />
         )}
 

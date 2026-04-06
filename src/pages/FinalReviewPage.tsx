@@ -21,6 +21,12 @@ const FinalReviewPage = () => {
     }
   }, [title, content, navigate, issueId])
 
+  const stripHtml = (html: string) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || "";
+  };
+
+  const textLength = stripHtml(content).length;
   const safeContent = DOMPurify.sanitize(content)
   
   return (
@@ -39,7 +45,7 @@ const FinalReviewPage = () => {
 
       <main className="flex-1 flex flex-col md:flex-row min-h-0 animate-page-in overflow-hidden">
         {/* Article Preview Section */}
-        <section className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center py-6 md:py-10 min-h-0 px-4 text-left">
+        <section className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center py-4 md:py-7 min-h-0 px-4 text-left">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-sm font-bold mb-8 border border-primary/10 text-left">
             <span className="material-symbols-outlined text-[16px]">info</span>
             현재 단계 : 최종 검토
@@ -47,9 +53,9 @@ const FinalReviewPage = () => {
           <div className="w-full max-w-[800px] bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col mb-10">
             <div className="p-6 md:p-10 border-b border-slate-50">
               <div className="flex items-center gap-2 mb-6">
-                <div className="bg-slate-900 text-white px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded">Politics FOC-US</div>
+                <div className="bg-slate-900 text-white px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded">발행 대기 중</div>
                 <div className="h-3 w-px bg-slate-200 mx-1"></div>
-                <span className="text-xs text-slate-500 font-medium tracking-tight">정치 / 정당 행정 섹션</span>
+                <span className="text-xs text-slate-500 font-medium tracking-tight">총 글자 수: {textLength.toLocaleString()}자</span>
               </div>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 leading-[1.3] mb-8 tracking-tight text-left">
                 {title || '제목 없음'}
@@ -87,7 +93,7 @@ const FinalReviewPage = () => {
         </section>
 
         {/* Quality Review Sidebar */}
-        <aside className="w-full md:w-[320px] lg:w-[420px] border-t md:border-t-0 md:border-l border-slate-200 bg-white p-5 pb-24 shrink-0 md:h-full overflow-y-hidden select-none text-left">
+        <aside className="w-full md:w-[320px] lg:w-[420px] border-t md:border-t-0 md:border-l border-slate-200 bg-white pt-4 md:pt-7 px-5 pb-24 shrink-0 md:h-full overflow-y-hidden select-none text-left">
           <SectionHeader 
             icon="fact_check" 
             title="최종 품질 검토 리포트" 
