@@ -9,11 +9,15 @@ export interface DraftState {
   sidebarQuotes: SidebarQuote[];
   lastSaved: string | null;
   isDirty: boolean;
+  isPreviewMode: boolean; // 💡 AI 수정 제안 프리뷰 모드 여부
+  previewContent: string | null; // 💡 AI 수정 제안 임시 하이라이트 HTML
   
   // Actions
   setIssueId: (id: string | null) => void;
   setTitle: (title: string) => void;
   setContent: (content: string, skipDirty?: boolean) => void;
+  setPreviewContent: (content: string | null) => void; // 💡 프리뷰 내용 설정
+  setPreviewMode: (val: boolean) => void; // 💡 프리뷰 상태 설정
   setSidebarQuotes: (quotes: SidebarQuote[]) => void;
   saveDraft: () => Promise<void>;
   resetDraft: () => void;

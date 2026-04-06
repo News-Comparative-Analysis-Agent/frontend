@@ -32,6 +32,9 @@ const DraftingPage = () => {
     handleEditorInput, handleMouseDown,
     handleDragStart, handleDragOver, handleDragLeave, handleDrop,
     handleSendMessage,
+    applySuggestion,
+    cancelSuggestion,
+    undoSuggestion,
     navigate,
     blocker,
     temporarySave
@@ -240,6 +243,9 @@ const DraftingPage = () => {
           setInputMessage={setInputMessage}
           isChatLoading={isChatLoading}
           handleSendMessage={handleSendMessage}
+          onApplySuggestion={applySuggestion}
+          onCancelSuggestion={cancelSuggestion} // 💡 프리뷰 취소 및 본문 원복 연동
+          onUndoSuggestion={undoSuggestion}
           chatEndRef={chatEndRef}
           onMouseDown={handleMouseDown}
         />

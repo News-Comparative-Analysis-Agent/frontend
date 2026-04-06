@@ -22,7 +22,10 @@ const DraftingEditorArea = ({
   handleDragOver, handleDragLeave, handleDrop, dropIndicator, handleDragStart,
   draftImages, isCrossCheckMode
 }: DraftingEditorAreaProps) => {
+  const { isPreviewMode } = useDraftStore()
+
   const handleEditorClick = (e: React.MouseEvent) => {
+    if (isPreviewMode) return; // 💡 프리뷰 중에는 클릭 동작 무시
     const target = e.target as HTMLElement;
     const deleteBtn = target.closest('.editor-delete-btn');
     if (deleteBtn) {
@@ -55,9 +58,9 @@ const DraftingEditorArea = ({
           />
         )}
 
-        <div className="group relative mb-10 w-full">
+        <div className={`group relative mb-10 w-full transition-opacity duration-300 ${isPreviewMode ? 'opacity-80' : ''}`}>
           <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Article Title</span>
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest cursor-default">Article Title</span>
           </div>
           <textarea 
             className="w-full bg-transparent border-none text-[28px] font-bold focus:ring-0 resize-none p-0 placeholder-slate-200 leading-snug overflow-hidden" 
@@ -71,7 +74,7 @@ const DraftingEditorArea = ({
         <div className="relative">
           <div 
             ref={editorRef}
-            className="space-y-6 text-[16px] leading-[1.9] text-slate-700 focus:outline-none drafting-editor min-h-[400px] relative" 
+            className={`space-y-6 text-[16px] leading-[1.9] text-slate-700 focus:outline-none drafting-editor min-h-[400px] relative`} 
             contentEditable="true"
             onInput={handleEditorInput}
             onClick={handleEditorClick}

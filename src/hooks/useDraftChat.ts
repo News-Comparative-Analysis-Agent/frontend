@@ -5,7 +5,9 @@ interface ChatMessage {
   role: 'user' | 'ai'
   content: string
   modifiedContent?: string
+  originalContent?: string // 💡 제안 당시의 원본 본문 (대조용)
   isApplied?: boolean
+  isCancelled?: boolean // 💡 사용자가 제안을 명시적으로 취소했는지 여부
 }
 
 const INITIAL_MESSAGE: ChatMessage = {
@@ -17,7 +19,10 @@ interface UseDraftChatOptions {
   issueId: string
   content: string
   editorRef: RefObject<HTMLDivElement>
-  setContent: (content: string) => void
+  setContent: (content: string, skipDirty?: boolean) => void
+  previewContent: string | null
+  setPreviewContent: (content: string | null) => void
+  setPreviewMode: (val: boolean) => void
   pushHistory: () => void
   undo: () => void
 }
@@ -27,9 +32,12 @@ interface UseDraftChatOptions {
  */
 export const useDraftChat = ({
   issueId,
-  content,
+  content: realContent,
   editorRef,
   setContent,
+  previewContent,
+  setPreviewContent,
+  setPreviewMode,
   pushHistory,
   undo: storeUndo
 }: UseDraftChatOptions) => {
@@ -54,9 +62,10 @@ export const useDraftChat = ({
     setMessages(currentMessages)
     setIsChatLoading(true)
 
+    // 실시간 에디터 내용 확보 (AI 요청 전 최신 상태 확보)
+    const realTimeContent = editorRef.current?.innerHTML || realContent;
+
     try {
-      // 실시간 에디터 내용 확보 (React 상태 지연 대비 강제 동기화)
-      const realTimeContent = editorRef.current?.innerHTML || content;
 
       const response = await chatWithAI({
         messages: currentMessages.map((msg, idx) => {
@@ -64,7 +73,7 @@ export const useDraftChat = ({
           if (idx === currentMessages.length - 1 && msg.role === 'user') {
             return {
               role: 'user',
-              content: `### 현재 기사 초안 상태 ###\n${realTimeContent}\n\n### 기자의 요청 ###\n${msg.content}`
+              content: `### 현재 기사 초안 상태 ###\n${realTimeContent}\n\n### 기자의 요청 ###\n${msg.content}\n\n(※ 중요: 답변 시 'modified_content'와 같은 기술 용어는 생략하고 자연스럽게 전문가처럼 답변해 주세요.)`
             };
           }
           return { role: msg.role, content: msg.content };
@@ -73,10 +82,35 @@ export const useDraftChat = ({
         issue_id: Number(issueId),
       })
 
+      let aiMsgContent = response.response;
+      const aiModifiedContent = response.modified_content;
+
+      // 💡 [AI 말실수 교정] 기술 용어가 포함된 경우 자연스러운 표현으로 치환
+      if (aiMsgContent) {
+        aiMsgContent = aiMsgContent
+          .replace(/`modified_content`/g, '수정 제안')
+          .replace(/modified_content/g, '수정 제안')
+          .replace(/`original_content`/g, '원본 내용')
+          .replace(/original_content/g, '원본 내용')
+          .replace(/JSON/g, '항목')
+          .replace(/필드/g, '부분');
+      }
+
+      // 💡 [2단계 확장] 본문 실시간 프리뷰 주입 (실제 본문 보존)
+      if (aiModifiedContent) {
+        import('../utils/diffUtils').then(({ generateFullDiffHtml }) => {
+          const fullDiffHtml = generateFullDiffHtml(realContent, aiModifiedContent);
+          setPreviewContent(fullDiffHtml); // 💡 임시 저장소에만 주입
+          setPreviewMode(true); // 에디터 프리뷰 모드 활성화
+        }).catch(err => console.error('Diff Preview Error:', err));
+      }
+
       setMessages(prev => [...prev, {
         role: 'ai',
-        content: response.response,
-        modifiedContent: response.modified_content,
+        content: aiMsgContent || '수정 제안을 생성했습니다. 아래 대조창에서 확인해 보세요.',
+        modifiedContent: aiModifiedContent,
+        originalContent: realTimeContent, // 💡 비교를 위해 당시 본문 저장
+        isApplied: false // 💡 처음에는 미적용 상태 (수동 적용 대기)
       }])
     } catch (error) {
       console.error('Chat error:', error)
@@ -87,7 +121,74 @@ export const useDraftChat = ({
     } finally {
       setIsChatLoading(false)
     }
-  }, [inputMessage, isChatLoading, content, issueId, messages, editorRef])
+  }, [inputMessage, isChatLoading, realContent, issueId, messages, editorRef])
+
+  // AI의 수정 제안을 수동으로 에디터에 반영 (지능형 태그 세척 포함)
+  const applySuggestion = useCallback((index: number) => {
+    const msg = messages[index];
+    if (msg?.role === 'ai') {
+      pushHistory(); // Undo 스냅샷 저장
+
+      // 💡 [지능형 태그 세척] 사용자가 하이라이트 상태에서 수정한 내용을 반영하기 위해 에디터에서 직접 읽어옴
+      if (editorRef.current) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = editorRef.current.innerHTML;
+
+        // 1. 빨간색 하이라이트(삭제 예정) 요소들 제거
+        const removedSpans = tempDiv.querySelectorAll('.bg-rose-100');
+        removedSpans.forEach(span => span.remove());
+
+        // 2. 초록색 하이라이트(추가) 태그 제거 (글자만 남김)
+        const addedSpans = tempDiv.querySelectorAll('.bg-emerald-100');
+        addedSpans.forEach(span => {
+          const text = span.textContent || '';
+          span.replaceWith(text);
+        });
+
+        // 3. 최종 정제된 내용을 본문에 주입 및 프리뷰 종료
+        setContent(tempDiv.innerHTML);
+        setPreviewContent(null);
+        setPreviewMode(false);
+      } else if (msg.modifiedContent) {
+        setContent(msg.modifiedContent);
+        setPreviewContent(null);
+        setPreviewMode(false);
+      }
+
+      // 해당 메시지의 반영 상태 업데이트
+      const newMessages = [...messages];
+      newMessages[index] = { ...msg, isApplied: true };
+      setMessages(newMessages);
+    }
+  }, [messages, setContent, setPreviewContent, setPreviewMode, pushHistory, editorRef]);
+
+  // 프리뷰 상태를 취소하고 원래 본문으로 복구 (카드는 유지)
+  const cancelSuggestion = useCallback((index: number) => {
+    setPreviewContent(null); // 💡 임시 하이라이트 컨텐츠만 비움
+    setPreviewMode(false); // 💡 프리뷰 모드 종료
+
+    // 💡 해당 메시지의 취소 상태 업데이트
+    const newMessages = [...messages];
+    if (newMessages[index]) {
+      newMessages[index] = { ...newMessages[index], isCancelled: true, isApplied: false };
+      setMessages(newMessages);
+    }
+  }, [messages, setPreviewContent, setPreviewMode]);
+
+  // 반영된 수정 제안을 취소하고 이전으로 되돌림
+  const undoSuggestion = useCallback((index: number) => {
+    const msg = messages[index];
+    if (msg?.role === 'ai' && msg.isApplied) {
+      setPreviewContent(null);
+      setPreviewMode(false);
+      storeUndo(); // 스토어의 Undo 실행
+
+      // 해당 메시지의 반영 상태 해제
+      const newMessages = [...messages];
+      newMessages[index] = { ...msg, isApplied: false };
+      setMessages(newMessages);
+    }
+  }, [messages, storeUndo, setPreviewContent, setPreviewMode]);
 
   return {
     messages,
@@ -95,6 +196,9 @@ export const useDraftChat = ({
     setInputMessage,
     isChatLoading,
     chatEndRef,
-    handleSendMessage
+    handleSendMessage,
+    applySuggestion,
+    cancelSuggestion, // 💡 신규 추가
+    undoSuggestion
   }
 }

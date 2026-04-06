@@ -8,18 +8,20 @@ import { DraftState } from '../types/store';
  */
 export const useDraftStore = create<DraftState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       currentIssueId: null,
       title: '',
       content: '', 
+      previewContent: null, // AI 제안용 임시 공간
       pastContent: [],
       futureContent: [],
       sidebarQuotes: [],
       lastSaved: null,
       isDirty: false,
+      isPreviewMode: false,
 
       // 기본 상태 변경 액션
-      setIssueId: (currentIssueId) => set({ currentIssueId, isDirty: false, pastContent: [], futureContent: [] }),
+      setIssueId: (currentIssueId) => set({ currentIssueId, isDirty: false, pastContent: [], futureContent: [], isPreviewMode: false, previewContent: null }),
       setTitle: (title) => set({ title, isDirty: true }),
       
       setContent: (newContent, skipDirty = false) => set((state) => {
@@ -29,6 +31,15 @@ export const useDraftStore = create<DraftState>()(
           isDirty: skipDirty ? state.isDirty : true 
         };
       }),
+
+      setPreviewContent: (newPreview) => set((state) => {
+        if (state.previewContent === newPreview) return state;
+        return { 
+          previewContent: newPreview, 
+          isDirty: true // 💡 프리뷰 도중 수정해도 변경된 것으로 간주
+        };
+      }),
+      setPreviewMode: (isPreviewMode) => set({ isPreviewMode }),
 
       setSidebarQuotes: (sidebarQuotes) => set({ sidebarQuotes, isDirty: true }),
       
@@ -81,21 +92,36 @@ export const useDraftStore = create<DraftState>()(
 
       // 저장 및 리셋
       saveDraft: async () => {
-        // 실제 API 연동 시 이곳에서 비동기 작업 수행
+        const state = get();
+        
+        // 💡 [Option A] 프리뷰 모드일 경우 저장 차단
+        if (state.isPreviewMode) {
+          alert('현재 AI 수정 제안 프리뷰 중입니다.\n제안을 [적용]하거나 [취소]한 후에 임시저장해 주세요.');
+          return;
+        }
+
+        // 실제 API 연동 시 이곳에서 비동기 작업 수행 (현재는 더미 구현)
         set({ lastSaved: new Date().toISOString(), isDirty: false })
       },
       resetDraft: () => set({ 
         currentIssueId: null, 
         title: '', 
         content: '', 
+        previewContent: null,
         sidebarQuotes: [], 
         lastSaved: null,
-        isDirty: false
+        isDirty: false,
+        isPreviewMode: false
       }),
       setIsDirty: (isDirty) => set({ isDirty }),
     }),
     {
       name: 'draft-storage',
+      // 💡 [오염 방지] previewContent와 isPreviewMode는 영구 저장에서 제외
+      partialize: (state) => {
+        const { previewContent, isPreviewMode, ...rest } = state;
+        return rest;
+      }
     }
   )
 );

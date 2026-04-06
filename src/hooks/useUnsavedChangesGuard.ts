@@ -12,7 +12,9 @@ export const useUnsavedChangesGuard = (isDirty: boolean) => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
         e.preventDefault();
-        e.returnValue = ''; // 브라우저 표준 안내창을 띄우기 위해 필요
+        // 💡 표준에 따라 returnValue를 설정해야 브라우저의 이탈 방지 대화 상자가 나타남
+        e.returnValue = '작성 중인 내용이 있습니다. 저장하지 않고 나갈까요?';
+        return e.returnValue;
       }
     };
 

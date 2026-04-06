@@ -20,7 +20,8 @@ export const useDraftingPage = () => {
     currentIssueId, title, content, sidebarQuotes,
     setIssueId, setTitle, setContent, setSidebarQuotes,
     saveDraft, lastSaved, isDirty, setIsDirty,
-    undo, pushHistory
+    undo, pushHistory, setPreviewMode,
+    previewContent, setPreviewContent, isPreviewMode // 💡 하단에서 위로 끌어올림
   } = useDraftStore()
 
   // --- 분리된 훅 조합 ---
@@ -37,27 +38,38 @@ export const useDraftingPage = () => {
   // 수동 입력 시: 상태는 즉시 업데이트, 히스토리는 1초간 멈췄을 때만 기록 (단축키용)
   const handleEditorInput = useCallback(() => {
     if (editorRef.current) {
-      const newContent = editorRef.current.innerHTML
-      if (newContent !== content) {
-        setContent(newContent)
-
-        // 1초간 입력이 없으면 현재 상태를 히스토리에 기록 (Ctrl+Z용 스냅샷)
-        if (historyTimeoutRef.current) clearTimeout(historyTimeoutRef.current)
-        historyTimeoutRef.current = setTimeout(() => {
-          pushHistory()
-        }, 1000)
+      const newHtml = editorRef.current.innerHTML;
+      
+      // 💡 프리뷰 모드면 임시 공간에, 아니면 진짜 본문에 저장
+      if (isPreviewMode) {
+        if (newHtml !== previewContent) {
+          setPreviewContent(newHtml);
+        }
+      } else {
+        if (newHtml !== content) {
+          setContent(newHtml);
+          
+          // 1초간 입력이 없으면 현재 상태를 히스토리에 기록 (Ctrl+Z용 스냅샷)
+          if (historyTimeoutRef.current) clearTimeout(historyTimeoutRef.current)
+          historyTimeoutRef.current = setTimeout(() => {
+            pushHistory()
+          }, 1000)
+        }
       }
     }
-  }, [setContent, content, pushHistory])
+  }, [setContent, setPreviewContent, content, previewContent, isPreviewMode, pushHistory])
 
   const {
     messages, inputMessage, setInputMessage, isChatLoading,
-    chatEndRef, handleSendMessage
+    chatEndRef, handleSendMessage, applySuggestion, cancelSuggestion, undoSuggestion
   } = useDraftChat({ 
     issueId, 
     content, 
     editorRef: editorRef as React.RefObject<HTMLDivElement>, 
     setContent,
+    previewContent, // 💡 임시 저장소 전달
+    setPreviewContent, // 💡 임시 저장소 제어 함수 전달
+    setPreviewMode,
     pushHistory,
     undo
   })
@@ -189,13 +201,17 @@ export const useDraftingPage = () => {
 
   // --- 에디터 DOM 동기화 ---
   useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML !== content) {
-      editorRef.current.innerHTML = content || ''
+    if (editorRef.current) {
+      // 💡 프리뷰 모드면 previewContent를, 아니면 일반 content를 보여줌
+      const displayContent = isPreviewMode ? (previewContent || '') : (content || '');
+      if (editorRef.current.innerHTML !== displayContent) {
+        editorRef.current.innerHTML = displayContent;
+      }
     }
-  }, [content])
+  }, [content, previewContent, isPreviewMode])
 
   const temporarySave = useCallback(async () => {
-    console.log('--- [저장 단축키 트리거] ---')
+    console.log('--- [저장 버튼 트리거] ---')
     await saveDraft()
   }, [saveDraft])
 
@@ -219,21 +235,12 @@ export const useDraftingPage = () => {
       }
     };
 
-    // 브라우저 새로고침/닫기 시 자동 저장 시도
-    const handleBeforeUnload = () => {
-      if (isDirty) {
-        saveDraft(); // 변경사항이 있다면 저장 처리
-      }
-    };
-
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [undo, temporarySave, isDirty, saveDraft]);
+  }, [undo, temporarySave]);
 
   // --- 저장 관련 ---
   const formatLastSaved = () => {
@@ -286,6 +293,9 @@ export const useDraftingPage = () => {
     handleDragLeave,
     handleDrop,
     handleSendMessage,
+    applySuggestion,
+    cancelSuggestion, // 💡 신규 추가
+    undoSuggestion,
     navigate,
     isDirty,
     setIsDirty,
