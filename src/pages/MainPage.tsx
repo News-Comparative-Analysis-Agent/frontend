@@ -84,7 +84,7 @@ const MainPage = () => {
 
           {/* 3. 메인 뉴스 컨텐츠 영역 */}
           <div className="max-w-[1400px] mx-auto px-6 pb-12 pt-6">
-            <div className="flex flex-col xl:flex-row gap-4 items-start">
+            <div className="flex flex-col md:flex-row gap-4 items-start">
               
               {/* 좌측: 언론사별 인기 뉴스 */}
               <PublisherNewsSection 

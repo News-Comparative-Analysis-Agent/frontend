@@ -36,12 +36,12 @@ const DraftingEditorArea = ({
 
   return (
     <section 
-      className="flex-1 overflow-y-auto custom-scrollbar bg-white relative min-h-0 text-left transition-all duration-500"
+      className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-white relative min-h-0 min-w-[400px] text-left transition-all duration-500"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div className="max-w-3xl px-8 mx-auto py-12 relative">
+      <div className="max-w-3xl px-4 sm:px-8 mx-auto py-12 relative">
         {dropIndicator.index !== -1 && dropIndicator.rect && (
           <div 
             className="absolute left-8 right-8 h-1 bg-primary rounded-full z-50 pointer-events-none shadow-[0_0_10px_rgba(242,127,13,0.5)] transition-all duration-75"
@@ -71,20 +71,13 @@ const DraftingEditorArea = ({
         <div className="relative">
           <div 
             ref={editorRef}
-            className="space-y-6 text-[16px] leading-[1.8] text-slate-700 focus:outline-none drafting-editor min-h-[400px]" 
+            className="space-y-6 text-[16px] leading-[1.9] text-slate-700 focus:outline-none drafting-editor min-h-[400px] relative" 
             contentEditable="true"
             onInput={handleEditorInput}
             onClick={handleEditorClick}
+            suppressContentEditableWarning={true}
           />
 
-          {!content && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center py-20 text-slate-300 pointer-events-none">
-              <div className="size-16 rounded-full bg-slate-50 flex items-center justify-center mb-4 transition-all duration-300">
-                <span className="material-symbols-outlined text-slate-200 text-[32px] animate-pulse">article</span>
-              </div>
-              <p className="text-sm font-medium italic">초안 데이터를 불러오고 있습니다...</p>
-            </div>
-          )}
         </div>
 
         <div className="mt-16 pt-8 border-t border-slate-100" contentEditable="false">

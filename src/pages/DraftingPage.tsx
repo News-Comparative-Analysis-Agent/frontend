@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Layout from '../layouts/Layout'
 import Breadcrumb from '../components/ui/Breadcrumb'
 import { useDraftingPage } from '../hooks/useDraftingPage'
@@ -46,20 +46,27 @@ const DraftingPage = () => {
   const [isCrossCheckMode, setIsCrossCheckMode] = useState(false)
   const [selectedQuote, setSelectedQuote] = useState<any>(null)
 
+  // 팝업 감시를 위한 Ref
+  const popupRef = useRef<Window | null>(null)
+  const popupTimerRef = useRef<any>(null)
+
   // --- 사이드바 축소 시 보여줄 고유 언론사 목록 추출 ---
   const uniqueMediaList = Array.from(new Map(sidebarQuotes.map(q => [q.media, q])).values());
 
   const openArticlePopup = (url: string) => {
     if (!url) return;
     
+    // 기존 타이머가 있다면 제거
+    if (popupTimerRef.current) {
+      clearInterval(popupTimerRef.current);
+    }
+    
     // 💡 사용자의 현재 화면 해상도를 감지하여 정확히 절반(50%) 너비로 설정
-    // 이렇게 하면 윈도우 스냅(Win + 방향키) 사용 시 여백 없이 두 창이 딱 붙게 됩니다.
     const screenWidth = window.screen.availWidth;
     const screenHeight = window.screen.availHeight;
     const popupWidth = Math.floor(screenWidth / 2);
     
     try {
-      // 메인 창을 팝업창 너비만큼 오른쪽으로 밀고 리사이징 시도
       window.moveTo(popupWidth, 0);
       window.resizeTo(screenWidth - popupWidth, screenHeight);
     } catch (e) {
@@ -67,8 +74,28 @@ const DraftingPage = () => {
     }
     
     const features = `width=${popupWidth},height=${screenHeight},left=0,top=0,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`;
-    window.open(url, 'CrossCheckArticle', features);
+    const popup = window.open(url, 'CrossCheckArticle', features);
+    popupRef.current = popup;
+
+    // 팝업 닫힘 감지 타이머 시작
+    if (popup) {
+      popupTimerRef.current = setInterval(() => {
+        if (popup.closed) {
+          if (popupTimerRef.current) clearInterval(popupTimerRef.current);
+          setSelectedQuote(null);
+          setIsCrossCheckMode(false);
+          popupRef.current = null;
+        }
+      }, 1000);
+    }
   };
+
+  // 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (popupTimerRef.current) clearInterval(popupTimerRef.current);
+    }
+  }, []);
 
   const handleCloseGuide = () => {
     if (dontShowAgain) {

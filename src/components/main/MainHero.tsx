@@ -2,14 +2,14 @@ import React from 'react'
 
 const MainHero = () => {
   return (
-    <section className="bg-primary h-[180px] flex flex-col justify-center relative z-10 hero-depth-shadow">
-      <div className="max-w-[1400px] w-full mx-auto px-6 flex items-center justify-between gap-24">
-        <div className="flex-1 text-left shrink-0">
-          <h2 className="text-4xl font-extrabold text-white tracking-tight leading-[1.3] break-keep">
-            기사 작성의 모든 과정,<br />실시간으로 도와드립니다.
+    <section className="bg-primary min-h-[200px] py-8 md:py-0 md:h-[220px] flex flex-col justify-center relative z-10 hero-depth-shadow">
+      <div className="max-w-[1400px] w-full mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 lg:gap-24">
+        <div className="flex-1 text-center md:text-left shrink-0">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-[1.3] break-keep">
+            기사 작성의 모든 과정,<br className="hidden sm:block" /> 실시간으로 도와드립니다.
           </h2>
         </div>
-        <div className="flex flex-row items-start gap-8 py-6 flex-[2]">
+        <div className="flex flex-row items-center gap-3 sm:gap-6 py-2 md:py-6 flex-[2] w-full md:w-auto">
           <div className="flex flex-col items-start gap-2 flex-1 relative">
             <span className="flex items-center justify-center size-14 rounded-full bg-white text-primary text-2xl font-black shadow-glow ring-4 ring-white/30 shrink-0">1</span>
             <div className="text-left">

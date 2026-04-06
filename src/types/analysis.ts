@@ -14,12 +14,29 @@ export interface Contention {
   media_views: MediaView[];
 }
 
+export interface Section {
+  section_title: string;
+  content: string;
+  media_views: MediaView[];
+}
+
 export interface PreGeneratedDraft {
   title: string;
-  introduction: string;
-  contentions: Contention[];
-  summary: string;
-  edit_log: string;
+  introduction?: string;
+  intro?: string;
+  contentions?: Contention[];
+  sections?: Section[];
+  summary?: string;
+  conclusion?: string;
+  edit_log?: string;
+  
+  // 평면 구조(Flat Structure) 대응 필드 추가
+  article_body?: string;
+  description?: string;
+  background?: string;
+  core_contentions?: string;
+  conflict_summary?: string;
+  media_views?: MediaView[];
 }
 
 export interface ClaimCard {

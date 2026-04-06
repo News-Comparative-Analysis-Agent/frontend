@@ -19,7 +19,7 @@ const PopularIssuesSection = ({
   loading, dailyIssues, activeTab, setActiveTab, currentPage, setCurrentPage, topImageIndex, onNavigateToAnalysis
 }: PopularIssuesSectionProps) => {
   return (
-    <div className="xl:flex-1 min-w-0 border-l border-slate-100 pl-4 flex flex-col text-left">
+    <div className="w-full md:w-1/2 min-w-0 border-l border-slate-100 pl-4 flex flex-col text-left">
       <div className="h-[135px] flex flex-col">
         <div className="flex items-center justify-between h-8 mb-1">
           <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">

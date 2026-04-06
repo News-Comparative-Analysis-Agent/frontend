@@ -10,8 +10,8 @@ interface AnalysisBackgroundProps {
 
 const AnalysisBackground = ({ description, background, coreContentions, mediaRatio, timeline }: AnalysisBackgroundProps) => {
   return (
-    <div className="flex flex-col lg:flex-row gap-4 mb-2 items-stretch">
-      <div className="flex-1 bg-white border border-slate-100 rounded-[32px] p-8 shadow-premium min-w-0">
+    <div className="flex flex-col md:flex-row gap-4 mb-2 items-stretch">
+      <div className="flex-1 bg-white border border-slate-100 rounded-[32px] p-6 shadow-premium min-w-0">
         <div className="flex items-center gap-3 mb-8">
           <div className="flex items-center justify-center size-8 bg-primary rounded-full shadow-sm shadow-primary/20">
             <span className="material-symbols-outlined text-[18px] text-white">subject</span>
@@ -19,7 +19,7 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
           <h3 className="text-[20px] font-bold text-slate-900">이슈 배경 상세</h3>
         </div>
         
-        <div className="pr-6 pt-1">
+        <div className="pr-2 pt-1">
           <div className="bullet-point min-h-[85px]">
             <div className="bullet-dot mt-2"></div>
             <p className="text-[15px] text-slate-600 leading-relaxed font-medium mt-0.5">{description}</p>
@@ -40,7 +40,7 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
       </div>
 
       {/* 이슈 타임라인 영역 - 하단 논조 카드와 동일한 420px 너비 적용 */}
-      <div className="w-full lg:w-[420px] shrink-0 bg-white border border-slate-100 rounded-[32px] p-8 shadow-premium">
+      <div className="w-full md:w-[380px] lg:w-[420px] shrink-0 bg-white border border-slate-100 rounded-[32px] p-6 shadow-premium">
         <div className="flex items-center gap-3 mb-8">
           <div className="flex items-center justify-center size-8 bg-primary rounded-full shadow-sm shadow-primary/20">
             <span className="material-symbols-outlined text-[18px] text-white">calendar_today</span>
@@ -79,10 +79,10 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
       </div>
       
       {mediaRatio && (
-        <div className="w-full lg:w-[240px] shrink-0 bg-white border border-slate-100 rounded-[32px] p-8 shadow-premium flex flex-col items-center justify-center">
+        <div className="w-full md:w-[220px] lg:w-[240px] shrink-0 bg-white border border-slate-100 rounded-[32px] p-6 shadow-premium flex flex-col items-center justify-center">
            <div className="text-center">
              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">MEDIA RATIO</p>
-             <div className="relative size-32 mb-4">
+             <div className="relative size-24 mb-4 mx-auto">
                <div className="absolute inset-0 rounded-full border-[10px] border-slate-100"></div>
                <div className="absolute inset-0 rounded-full border-[10px] border-primary border-r-transparent border-b-transparent rotate-45"></div>
              </div>

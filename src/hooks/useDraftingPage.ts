@@ -79,7 +79,20 @@ export const useDraftingPage = () => {
       let draft: PreGeneratedDraft | null = null
       try {
         if (data.pre_generated_draft) {
-          draft = JSON.parse(data.pre_generated_draft)
+          let parsed: any;
+          try {
+            parsed = typeof data.pre_generated_draft === 'string' 
+              ? JSON.parse(data.pre_generated_draft) 
+              : data.pre_generated_draft;
+            
+            draft = {
+              ...parsed,
+              description: parsed.description || data.description,
+              background: parsed.background || data.background
+            };
+          } catch (e) {
+            console.error('Failed to parse pre_generated_draft:', e);
+          }
         }
       } catch (e) {
         console.error('JSON Parse Error:', e)
@@ -87,7 +100,8 @@ export const useDraftingPage = () => {
 
       const allMedia = [
         ...cards.map(c => c.press),
-        ...(draft?.contentions?.flatMap(c => c.media_views?.map(v => v.press)) || [])
+        ...(draft?.media_views?.map(v => v.press) || []),
+        ...((draft?.sections || draft?.contentions || []).flatMap((c: any) => c.media_views?.map((v: any) => v.press || '')) || [])
       ].filter(Boolean)
       const mediaColorMap = buildMediaColorMap(allMedia)
 
@@ -144,7 +158,7 @@ export const useDraftingPage = () => {
 
   // --- 빈 상태일 때 초안 로드 ---
   useEffect(() => {
-    if (issueId === currentIssueId && !content && !title && sidebarQuotes.length === 0) {
+    if (issueId === currentIssueId && (!content || !title || sidebarQuotes.length === 0)) {
       loadDraft()
     }
     if (issueId === currentIssueId && draftImages.length === 0) {
@@ -152,10 +166,31 @@ export const useDraftingPage = () => {
     }
   }, [issueId, currentIssueId, content, title, sidebarQuotes, draftImages.length, loadDraft, loadImages])
 
+  // --- 💡 반응형 사이드바 자동 접기 (50% 너비 대응) ---
+  const prevWidthRef = useRef(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const currentWidth = window.innerWidth;
+      const prevWidth = prevWidthRef.current;
+
+      // 화면이 1100px 이상이었다가 1100px 미만으로 "줄어드는 순간"에만 자동으로 좌측 사이드바를 접음
+      // 이렇게 함으로써 좁은 화면에서도 사용자가 수동으로 사이드바를 여는 것을 방해하지 않음
+      if (prevWidth >= 1100 && currentWidth < 1100 && isLeftSidebarOpen) {
+        setIsLeftSidebarOpen(false);
+      }
+
+      prevWidthRef.current = currentWidth;
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isLeftSidebarOpen, setIsLeftSidebarOpen]);
+
   // --- 에디터 DOM 동기화 ---
   useEffect(() => {
-    if (editorRef.current && content && editorRef.current.innerHTML !== content) {
-      editorRef.current.innerHTML = content
+    if (editorRef.current && editorRef.current.innerHTML !== content) {
+      editorRef.current.innerHTML = content || ''
     }
   }, [content])
 

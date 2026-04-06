@@ -65,19 +65,19 @@ export const mapToAnalysisViewModel = (
 ): AnalysisViewModel => {
   
   // 1. 초안(Draft) 기반으로 의견 목록 생성
-  const draftOpinions: OpinionItem[] = parsedDraft?.contentions.flatMap(contention => 
-    contention.media_views.map((view, idx) => ({
-      media: view.press as any,
-      color: getColorKeyByIndex(idx),
-      title: view.narrative.split('.')[0] + '.',
-      analysisTitle: view.claim,
-      description: view.narrative,
-      sources: [{ 
-        title: view.title || findActualTitle(view.url, view.press, sourceArticles), 
-        url: view.url 
-      }]
-    }))
-  ) || [];
+  const draftMediaViews = parsedDraft?.media_views || (parsedDraft?.sections || parsedDraft?.contentions || []).flatMap(s => s.media_views || []);
+  
+  const draftOpinions: OpinionItem[] = draftMediaViews.map((view: any, idx: number) => ({
+    media: view.press as any,
+    color: getColorKeyByIndex(idx),
+    title: (view.narrative || '').split('.')[0] + '.',
+    analysisTitle: view.claim || "보도 내용",
+    description: view.narrative || "",
+    sources: [{ 
+      title: view.title || findActualTitle(view.url || '', view.press || '', sourceArticles), 
+      url: view.url || ''
+    }]
+  }));
 
   // 2. 클레임 카드 기반으로 의견 목록 생성 (초안 없을 시 대비)
   const cardOpinions: OpinionItem[] = (analysisRes.claim_cards ?? []).map((card, idx) => ({

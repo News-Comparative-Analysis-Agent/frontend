@@ -37,7 +37,7 @@ const FinalReviewPage = () => {
         </div>
       </div>
 
-      <main className="flex-1 flex flex-col lg:flex-row min-h-0 animate-page-in overflow-hidden">
+      <main className="flex-1 flex flex-col md:flex-row min-h-0 animate-page-in overflow-hidden">
         {/* Article Preview Section */}
         <section className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center py-6 md:py-10 min-h-0 px-4 text-left">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-sm font-bold mb-8 border border-primary/10 text-left">
@@ -87,7 +87,7 @@ const FinalReviewPage = () => {
         </section>
 
         {/* Quality Review Sidebar */}
-        <aside className="w-full lg:w-[420px] border-t lg:border-t-0 lg:border-l border-slate-200 bg-white p-5 pb-24 shrink-0 h-full overflow-y-hidden select-none text-left">
+        <aside className="w-full md:w-[320px] lg:w-[420px] border-t md:border-t-0 md:border-l border-slate-200 bg-white p-5 pb-24 shrink-0 md:h-full overflow-y-hidden select-none text-left">
           <SectionHeader 
             icon="fact_check" 
             title="최종 품질 검토 리포트" 

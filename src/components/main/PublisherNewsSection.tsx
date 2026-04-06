@@ -25,7 +25,7 @@ const PublisherNewsSection = ({
   loading, error, newsData, selectedMedia, handleMediaChange, filteredPublishers
 }: PublisherNewsSectionProps) => {
   return (
-    <div className="w-full xl:w-[54%] flex flex-col">
+    <div className="w-full md:w-1/2 flex flex-col">
       <div className="h-[135px] flex flex-col">
         <div className="flex items-center justify-between h-8 mb-1">
           <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">
@@ -39,10 +39,10 @@ const PublisherNewsSection = ({
         <div className="w-full h-px bg-slate-100 mb-2"></div>
 
         <div className="mt-auto pb-2">
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-full w-full no-scrollbar overflow-x-auto border border-slate-200/50 shadow-inner">
+          <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-full w-full border border-slate-200/50 shadow-inner">
             <button 
               onClick={() => handleMediaChange('전체')}
-              className={`flex-1 min-w-[70px] py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${
+              className={`flex-[1.5] py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${
                 selectedMedia.length === 5 
                   ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
@@ -55,7 +55,7 @@ const PublisherNewsSection = ({
               <button 
                 key={media}
                 onClick={() => handleMediaChange(media)}
-                className={`flex-1 min-w-[70px] py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${
+                className={`flex-1 py-2 rounded-full text-[14px] font-medium transition-all duration-300 ${
                   selectedMedia.includes(media) 
                     ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100' 
                     : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
@@ -90,13 +90,13 @@ const PublisherNewsSection = ({
       ) : (
         <div className="flex-1">
           {filteredPublishers.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-4">
               {filteredPublishers.map((publisher) => {
                 const articles = newsData[publisher] ?? [];
                 const style = PUBLISHER_STYLES[publisher] ?? DEFAULT_STYLE;
                 return (
-                  <div key={publisher} className="shadow-premium-card p-6 transition-all duration-300 group/card">
-                    <div className={`border-t-[3px] ${style.borderColor} mb-5`}></div>
+                  <div key={publisher} className="shadow-premium-card p-3 sm:p-4 transition-all duration-300 group/card">
+                    <div className={`border-t-[3px] ${style.borderColor} mb-4`}></div>
                     <div className="flex items-center justify-between mb-5">
                       <h4 className="text-lg font-bold text-slate-700 flex items-center gap-1 group-hover/card:text-primary transition-colors">
                         {publisher} <span className="material-symbols-outlined text-sm group-hover/card:translate-x-1 transition-transform">chevron_right</span>

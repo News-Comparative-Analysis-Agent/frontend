@@ -45,7 +45,9 @@ export const useAnalysisPageData = (issueId: string | null) => {
         
         if (analysisRes.pre_generated_draft) {
           try {
-            const draft = JSON.parse(analysisRes.pre_generated_draft) as PreGeneratedDraft
+            const draft = typeof analysisRes.pre_generated_draft === 'string'
+              ? JSON.parse(analysisRes.pre_generated_draft) as PreGeneratedDraft
+              : analysisRes.pre_generated_draft as unknown as PreGeneratedDraft
             setParsedDraft(draft)
           } catch (e) {
             console.error('Failed to parse draft JSON', e)
