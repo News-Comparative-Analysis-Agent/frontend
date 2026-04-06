@@ -129,7 +129,7 @@ const SearchResultsPage = () => {
       <section className="flex-1 overflow-y-auto custom-scrollbar animate-page-in min-h-0">
         {/* Search Input Area */}
         <div className="bg-white border-b border-slate-100 pt-6 md:pt-8 pb-4 md:pb-6 sticky top-0 z-30">
-          <div className="max-w-[1400px] mx-auto px-6">
+          <div className="max-w-[1280px] mx-auto px-6">
             <div className="flex flex-col w-full max-w-4xl mx-auto md:px-0">
               <div className="max-w-4xl w-full relative mx-auto group">
                 <input 

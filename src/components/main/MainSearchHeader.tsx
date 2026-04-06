@@ -54,7 +54,7 @@ const MainSearchHeader = ({ searchQuery, setSearchQuery, onSearch }: MainSearchH
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 pt-6 pb-0 animate-fade-in mb-0">
+    <div className="max-w-[1280px] mx-auto px-6 pt-6 pb-0 animate-fade-in mb-0">
       <div className="flex flex-col md:flex-row items-start justify-between gap-4 border-b border-slate-200 pb-3 relative">
         {/* 💡 좌측: 오늘의 뉴스 트렌드 & 날짜 정보 */}
         <div className="flex flex-col text-left">

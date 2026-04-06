@@ -69,7 +69,7 @@ const AnalysisPage = () => {
       </div>
 
       <section className="flex-1 w-full animate-page-in overflow-y-auto custom-scrollbar bg-slate-50/30 text-left">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-4">
+        <div className="max-w-[1280px] mx-auto px-6 md:px-10 py-4">
           
           {/* 1. 헤더 영역 (이미지 및 타이틀) */}
           <AnalysisHeader 
