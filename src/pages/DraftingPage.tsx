@@ -64,10 +64,10 @@ const DraftingPage = () => {
       clearInterval(popupTimerRef.current);
     }
     
-    // 💡 사용자의 현재 화면 해상도를 감지하여 정확히 절반(50%) 너비로 설정
+    // 💡 사용자의 현재 화면 해상도를 감지하여 49% 너비로 설정
     const screenWidth = window.screen.availWidth;
     const screenHeight = window.screen.availHeight;
-    const popupWidth = Math.floor(screenWidth / 2);
+    const popupWidth = Math.floor(screenWidth * 0.49);
     
     try {
       window.moveTo(popupWidth, 0);
