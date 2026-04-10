@@ -71,7 +71,8 @@ export const useDraftingPage = () => {
     setPreviewContent, // 💡 임시 저장소 제어 함수 전달
     setPreviewMode,
     pushHistory,
-    undo
+    undo,
+    mediaNames: sidebarQuotes.map(q => q.media) // 💡 언론사 목록 전달
   })
 
   const {
@@ -88,37 +89,44 @@ export const useDraftingPage = () => {
       if (loadingRef.current !== issueId) return
 
       const cards = data.claim_cards ?? []
-      let draft: PreGeneratedDraft | null = null
-      try {
-        if (data.pre_generated_draft) {
-          let parsed: any;
-          try {
-            parsed = typeof data.pre_generated_draft === 'string' 
-              ? JSON.parse(data.pre_generated_draft) 
-              : data.pre_generated_draft;
-            
-            draft = {
-              ...parsed,
-              description: parsed.description || data.description,
-              background: parsed.background || data.background
-            };
-          } catch (e) {
-            console.error('Failed to parse pre_generated_draft:', e);
+      let draft: any = null
+      let parsedSuccessfully = false
+
+      if (data.pre_generated_draft) {
+        if (typeof data.pre_generated_draft === 'string') {
+          // JSON 형태인지만 먼저 가볍게 체크
+          const trimmed = data.pre_generated_draft.trim();
+          if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+            try {
+              draft = JSON.parse(data.pre_generated_draft);
+              parsedSuccessfully = true;
+            } catch (e) {
+              console.warn('Draft looks like JSON but parsing failed, treating as plain text.');
+              draft = data.pre_generated_draft;
+            }
+          } else {
+            // 명백한 평문 문자열
+            draft = data.pre_generated_draft;
           }
+        } else {
+          // 이미 객체 형태인 경우
+          draft = data.pre_generated_draft;
+          parsedSuccessfully = true;
         }
-      } catch (e) {
-        console.error('JSON Parse Error:', e)
       }
 
-      const allMedia = [
-        ...cards.map(c => c.press),
-        ...(draft?.media_views?.map(v => v.press) || []),
-        ...((draft?.sections || draft?.contentions || []).flatMap((c: any) => c.media_views?.map((v: any) => v.press || '')) || [])
-      ].filter(Boolean)
+      // 미디어 컬러맵 구축을 위한 미디어 목록 수집
+      const allMediaFromCards = cards.map(c => c.press);
+      const allMediaFromDraft = parsedSuccessfully && draft ? [
+        ...(draft.media_views?.map((v: any) => v.press) || []),
+        ...((draft.sections || draft.contentions || []).flatMap((c: any) => c.media_views?.map((v: any) => v.press || '')) || [])
+      ] : [];
+      
+      const allMedia = Array.from(new Set([...allMediaFromCards, ...allMediaFromDraft])).filter(Boolean);
       const mediaColorMap = buildMediaColorMap(allMedia)
 
       const mappedQuotes: SidebarQuote[] = cards.map((card) => {
-        const scheme = mediaColorMap[card.press] || { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-300', hl: 'hl-neutral' }
+        const scheme = mediaColorMap[card.press] || { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-slate-300' }
         return {
           id: card.id,
           media: card.press,
@@ -133,10 +141,15 @@ export const useDraftingPage = () => {
 
       setSidebarQuotes(mappedQuotes)
 
+      // 제목 및 본문 설정
       if (draft) {
-        setTitle(draft.title || '')
+        // 우선순위: 구조화된 데이터의 title -> 전체 응답의 name
+        setTitle(draft.title || data.name || '')
         const safeHtml = buildDraftHtml(draft, mediaColorMap)
-        setContent(safeHtml, true) // 로딩 시에는 isDirty를 켜지 않음
+        setContent(safeHtml, true)
+      } else {
+        setTitle(data.name || '')
+        setContent('<p class="text-slate-400">생성된 초안 내용이 없습니다.</p>', true)
       }
     } catch (e) {
       console.error('Failed to load draft:', e)

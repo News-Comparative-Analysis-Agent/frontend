@@ -54,8 +54,8 @@ export interface IssueAnalysisResponse {
   description: string;
   background: string;
   core_contentions: string;
-  media_ratio: null | any;
-  pre_generated_draft: string; // JSON String
+  media_ratio?: null | any;
+  pre_generated_draft: string | any; // JSON String 또는 Plain Text
   created_at: string;
   claim_cards: ClaimCard[];
   image_urls?: string[];

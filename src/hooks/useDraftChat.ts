@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, RefObject } from 'react'
 import { chatWithAI } from '../api/drafting'
+import { applyMediaBolding } from '../utils/mediaBolding'
 
 interface ChatMessage {
   role: 'user' | 'ai'
@@ -25,6 +26,7 @@ interface UseDraftChatOptions {
   setPreviewMode: (val: boolean) => void
   pushHistory: () => void
   undo: () => void
+  mediaNames?: string[] // 💡 추가
 }
 
 /**
@@ -39,7 +41,8 @@ export const useDraftChat = ({
   setPreviewContent,
   setPreviewMode,
   pushHistory,
-  undo: storeUndo
+  undo: storeUndo,
+  mediaNames = [] // 💡 기본값 빈 배열
 }: UseDraftChatOptions) => {
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE])
   const [inputMessage, setInputMessage] = useState('')
@@ -57,8 +60,11 @@ export const useDraftChat = ({
     const userMsg = inputMessage.trim()
     setInputMessage('')
     
+    // 사용자 메시지에도 언론사 볼드 처리 적용
+    const boldedUserMsg = applyMediaBolding(userMsg, mediaNames);
+    
     // 현재 메시지 목록을 상태에서 직접 가져옴 (클로저 문제 해결을 위해 최신값 보장)
-    const currentMessages: ChatMessage[] = [...messages, { role: 'user' as const, content: userMsg }]
+    const currentMessages: ChatMessage[] = [...messages, { role: 'user' as const, content: boldedUserMsg }]
     setMessages(currentMessages)
     setIsChatLoading(true)
 
@@ -99,19 +105,32 @@ export const useDraftChat = ({
       // 💡 [2단계 확장] 본문 실시간 프리뷰 주입 (실제 본문 보존)
       if (aiModifiedContent) {
         import('../utils/diffUtils').then(({ generateFullDiffHtml }) => {
-          const fullDiffHtml = generateFullDiffHtml(realContent, aiModifiedContent);
+          // AI가 제안한 내용에도 언론사 이름이 있다면 볼드 처리 적용
+          const boldedModifiedContent = applyMediaBolding(aiModifiedContent, mediaNames);
+          
+          const fullDiffHtml = generateFullDiffHtml(realContent, boldedModifiedContent);
           setPreviewContent(fullDiffHtml); // 💡 임시 저장소에만 주입
           setPreviewMode(true); // 에디터 프리뷰 모드 활성화
-        }).catch(err => console.error('Diff Preview Error:', err));
-      }
 
-      setMessages(prev => [...prev, {
-        role: 'ai',
-        content: aiMsgContent || '수정 제안을 생성했습니다. 아래 대조창에서 확인해 보세요.',
-        modifiedContent: aiModifiedContent,
-        originalContent: realTimeContent, // 💡 비교를 위해 당시 본문 저장
-        isApplied: false // 💡 처음에는 미적용 상태 (수동 적용 대기)
-      }])
+          // 메시지 목록 업데이트 시에도 볼드 처리된 내용을 저장하여 적용 시 반영되도록 함
+          const boldedMsgContent = applyMediaBolding(aiMsgContent || '수정 제안을 생성했습니다. 아래 대조창에서 확인해 보세요.', mediaNames);
+          
+          setMessages(prev => [...prev, {
+            role: 'ai',
+            content: boldedMsgContent,
+            modifiedContent: boldedModifiedContent,
+            originalContent: realTimeContent,
+            isApplied: false
+          }])
+        }).catch(err => console.error('Diff Preview Error:', err));
+      } else {
+        const boldedMsgContent = applyMediaBolding(aiMsgContent || '응답을 생성했습니다.', mediaNames);
+        setMessages(prev => [...prev, {
+          role: 'ai',
+          content: boldedMsgContent,
+          isApplied: false
+        }])
+      }
     } catch (error) {
       console.error('Chat error:', error)
       setMessages(prev => [...prev, {
@@ -121,7 +140,7 @@ export const useDraftChat = ({
     } finally {
       setIsChatLoading(false)
     }
-  }, [inputMessage, isChatLoading, realContent, issueId, messages, editorRef])
+  }, [inputMessage, isChatLoading, realContent, issueId, messages, editorRef, mediaNames])
 
   // AI의 수정 제안을 수동으로 에디터에 반영 (지능형 태그 세척 포함)
   const applySuggestion = useCallback((index: number) => {
@@ -145,8 +164,12 @@ export const useDraftChat = ({
           span.replaceWith(text);
         });
 
-        // 3. 최종 정제된 내용을 본문에 주입 및 프리뷰 종료
-        setContent(tempDiv.innerHTML);
+        // 3. 태그 세척 과정에서 사라졌을 수 있는 언론사 볼드 처리 재적용
+        const cleanedHtml = tempDiv.innerHTML;
+        const reBoldedHtml = applyMediaBolding(cleanedHtml, mediaNames);
+
+        // 4. 최종 정제된 내용을 본문에 주입 및 프리뷰 종료
+        setContent(reBoldedHtml);
         setPreviewContent(null);
         setPreviewMode(false);
       } else if (msg.modifiedContent) {

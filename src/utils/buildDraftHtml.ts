@@ -1,5 +1,5 @@
 import DOMPurify from 'dompurify'
-import { PreGeneratedDraft } from '../types/analysis'
+import { applyMediaBolding } from './mediaBolding'
 
 interface MediaColorScheme {
   hl: string
@@ -13,6 +13,20 @@ export const buildDraftHtml = (
   draft: any,
   mediaColorMap: Record<string, MediaColorScheme>
 ): string => {
+  const mediaNames = Object.keys(mediaColorMap);
+
+  // 0. 단순 문자열인 경우 처리 (신규 포맷 대응)
+  if (typeof draft === 'string') {
+    let content = applyMediaBolding(draft, mediaNames);
+
+    const paragraphs = content.split('\n').filter((p: string) => p.trim());
+    const html = paragraphs.map((p: string) => `<p class="mb-5 leading-[1.8] text-slate-700">${p.trim().replace(/\n/g, '<br/>')}</p>`).join('');
+    return DOMPurify.sanitize(html, {
+      ADD_TAGS: ['span', 'h4', 'div', 'br', 'p'],
+      ADD_ATTR: ['class']
+    });
+  }
+
   let html = ''
   let mediaViewsRendered = false;
 
@@ -32,10 +46,8 @@ export const buildDraftHtml = (
   if (rootMediaViews.length > 0) {
     mediaViewsRendered = true;
     rootMediaViews.forEach((view: any) => {
-      const scheme = mediaColorMap[view.press]
-      const hlClass = scheme ? scheme.hl : 'hl-neutral'
-      // 하이라이트 + 원본 narrative 만 노출 (순서 존중)
-      html += `<p class="mb-4 leading-relaxed"><span class="${hlClass}">${view.press || ''}</span> ${view.narrative || ''}</p>`
+      // 하이라이트 대신 볼드체 적용
+      html += `<p class="mb-4 leading-relaxed"><span class="font-bold text-slate-900">${view.press || ''}</span> ${view.narrative || ''}</p>`
     });
   }
 
@@ -50,16 +62,17 @@ export const buildDraftHtml = (
     
     if (section.media_views && section.media_views.length > 0) {
       section.media_views.forEach((view: any) => {
-        const scheme = mediaColorMap[view.press]
-        const hlClass = scheme ? scheme.hl : 'hl-neutral'
-        html += `<p class="mb-4 leading-relaxed"><span class="${hlClass}">${view.press || ''}</span> ${view.narrative || ''}</p>`
+        // 하이라이트 대신 볼드체 적용
+        html += `<p class="mb-4 leading-relaxed"><span class="font-bold text-slate-900">${view.press || ''}</span> ${view.narrative || ''}</p>`
       })
     }
   });
 
   // 5. 기사 본문 (article_body) - 백엔드 순서상 가장 마지막에 오는 경우가 많음
   if (draft.article_body) {
-    const paragraphs = draft.article_body.split('\n\n').filter((p: string) => p.trim());
+    let content = applyMediaBolding(draft.article_body, mediaNames);
+
+    const paragraphs = content.split('\n\n').filter((p: string) => p.trim());
     html += paragraphs.map((p: string) => `<p class="mb-5 leading-[1.8] text-slate-700">${p.trim().replace(/\n/g, '<br/>')}</p>`).join('');
   } 
 

@@ -26,9 +26,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen }) => {
     console.log(`${provider} 로그인 시도...`);
     
     if (provider === 'kakao') {
-      window.location.href = 'https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=fb2adf71ebb777c796fe87585202484a&redirect_uri=https://209.38.76.211.nip.io/user/login/kakao';
+      window.location.href = 'https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=fb2adf71ebb777c796fe87585202484a&redirect_uri=https://68.183.177.114.nip.io/user/login/kakao';
     } else {
-      window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=368165235592-uldsap02g23hvi3u313drn1ehrfeblso.apps.googleusercontent.com&redirect_uri=https://209.38.76.211.nip.io/user/login/google&response_type=id_token&scope=openid%20email%20profile&nonce=anything_random_string';
+      window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=368165235592-uldsap02g23hvi3u313drn1ehrfeblso.apps.googleusercontent.com&redirect_uri=https://68.183.177.114.nip.io/user/login/google&response_type=id_token&scope=openid%20email%20profile&nonce=anything_random_string';
     }
   };
 
