@@ -75,11 +75,8 @@ const MainPage = () => {
           {/* 1. Hero 섹션: 프로세스 안내 */}
           <MainHero />
 
-          {/* 2. 검색 및 헤더 섹션 */}
+          {/* 2. 주간 트렌드 헤더 (검색 기능 제거됨) */}
           <MainSearchHeader 
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onSearch={handleSearch}
             selectedDate={selectedDate}
             onDateChange={handleDateChange}
           />
@@ -110,6 +107,9 @@ const MainPage = () => {
                 selectedDate={selectedDate}
                 onDateChange={handleDateChange}
                 onNavigateToAnalysis={(id) => navigate(`/analysis?id=${id}`)}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onSearch={handleSearch}
               />
 
             </div>

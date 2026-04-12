@@ -2,11 +2,11 @@ import React from 'react'
 
 const MainHero = () => {
   return (
-    <section className="bg-primary w-full flex flex-col items-center shadow-md relative z-10">
-      <div className="max-w-[1280px] w-full px-6 flex items-end justify-between md:h-[160px]">
+    <section className="bg-primary w-full flex flex-col items-center shadow-md relative z-10 pt-8 lg:pt-0">
+      <div className="max-w-[1280px] w-full px-6 flex flex-col lg:flex-row items-center lg:items-end justify-between lg:h-[160px]">
         
-        {/* 1. 좌측 홍보 문구 (계층 구조 최적화) */}
-        <div className="flex-1 pb-6 md:pb-8">
+        {/* 1. 좌측 홍보 문구 (모바일 중앙 정렬 대응) */}
+        <div className="flex-1 pb-4 lg:pb-8 text-center lg:text-left">
           <h2 className="flex flex-col items-start break-keep">
             <span className="bg-white text-slate-900 text-2xl sm:text-3xl lg:text-[34px] font-black px-2 py-1 mb-2 leading-tight">
               더 쉽고 빠른 기사 작성,
@@ -17,8 +17,8 @@ const MainHero = () => {
           </h2>
         </div>
 
-        {/* 2. 우측 프로세스 영역 (화이트 박스 제거 및 플랫 디자인 적용) */}
-        <div className="flex items-center gap-12 relative h-full">
+        {/* 2. 우측 프로세스 영역 (모바일 줄바꿈 및 간격 최적화) */}
+        <div className="flex flex-wrap items-center justify-center lg:justify-end gap-x-6 sm:gap-x-12 gap-y-6 relative h-full pb-8 lg:pb-0">
           {[
             { num: '01', label: '주제 선택', desc: '원하는 주제를 선택하세요.' },
             { num: '02', label: '심층 분석', desc: '언론사 별 관점을 분석하세요.' },
