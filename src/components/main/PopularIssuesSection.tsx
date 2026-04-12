@@ -1,5 +1,7 @@
-import React from 'react'
-import Button from '../ui/Button'
+import React, { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import WeeklyCalendar from './WeeklyCalendar'
+import MonthlyCalendar from './MonthlyCalendar'
 import { DailyIssuesResponse } from '../../types/issues'
 
 interface PopularIssuesSectionProps {
@@ -10,23 +12,26 @@ interface PopularIssuesSectionProps {
   currentPage: number
   setCurrentPage: (page: number) => void
   topImageIndex: number
+  selectedDate: Date
+  onDateChange: (date: Date) => void
   onNavigateToAnalysis: (id: number) => void
 }
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop'
 
 const PopularIssuesSection = ({
-  loading, dailyIssues, activeTab, setActiveTab, currentPage, setCurrentPage, topImageIndex, onNavigateToAnalysis
+  loading, dailyIssues, activeTab, setActiveTab, currentPage, setCurrentPage, topImageIndex, selectedDate, onDateChange, onNavigateToAnalysis
 }: PopularIssuesSectionProps) => {
   return (
     <div className="w-full md:w-1/2 min-w-0 border-l border-slate-100 pl-4 flex flex-col text-left">
-      <div className="h-[135px] flex flex-col">
-        <div className="flex items-center justify-between h-8 mb-1">
+      <div className="flex flex-col mb-4">
+        <div className="flex items-center justify-between h-8 mb-4">
           <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">
             {activeTab === 'integrated' ? '언론사 공통으로 다루는 인기 뉴스에요' : '최근에 차트에서 아웃된 이슈들이에요'}
           </h2>
         </div>
-        <div className="flex items-center gap-1.5 mt-3.5 mb-2 text-[12px] text-slate-500 font-medium opacity-90">
+
+        <div className="flex items-center gap-1.5 mb-3 text-[12px] text-slate-500 font-medium opacity-90">
           <span className="material-symbols-outlined text-[14px] text-primary">info</span>
           이곳의 기사들은 이미 초안이 준비되어 있어요. 바로 편집을 시작해 보세요!
         </div>
@@ -74,74 +79,83 @@ const PopularIssuesSection = ({
                 </div>
               </div>
             ) : (
-              <>
-                {dailyIssues.top_issues.length > 0 && (
-                  <div 
-                    className="shadow-premium-card p-4 group cursor-pointer w-full mb-6" 
-                    onClick={() => onNavigateToAnalysis(dailyIssues.top_issues[0].id)}
-                  >
-                    <div className="border-t-[3px] border-primary mb-4"></div>
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-bold text-primary flex items-center gap-1 tracking-tight">통합 인기 1위</h4>
+              (() => {
+                const year = selectedDate.getFullYear();
+                const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                const day = String(selectedDate.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+                
+                const issuesForDate = dailyIssues?.data?.[dateStr] || [];
+                
+                if (issuesForDate.length === 0) {
+                  return (
+                    <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-3">
+                      <span className="material-symbols-outlined text-4xl">event_busy</span>
+                      <p className="text-sm font-medium">선택한 날짜({dateStr})에 대한 이슈가 없습니다.</p>
                     </div>
-                    <div className="pb-4 pt-1 group cursor-pointer border-b border-slate-100">
-                      <div className="relative w-full aspect-[21/9] mb-3 overflow-hidden rounded-xl bg-slate-100">
-                        {dailyIssues.top_issues[0].image_urls.map((url, imgIdx) => (
-                          <img 
-                            key={`${dailyIssues.top_issues[0].id}-${imgIdx}`}
-                            alt={dailyIssues.top_issues[0].name} 
-                            className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ease-in-out ${
-                              imgIdx === topImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-                            }`} 
-                            src={url || DEFAULT_IMAGE}
-                            onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
-                          />
-                        ))}
-                        {dailyIssues.top_issues[0].image_urls.length === 0 && (
-                          <img 
-                            alt={dailyIssues.top_issues[0].name} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                            src={DEFAULT_IMAGE}
-                          />
-                        )}
-                        <div className="absolute top-2 left-2 size-7 bg-primary text-white flex items-center justify-center font-black rank-number rounded shadow-glow z-10">1</div>
-                        <div className="absolute top-2 right-2 px-2.5 py-1 bg-white/90 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center shadow-sm z-10">
-                          <span className="text-[10px] font-bold text-slate-700">AI 초안 작성 완료</span>
-                        </div>
-                        {dailyIssues.top_issues[0].image_urls.length > 1 && (
-                          <div className="absolute bottom-2 right-2 flex gap-1 z-10">
-                            {dailyIssues.top_issues[0].image_urls.map((_, i) => (
-                              <div 
-                                key={i} 
-                                className={`size-1 rounded-full transition-all duration-300 ${
-                                  i === topImageIndex ? 'bg-white w-3' : 'bg-white/40'
-                                }`} 
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <h5 className="text-[15px] font-bold text-slate-900 leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                        {dailyIssues.top_issues[0].name}
-                      </h5>
-                    </div>
-                  </div>
-                )}
-                <div className="divide-y divide-slate-50 bg-white">
-                  {dailyIssues.top_issues.slice(1).map((issue) => (
+                  );
+                }
+
+                const topIssue = issuesForDate[0];
+                
+                return (
+                  <>
                     <div 
-                      key={issue.id} 
-                      className="py-2.5 group cursor-pointer flex gap-4 items-baseline" 
-                      onClick={() => onNavigateToAnalysis(issue.id)}
+                      className="shadow-premium-card p-4 group cursor-pointer w-full mb-6" 
+                      onClick={() => onNavigateToAnalysis(topIssue.id)}
                     >
-                      <span className="rank-number text-xs font-bold text-slate-400 w-4 text-center shrink-0">{issue.rank}</span>
-                      <p className="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary transition-colors">
-                        {issue.name}
-                      </p>
+                      <div className="border-t-[3px] border-primary mb-4"></div>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-lg font-bold text-primary flex items-center gap-1 tracking-tight">통합 인기 1위</h4>
+                      </div>
+                      <div className="pb-4 pt-1 group cursor-pointer border-b border-slate-100">
+                        <div className="relative w-full aspect-[21/9] mb-3 overflow-hidden rounded-xl bg-slate-100">
+                          {topIssue.image_urls?.map((url, imgIdx) => (
+                            <img 
+                              key={`${topIssue.id}-${imgIdx}`}
+                              alt={topIssue.name} 
+                              className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ease-in-out ${
+                                imgIdx === topImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+                              }`} 
+                              src={url || DEFAULT_IMAGE}
+                              onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
+                            />
+                          ))}
+                          {(topIssue.image_urls?.length === 0 || !topIssue.image_urls) && (
+                            <img 
+                              alt={topIssue.name} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                              src={DEFAULT_IMAGE}
+                            />
+                          )}
+                          <div className="absolute top-2 left-2 size-7 bg-primary text-white flex items-center justify-center font-black rank-number rounded shadow-glow z-10">1</div>
+                          <div className="absolute top-2 right-2 px-2.5 py-1 bg-white/90 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center shadow-sm z-10">
+                            <span className="text-[10px] font-bold text-slate-700">AI 초안 작성 완료</span>
+                          </div>
+                        </div>
+                        <h5 className="text-[15px] font-bold text-slate-900 leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                          {topIssue.name}
+                        </h5>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </>
+                    
+                    <div className="divide-y divide-slate-50 bg-white">
+                      {issuesForDate.slice(1, 10).map((issue) => (
+                        <div 
+                          key={issue.id} 
+                          className="py-2.5 group cursor-pointer flex gap-4 items-baseline" 
+                          onClick={() => onNavigateToAnalysis(issue.id)}
+                        >
+                          <span className="rank-number text-xs font-bold text-slate-400 w-4 text-center shrink-0">{issue.rank}</span>
+                          <p className="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary transition-colors">
+                            {issue.name}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                );
+              })()
             )}
           </div>
         ) : (
@@ -159,13 +173,16 @@ const PopularIssuesSection = ({
               (() => {
                 const itemsOnPage1 = 5;
                 const itemsOnOtherPages = 10;
-                const allChartoutItems = dailyIssues.chart_out_issues;
+                const allChartoutItems: any[] = [];
                 
                 if (allChartoutItems.length === 0) {
                   return (
                     <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-3">
                       <span className="material-symbols-outlined text-4xl">history_toggle_off</span>
-                      <p className="text-sm font-medium">최근 차트아웃된 이슈가 없습니다.</p>
+                      <p className="text-sm font-medium text-center px-6">
+                        현재 선택한 구조에서는 실시간 통합 순위만 제공됩니다.<br/>
+                        차트아웃 데이터는 업데이트 예정입니다.
+                      </p>
                     </div>
                   );
                 }
@@ -204,7 +221,7 @@ const PopularIssuesSection = ({
                                 <img 
                                   alt={item.name} 
                                   className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-1000" 
-                                  src={(item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : DEFAULT_IMAGE}
+                                  src={(item.image_urls?.length ?? 0) > 0 ? item.image_urls[0] : DEFAULT_IMAGE}
                                   onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
                                 />
                                 <div className="absolute top-2 left-2 px-2 py-1 bg-slate-900/80 backdrop-blur-sm text-white text-[9px] font-black rounded-lg flex items-center justify-center tracking-tighter">OUT</div>

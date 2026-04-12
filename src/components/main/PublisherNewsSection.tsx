@@ -1,11 +1,14 @@
 import React from 'react'
 import { NewsArticle } from '../../types'
+import MonthlyCalendar from './MonthlyCalendar'
 
 interface PublisherNewsSectionProps {
   loading: boolean
   error: string | null
-  newsData: Record<string, NewsArticle[]>
+  newsData: Record<string, Record<string, NewsArticle[]>>
   selectedMedia: string[]
+  selectedDate: Date
+  onDateChange: (date: Date) => void
   handleMediaChange: (media: string) => void
   filteredPublishers: string[]
 }
@@ -22,17 +25,19 @@ const PUBLISHER_ORDER = ['조선일보', '한겨레', '경향신문', '동아일
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop'
 
 const PublisherNewsSection = ({
-  loading, error, newsData, selectedMedia, handleMediaChange, filteredPublishers
+  loading, error, newsData, selectedMedia, selectedDate, onDateChange, handleMediaChange, filteredPublishers
 }: PublisherNewsSectionProps) => {
+  const formattedDate = `${selectedDate.getFullYear()}년 ${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`;
+
   return (
     <div className="w-full md:w-1/2 flex flex-col">
-      <div className="h-[135px] flex flex-col">
-        <div className="flex items-center justify-between h-8 mb-1">
+      <div className="flex flex-col mb-4">
+        <div className="flex items-center justify-between h-8 mb-4">
           <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">
-            각 언론사별 현재 인기 뉴스에요
+            각 언론사별 인기 뉴스에요
           </h2>
         </div>
-        <div className="flex items-center gap-1.5 mt-3.5 mb-2 text-[12px] text-slate-500 font-medium opacity-90">
+        <div className="flex items-center gap-1.5 mb-3 text-[12px] text-slate-500 font-medium opacity-90">
           <span className="material-symbols-outlined text-[14px] text-primary">info</span>
           필터를 선택하여 원하는 언론사의 인기 뉴스만 골라볼 수 있어요.
         </div>
@@ -88,14 +93,20 @@ const PublisherNewsSection = ({
           </div>
         </div>
       ) : (
-        <div className="flex-1">
+        <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
           {filteredPublishers.length > 0 ? (
-            <div className="grid grid-cols-2 gap-x-2 gap-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4">
               {filteredPublishers.map((publisher) => {
-                const articles = newsData[publisher] ?? [];
+                const year = selectedDate.getFullYear();
+                const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                const day = String(selectedDate.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+                
+                const articles = newsData[dateStr]?.[publisher] || [];
                 const style = PUBLISHER_STYLES[publisher] ?? DEFAULT_STYLE;
+                
                 return (
-                  <div key={publisher} className="shadow-premium-card p-4 transition-all duration-300 group/card">
+                  <div key={publisher} className="shadow-premium-card p-4 transition-all duration-300 group/card bg-white">
                     <div className={`border-t-[3px] ${style.borderColor} mb-4`}></div>
                     <div className="flex items-center justify-between mb-5">
                       <h4 className="text-lg font-bold text-slate-700 flex items-center gap-1 group-hover/card:text-primary transition-colors">

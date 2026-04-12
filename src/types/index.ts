@@ -58,9 +58,9 @@ export interface NewsArticle {
   title: string;
   url: string;
   published_at: string;
-  summary: string;
-  bias: string;
-  bias_score: number;
+  summary?: string;
+  bias?: string;
+  bias_score?: number;
   reporter: string;
   publisher_id: number;
   publisher_name: string;

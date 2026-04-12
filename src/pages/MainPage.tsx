@@ -32,6 +32,8 @@ const MainPage = () => {
     searchQuery,
     setSearchQuery,
     topImageIndex,
+    selectedDate,
+    handleDateChange,
     handleMediaChange,
     handleSearch,
     filteredPublishers
@@ -80,10 +82,12 @@ const MainPage = () => {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             onSearch={handleSearch}
+            selectedDate={selectedDate}
+            onDateChange={handleDateChange}
           />
 
           {/* 3. 메인 뉴스 컨텐츠 영역 */}
-          <div className="max-w-[1280px] mx-auto px-6 pb-12 pt-4">
+          <div className="max-w-[1280px] mx-auto px-6 pb-12 pt-1">
             <div className="flex flex-col md:flex-row gap-4 items-start">
               
               {/* 좌측: 언론사별 인기 뉴스 */}
@@ -92,6 +96,8 @@ const MainPage = () => {
                 error={error}
                 newsData={newsData}
                 selectedMedia={selectedMedia}
+                selectedDate={selectedDate}
+                onDateChange={handleDateChange}
                 handleMediaChange={handleMediaChange}
                 filteredPublishers={filteredPublishers}
               />
@@ -105,6 +111,8 @@ const MainPage = () => {
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}
                 topImageIndex={topImageIndex}
+                selectedDate={selectedDate}
+                onDateChange={handleDateChange}
                 onNavigateToAnalysis={(id) => navigate(`/analysis?id=${id}`)}
               />
 

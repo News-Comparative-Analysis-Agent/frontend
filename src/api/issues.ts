@@ -6,7 +6,7 @@ import { apiGet } from './fetchWithTimeout';
  * 실시간 통합 순위 및 차트아웃 이슈 데이터를 가져오는 API 서비스입니다.
  */
 export const fetchDailyIssues = () =>
-  apiGet<DailyIssuesResponse>('/issues/daily-issues', '이슈 데이터를 불러오는 데 실패했습니다');
+  apiGet<DailyIssuesResponse>('/issues/grouped?days=7', '이슈 데이터를 불러오는 데 실패했습니다');
 
 /**
  * 특정 이슈의 심층 분석 데이터를 가져오는 API 서비스입니다.
