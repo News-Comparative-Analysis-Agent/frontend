@@ -25,8 +25,6 @@ const MainPage = () => {
     newsData,
     dailyIssues,
     selectedMedia,
-    activePopularTab,
-    setActivePopularTab,
     currentPage,
     setCurrentPage,
     searchQuery,
@@ -106,8 +104,6 @@ const MainPage = () => {
               <PopularIssuesSection 
                 loading={loading}
                 dailyIssues={dailyIssues}
-                activeTab={activePopularTab}
-                setActiveTab={setActivePopularTab}
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}
                 topImageIndex={topImageIndex}

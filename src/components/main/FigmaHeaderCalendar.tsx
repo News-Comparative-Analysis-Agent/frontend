@@ -28,8 +28,9 @@ const FigmaHeaderCalendar: React.FC<FigmaHeaderCalendarProps> = ({ selectedDate,
     <div className="flex items-center gap-1 px-4 py-1">
       {days.map((date, idx) => {
         const active = isSameDay(date, selectedDate);
-        const isSun = date.getDay() === 0;
-        const isToday = isSameDay(date, today);
+        const day = date.getDay();
+        const isSun = day === 0;
+        const isSat = day === 6;
         
         return (
           <button
@@ -41,12 +42,12 @@ const FigmaHeaderCalendar: React.FC<FigmaHeaderCalendarProps> = ({ selectedDate,
             `}
           >
             <span 
-              className={`text-[11px] font-medium mb-1 ${isSun && !active ? 'text-rose-400' : 'text-slate-400'}`}
+              className={`text-[11px] font-bold mb-1 ${isSun ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-slate-400'}`}
             >
-              {daysOfWeek[date.getDay()]}
+              {daysOfWeek[day]}
             </span>
             <span 
-              className={`text-[18px] font-black ${active ? 'text-slate-900' : isSun ? 'text-rose-500' : 'text-slate-700'}`}
+              className={`text-[18px] font-black ${isSun ? 'text-rose-600' : isSat ? 'text-blue-600' : active ? 'text-slate-900' : 'text-slate-700'}`}
             >
               {date.getDate()}
             </span>

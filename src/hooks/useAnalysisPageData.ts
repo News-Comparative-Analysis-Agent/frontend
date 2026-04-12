@@ -54,15 +54,21 @@ export const useAnalysisPageData = (issueId: string | null) => {
           }
         }
         
-        const allIssues = [...(issuesRes.top_issues || []), ...(issuesRes.chart_out_issues || [])]
-        const matchedIssue = allIssues.find(iss => 
-          String(iss.id) === String(issueId) || 
-          (analysisRes.name && iss.name.includes(analysisRes.name.substring(0, 10).trim()))
+        // 새 API 구조: { data: { "YYYY-MM-DD": [] } } 에서 모든 이슈 추출
+        const allIssues = Object.values(issuesRes.data || {}).flat()
+        const matchedIssue = allIssues.find(iss =>
+          String(iss.id) === String(issueId) ||
+          (analysisRes.name && iss.name && iss.name.includes(analysisRes.name.substring(0, 10).trim()))
         )
         
-        const allArticles = Object.values(newsRes).flat()
-        const matchedArticle = allArticles.find(art => 
-          (analysisRes.name && (art.title.includes(analysisRes.name.substring(0, 10).trim()) || analysisRes.name.includes(art.title.substring(0, 10).trim())))
+        // newsRes가 { data: {...} } 구조일 수도 있으므로 안전하게 처리
+        const newsItems = (newsRes as any)?.data ? Object.values((newsRes as any).data).flat() : Object.values(newsRes).flat()
+        const allArticles = newsItems as any[]
+        const matchedArticle = allArticles.find(art =>
+          art?.title && analysisRes.name && (
+            art.title.includes(analysisRes.name.substring(0, 10).trim()) ||
+            analysisRes.name.includes(art.title.substring(0, 10).trim())
+          )
         )
         
         const candidates = Array.from(new Set([

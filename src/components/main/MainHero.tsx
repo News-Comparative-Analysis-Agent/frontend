@@ -2,42 +2,46 @@ import React from 'react'
 
 const MainHero = () => {
   return (
-    <section className="bg-primary min-h-[200px] py-8 md:py-0 md:h-[220px] flex flex-col justify-center relative z-10 hero-depth-shadow">
-      <div className="max-w-[1280px] w-full mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 lg:gap-24">
-        <div className="flex-1 text-center md:text-left shrink-0">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-[1.3] break-keep text-3d-premium">
-            기사 작성의 모든 과정,<br className="hidden sm:block" /> 실시간으로 도와드립니다.
+    <section className="bg-primary w-full flex flex-col items-center shadow-md relative z-10">
+      <div className="max-w-[1280px] w-full px-6 flex items-end justify-between md:h-[160px]">
+        
+        {/* 1. 좌측 홍보 문구 (계층 구조 최적화) */}
+        <div className="flex-1 pb-6 md:pb-8">
+          <h2 className="flex flex-col items-start break-keep">
+            <span className="bg-white text-slate-900 text-2xl sm:text-3xl lg:text-[34px] font-black px-2 py-1 mb-2 leading-tight">
+              더 쉽고 빠른 기사 작성,
+            </span>
+            <span className="text-white text-lg sm:text-xl lg:text-[24px] font-light opacity-90 tracking-tight">
+              시작부터 완성까지 함께해요
+            </span>
           </h2>
         </div>
-        <div className="flex flex-row items-center gap-3 sm:gap-6 py-2 md:py-6 flex-[2] w-full md:w-auto">
-          <div className="flex flex-col items-start gap-2 flex-1 relative">
-            <span className="flex items-center justify-center size-14 rounded-full bg-white text-primary text-2xl font-black shadow-glow ring-4 ring-white/30 shrink-0">1</span>
-            <div className="text-left">
-              <p className="text-[18px] font-black text-white leading-none">주제 선택</p>
-               <p className="text-[13px] text-white mt-1.5 leading-snug font-medium opacity-90">주제를 선택하거나 검색해 보세요.</p>
+
+        {/* 2. 우측 프로세스 영역 (화이트 박스 제거 및 플랫 디자인 적용) */}
+        <div className="flex items-center gap-12 relative h-full">
+          {[
+            { num: '01', label: '주제 선택', desc: '원하는 주제를 선택하세요.' },
+            { num: '02', label: '심층 분석', desc: '언론사 별 관점을 분석하세요.' },
+            { num: '03', label: '초안 작성', desc: 'AI가 초안을 작성합니다.' },
+            { num: '04', label: '최종 검토', desc: '기사 품질을 검토하세요.' }
+          ].map((step, idx) => (
+            <div key={idx} className="flex flex-col items-center text-center group min-w-[120px]">
+              {/* 🎯 숫자 영역 (주황 배경에 맞춘 대비 조정) */}
+              <div className={`relative flex items-center justify-center mb-1 transition-all duration-300 ${idx === 0 ? 'bg-white rounded-full shadow-lg w-[52px] h-[52px]' : 'w-[80px] h-[48px] translate-y-[3px]'}`}>
+                <span className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[64px] font-black select-none -z-10 ${idx === 0 ? 'text-primary/10' : 'text-white/10'}`}>
+                  {step.num}
+                </span>
+                <span className={`font-black tracking-tighter leading-none transition-all duration-500 ${idx === 0 ? 'text-primary text-[28px]' : 'text-white/90 text-[32px]'}`}>
+                  {step.num}
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-0 transition-transform duration-300">
+                <p className={`text-[17px] font-bold tracking-tight whitespace-nowrap mt-1 ${idx === 0 ? 'text-white' : 'text-white/80'}`}>{step.label}</p>
+                <p className={`text-[10px] font-normal leading-tight whitespace-nowrap ${idx === 0 ? 'text-white/90' : 'text-white/60'}`}>{step.desc}</p>
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70">
-            <span className="flex items-center justify-center size-10 rounded-full bg-white/20 text-white text-lg font-bold border border-white/30 shrink-0">2</span>
-            <div className="text-left">
-              <p className="text-[16px] font-bold text-white leading-none">심층 분석</p>
-              <p className="text-[12px] text-white/80 mt-2 leading-snug font-normal">진보/보수 관점을 비교 분석합니다.</p>
-            </div>
-          </div>
-          <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70">
-            <span className="flex items-center justify-center size-10 rounded-full bg-white/20 text-white text-lg font-bold border border-white/30 shrink-0">3</span>
-            <div className="text-left">
-              <p className="text-[16px] font-bold text-white leading-none">초안 작성</p>
-              <p className="text-[12px] text-white/80 mt-2 leading-snug font-normal">AI가 기사 초안을 작성합니다.</p>
-            </div>
-          </div>
-          <div className="flex flex-col items-start gap-3 flex-1 mt-2 opacity-70 -ml-6">
-            <span className="flex items-center justify-center size-10 rounded-full bg-white/20 text-white text-lg font-bold border border-white/30 shrink-0">4</span>
-            <div className="text-left">
-               <p className="text-[16px] font-bold text-white leading-none">최종 검토</p>
-              <p className="text-[12px] text-white/80 mt-2 leading-snug font-normal">기사 품질 검토 후 발행합니다.</p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
