@@ -25,8 +25,7 @@ export const useUserStore = create<UserState>((set) => {
     user: savedToken ? {
       nickname: 'Guest 개발자',
       email: 'dev@test.com',
-      id: 0,
-      avatar: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+      id: 0
     } : null,
     login: (userData, token) => {
       localStorage.setItem('accessToken', token);

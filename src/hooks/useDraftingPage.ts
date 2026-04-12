@@ -191,18 +191,28 @@ export const useDraftingPage = () => {
     }
   }, [issueId, currentIssueId, content, title, sidebarQuotes, draftImages.length, loadDraft, loadImages])
 
-  // --- 💡 반응형 사이드바 자동 접기 (50% 너비 대응) ---
+  // --- 💡 고도화된 반응형 사이드바 자동 수납 (사용자 수동 조작 보호 버전) ---
   const prevWidthRef = useRef(window.innerWidth);
 
+  // 1. 초기 로드 시에만 현재 너비에 맞춰 자동 설정 (1회)
+  useEffect(() => {
+    if (window.innerWidth < 1200) setIsLeftSidebarOpen(false);
+    if (window.innerWidth < 1050) setIsRightSidebarOpen(false);
+  }, []); // 의존성 배열을 비워서 최초 로드 시에만 실행
+
+  // 2. 창 크기가 실제로 "변경"될 때만 자동 수납 동작 (수동 열기 차단 방지)
   useEffect(() => {
     const handleResize = () => {
       const currentWidth = window.innerWidth;
       const prevWidth = prevWidthRef.current;
 
-      // 화면이 1100px 이상이었다가 1100px 미만으로 "줄어드는 순간"에만 자동으로 좌측 사이드바를 접음
-      // 이렇게 함으로써 좁은 화면에서도 사용자가 수동으로 사이드바를 여는 것을 방해하지 않음
-      if (prevWidth >= 1100 && currentWidth < 1100 && isLeftSidebarOpen) {
+      // 특정 임계값을 "넘어가는 순간"에만 자동으로 닫음
+      if (prevWidth >= 1200 && currentWidth < 1200) {
         setIsLeftSidebarOpen(false);
+      }
+      
+      if (prevWidth >= 1050 && currentWidth < 1050) {
+        setIsRightSidebarOpen(false);
       }
 
       prevWidthRef.current = currentWidth;
@@ -210,7 +220,7 @@ export const useDraftingPage = () => {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isLeftSidebarOpen, setIsLeftSidebarOpen]);
+  }, [setIsLeftSidebarOpen, setIsRightSidebarOpen]);
 
   // --- 에디터 DOM 동기화 ---
   useEffect(() => {

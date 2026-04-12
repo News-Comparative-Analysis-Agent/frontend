@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import Layout from '../layouts/Layout'
 import ProfileSection from '../components/mypage/ProfileSection'
-import ScrapedArticlesSection from '../components/mypage/ScrapedArticlesSection'
 import DraftListSection from '../components/mypage/DraftListSection'
 
-type TabId = 'profile' | 'scraps' | 'drafts'
+type TabId = 'profile' | 'drafts'
 
 interface SidebarTab {
   id: TabId
@@ -14,7 +13,6 @@ interface SidebarTab {
 
 const TABS: SidebarTab[] = [
   { id: 'profile', label: '회원 정보 수정', icon: 'person' },
-  { id: 'scraps', label: '스크랩한 기사', icon: 'bookmark' },
   { id: 'drafts', label: '임시 저장 초안', icon: 'edit_note' },
 ]
 
@@ -69,7 +67,6 @@ const MyPage = () => {
         {/* 콘텐츠 영역 */}
         <div className="flex-1 space-y-8 min-w-0">
           {activeTab === 'profile' && <ProfileSection />}
-          {activeTab === 'scraps' && <ScrapedArticlesSection />}
           {activeTab === 'drafts' && <DraftListSection />}
         </div>
       </div>

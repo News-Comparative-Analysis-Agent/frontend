@@ -92,7 +92,7 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
               onClick={() => navigate('/mypage')}
             >
               <div className="text-right hidden sm:block">
-                <p className={`text-[11px] md:text-xs font-bold ${isWhite ? 'text-slate-700' : 'text-white'} group-hover:text-primary transition-colors`}>{user?.nickname}</p>
+                <p className={`text-[11px] md:text-xs font-bold ${isWhite ? 'text-slate-700' : 'text-white'} group-hover:text-primary transition-colors`}>MY</p>
               </div>
               <UserAvatar
                 avatar={user?.avatar}

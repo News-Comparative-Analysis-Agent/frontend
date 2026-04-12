@@ -265,7 +265,10 @@ const DraftingPage = () => {
       <DraftingFooterActions 
          lastSaved={lastSaved}
          saveDraft={saveDraft}
-         onFinalReview={() => navigate(`/final-review?id=${issueId}`)}
+         onFinalReview={async () => {
+           await temporarySave();
+           navigate(`/final-review?id=${issueId}`);
+         }}
          formatLastSaved={formatLastSaved}
       />
 

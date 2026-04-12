@@ -52,7 +52,7 @@ const DraftingEditorArea = ({
 
   return (
     <section 
-      className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-white relative min-h-0 min-w-[400px] text-left transition-all duration-500"
+      className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-white relative min-h-0 text-left transition-all duration-500"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
