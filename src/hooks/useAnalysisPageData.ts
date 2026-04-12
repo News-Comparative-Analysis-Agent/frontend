@@ -11,7 +11,7 @@ export const useAnalysisPageData = (issueId: string | null) => {
   const [analysisData, setAnalysisData] = useState<IssueAnalysisResponse | null>(null)
   const [timelineData, setTimelineData] = useState<IssueTimelineResponse | null>(null)
   const [parsedDraft, setParsedDraft] = useState<PreGeneratedDraft | null>(null)
-  const [sourceArticles, setSourceArticles] = useState<Record<string, any[]>>({})
+  const [sourceArticles, setSourceArticles] = useState<any>({})
   
   const [candidateImages, setCandidateImages] = useState<string[]>([])
   const [imageIndex, setImageIndex] = useState(0)
@@ -40,7 +40,7 @@ export const useAnalysisPageData = (issueId: string | null) => {
         ])
         
         setAnalysisData(analysisRes)
-        setSourceArticles(newsRes)
+        setSourceArticles(newsRes as any)
         setTimelineData(timelineRes)
         
         if (analysisRes.pre_generated_draft) {

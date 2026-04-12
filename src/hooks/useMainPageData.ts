@@ -42,8 +42,8 @@ export const useMainPageData = () => {
           })
         ])
         
-        const validNews = newsResponse?.data || {};
-        setNewsData(validNews);
+        const validNews = (newsResponse as any)?.data || newsResponse || {};
+        setNewsData(validNews as any);
 
         // 새로운 데이터 구조 { data: { "YYYY-MM-DD": [] } } 검증
         const isValidIssues = issuesResponse && 
