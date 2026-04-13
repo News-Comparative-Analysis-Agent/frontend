@@ -5,12 +5,16 @@ import { fetchDailyIssues } from '../api/issues'
 import { NewsArticle } from '../types'
 import { DailyIssuesResponse } from '../types/issues'
 
-export const PUBLISHER_ORDER = ['조선일보', '한겨레', '경향신문', '동아일보', '연합뉴스']
-
+// 12개 핵심 언론사 설정 (가나다 순)
+export const PRESS_NAMES = [
+  '경향신문', '국민일보', '동아일보', '문화일보', 
+  '서울신문', '세계일보', '조선일보', '중앙일보', 
+  '한겨레', '한국일보', 'JTBC', 'MBC'
+];
 
 export const useMainPageData = () => {
   const navigate = useNavigate()
-  const [selectedMedia, setSelectedMedia] = useState<string[]>(PUBLISHER_ORDER)
+  const [selectedMedia, setSelectedMedia] = useState<string[]>(PRESS_NAMES)
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
@@ -43,7 +47,19 @@ export const useMainPageData = () => {
         ])
         
         const validNews = (newsResponse as any)?.data || newsResponse || {};
-        setNewsData(validNews as any);
+        
+        // 12개 핵심 언론사 데이터만 필터링하여 저장 (가나다 순서 유지)
+        const filteredNews: Record<string, Record<string, NewsArticle[]>> = {};
+        Object.keys(validNews).forEach(date => {
+          filteredNews[date] = {};
+          PRESS_NAMES.forEach(press => {
+            if (validNews[date] && validNews[date][press]) {
+              filteredNews[date][press] = validNews[date][press];
+            }
+          });
+        });
+
+        setNewsData(filteredNews);
 
         // 새로운 데이터 구조 { data: { "YYYY-MM-DD": [] } } 검증
         const isValidIssues = issuesResponse && 
@@ -97,7 +113,7 @@ export const useMainPageData = () => {
 
   const handleMediaChange = useCallback((media: string) => {
     if (media === '전체') {
-      setSelectedMedia((prev) => prev.length === 5 ? [] : [...PUBLISHER_ORDER])
+      setSelectedMedia((prev) => prev.length === PRESS_NAMES.length ? [] : [...PRESS_NAMES])
       return
     }
     setSelectedMedia((prev) => {
@@ -115,10 +131,11 @@ export const useMainPageData = () => {
     }
   }, [navigate, searchQuery])
 
-  const filteredPublishers = PUBLISHER_ORDER.filter(p => selectedMedia.includes(p))
+  const filteredPublishers = PRESS_NAMES.filter(p => selectedMedia.includes(p))
 
   return {
     navigate,
+    allPublishers: PRESS_NAMES,
     selectedMedia,
     setSelectedMedia,
     currentPage,

@@ -65,27 +65,19 @@ const PopularIssuesSection = ({
   }
 
   return (
-    <div className="w-full md:w-1/2 min-w-0 border-l border-slate-100 pl-4 flex flex-col text-left self-stretch transition-all duration-300">
+    <div className="w-full min-w-0 md:border-l border-slate-100 md:pl-8 flex flex-col text-left self-stretch transition-all duration-300">
       <div className="flex flex-col mb-4">
         <div className="flex items-center justify-between h-8 mb-4">
           <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">
             언론사 공통으로 다루는 인기 뉴스에요
           </h2>
         </div>
-
         <div className="flex items-center gap-1.5 mb-3 text-[12px] text-slate-500 font-medium opacity-90">
           <span className="material-symbols-outlined text-[14px] text-primary">info</span>
-          이곳의 기사들은 이미 초안이 준비되어 있어요. 바로 편집을 시작해 보세요!
+          이곳은 이미 초안이 준비되어 있어요. 바로 편집을 시작하세요!
         </div>
-        <div className="w-full h-px bg-slate-100 mb-2"></div>
+        <div className="w-full h-px bg-slate-100 mb-6"></div>
         
-        <div className="mt-auto pb-2">
-          <div className="flex items-center p-1 bg-slate-100 rounded-full w-full border border-slate-200/50 shadow-inner">
-            <div className="flex-1 py-2 rounded-full text-[14px] font-bold bg-white text-slate-900 shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100 text-center" style={{ textShadow: '0 1px 1px rgba(0,0,0,0.1)' }}>
-              실시간 통합 순위
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="flex flex-col">

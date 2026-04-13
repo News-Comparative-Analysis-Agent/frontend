@@ -64,14 +64,15 @@ const DraftingPage = () => {
       clearInterval(popupTimerRef.current);
     }
     
-    // 💡 사용자의 현재 화면 해상도를 감지하여 49% 너비로 설정
+    // 💡 사용자의 현재 화면 해상도를 감지하여 정확히 절반(50%) 너비로 설정하되,
+    // 윈도우(OS)의 투명 테두리(Invisible Borders)가 차지하는 면적을 감안하여 살짝 적게(49.5%) 줍니다.
     const screenWidth = window.screen.availWidth;
     const screenHeight = window.screen.availHeight;
-    const popupWidth = Math.floor(screenWidth * 0.49);
+    const popupWidth = Math.floor(screenWidth * 0.495); // 절반보다 약간 작게
     
     try {
-      window.moveTo(popupWidth, 0);
-      window.resizeTo(screenWidth - popupWidth, screenHeight);
+      window.moveTo(screenWidth - popupWidth, 0); // 화면 우측으로 배치
+      window.resizeTo(popupWidth, screenHeight);
     } catch (e) {
       console.warn("Main window control limited by browser policy");
     }

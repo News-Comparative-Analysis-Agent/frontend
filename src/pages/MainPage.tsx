@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Layout from '../layouts/Layout'
 import { useMainPageData } from '../hooks/useMainPageData'
@@ -10,6 +10,7 @@ import MainHero from '../components/main/MainHero'
 import MainSearchHeader from '../components/main/MainSearchHeader'
 import PublisherNewsSection from '../components/main/PublisherNewsSection'
 import PopularIssuesSection from '../components/main/PopularIssuesSection'
+import PublisherSidebar from '../components/main/PublisherSidebar'
 
 /**
  * 메인 페이지 (MainPage)
@@ -24,6 +25,7 @@ const MainPage = () => {
     error,
     newsData,
     dailyIssues,
+    allPublishers,
     selectedMedia,
     currentPage,
     setCurrentPage,
@@ -36,6 +38,7 @@ const MainPage = () => {
     handleSearch,
     filteredPublishers
   } = useMainPageData()
+  const [isPublisherSidebarOpen, setIsPublisherSidebarOpen] = useState(false)
   const { isLoggedIn, login } = useUserStore()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -71,6 +74,28 @@ const MainPage = () => {
         {/* 로그인 모달: 비로그인 시 강제 노출 */}
         <LoginModal isOpen={!isLoggedIn} />
 
+        {/* 좌측 플로팅 탭 버튼 */}
+        <div 
+          onClick={() => setIsPublisherSidebarOpen(true)}
+          className="fixed left-0 top-1/2 -translate-y-1/2 z-40 group cursor-pointer"
+        >
+          <div className="bg-white/80 backdrop-blur-md border border-slate-200 border-l-0 rounded-r-2xl py-6 px-1.5 shadow-2xl shadow-slate-200 hover:pr-4 transition-all duration-300 flex flex-col items-center gap-3">
+            <span className="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">filter_list</span>
+            <span className="text-[11px] font-black text-slate-800 [writing-mode:vertical-lr] tracking-widest group-hover:text-primary">
+              언론사 필터
+            </span>
+          </div>
+        </div>
+
+        {/* 언론사 선택 사이드바 (숨김형) */}
+        <PublisherSidebar 
+          isOpen={isPublisherSidebarOpen}
+          onClose={() => setIsPublisherSidebarOpen(false)}
+          allPublishers={allPublishers}
+          selectedMedia={selectedMedia}
+          handleMediaChange={handleMediaChange}
+        />
+
         <div className={`transition-all duration-1000 ${!isLoggedIn ? 'blur-md pointer-events-none' : 'animate-page-in'}`}>
           {/* 1. Hero 섹션: 프로세스 안내 */}
           <MainHero />
@@ -83,34 +108,39 @@ const MainPage = () => {
 
           {/* 3. 메인 뉴스 컨텐츠 영역 */}
           <div className="max-w-[1280px] mx-auto px-6 pb-12 pt-1">
-            <div className="flex flex-col md:flex-row gap-4 items-start">
+            <div className="flex flex-col md:flex-row gap-8">
               
-              {/* 좌측: 언론사별 인기 뉴스 */}
-              <PublisherNewsSection 
-                loading={loading}
-                error={error}
-                newsData={newsData}
-                selectedMedia={selectedMedia}
-                selectedDate={selectedDate}
-                onDateChange={handleDateChange}
-                handleMediaChange={handleMediaChange}
-                filteredPublishers={filteredPublishers}
-              />
+              {/* 좌측: 언론사별 인기 뉴스 (3열 구성을 위해 더 넓게 배치) */}
+              <div className="w-full md:flex-[2.3] min-w-0">
+                <PublisherNewsSection 
+                  loading={loading}
+                  error={error}
+                  newsData={newsData}
+                  allPublishers={allPublishers}
+                  selectedMedia={selectedMedia}
+                  selectedDate={selectedDate}
+                  onDateChange={handleDateChange}
+                  handleMediaChange={handleMediaChange}
+                  filteredPublishers={filteredPublishers}
+                />
+              </div>
 
-              {/* 우측: 실시간 통합 순위 및 차트아웃 이슈 */}
-              <PopularIssuesSection 
-                loading={loading}
-                dailyIssues={dailyIssues}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-                topImageIndex={topImageIndex}
-                selectedDate={selectedDate}
-                onDateChange={handleDateChange}
-                onNavigateToAnalysis={(id) => navigate(`/analysis?id=${id}`)}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                onSearch={handleSearch}
-              />
+              {/* 우측: 실시간 통합 순위 (슬림하게 배치) */}
+              <div className="w-full md:flex-1 min-w-0">
+                <PopularIssuesSection 
+                  loading={loading}
+                  dailyIssues={dailyIssues}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                  topImageIndex={topImageIndex}
+                  selectedDate={selectedDate}
+                  onDateChange={handleDateChange}
+                  onNavigateToAnalysis={(id) => navigate(`/analysis?id=${id}`)}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  onSearch={handleSearch}
+                />
+              </div>
 
             </div>
           </div>

@@ -6,6 +6,7 @@ interface PublisherNewsSectionProps {
   loading: boolean
   error: string | null
   newsData: Record<string, Record<string, NewsArticle[]>>
+  allPublishers: string[]
   selectedMedia: string[]
   selectedDate: Date
   onDateChange: (date: Date) => void
@@ -21,16 +22,15 @@ const PUBLISHER_STYLES: Record<string, { borderColor: string; color: string; tex
   '연합뉴스': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
 }
 const DEFAULT_STYLE = { borderColor: 'border-slate-400', color: 'bg-slate-400', textColor: 'text-primary' }
-const PUBLISHER_ORDER = ['조선일보', '한겨레', '경향신문', '동아일보', '연합뉴스']
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop'
 
 const PublisherNewsSection = ({
-  loading, error, newsData, selectedMedia, selectedDate, onDateChange, handleMediaChange, filteredPublishers
+  loading, error, newsData, allPublishers, selectedMedia, selectedDate, onDateChange, handleMediaChange, filteredPublishers
 }: PublisherNewsSectionProps) => {
   const formattedDate = `${selectedDate.getFullYear()}년 ${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`;
 
   return (
-    <div className="w-full md:w-1/2 flex flex-col">
+    <div className="flex flex-col w-full h-full">
       <div className="flex flex-col mb-4">
         <div className="flex items-center justify-between h-8 mb-4">
           <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">
@@ -41,42 +41,12 @@ const PublisherNewsSection = ({
           <span className="material-symbols-outlined text-[14px] text-primary">info</span>
           필터를 선택하여 원하는 언론사의 인기 뉴스만 골라볼 수 있어요.
         </div>
-        <div className="w-full h-px bg-slate-100 mb-2"></div>
-
-        <div className="mt-auto pb-2">
-          <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-full w-full border border-slate-200/50 shadow-inner">
-            <button 
-              onClick={() => handleMediaChange('전체')}
-              className={`flex-[1.5] py-2 rounded-full text-[14px] transition-all duration-300 ${
-                selectedMedia.length === 5 
-                  ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
-              }`}
-              style={selectedMedia.length === 5 ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
-            >
-              전체
-            </button>
-            {PUBLISHER_ORDER.map(media => (
-              <button 
-                key={media}
-                onClick={() => handleMediaChange(media)}
-                className={`flex-1 py-2 rounded-full text-[14px] transition-all duration-300 ${
-                  selectedMedia.includes(media) 
-                    ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100' 
-                    : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
-                }`}
-                style={selectedMedia.includes(media) ? { textShadow: '0 1px 1px rgba(0,0,0,0.1)' } : {}}
-              >
-                {media.replace('신문', '').replace('일보', '')}
-              </button>
-            ))}
-          </div>
-        </div>
+        <div className="w-full h-px bg-slate-100 mb-6"></div>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-          {[1, 2].map(i => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-6">
+          {[1, 2, 3].map(i => (
             <div key={i} className="animate-pulse space-y-3">
               <div className="h-3 w-20 bg-slate-200 rounded" />
               <div className="w-full aspect-video bg-slate-200 rounded-xl" />
@@ -95,7 +65,7 @@ const PublisherNewsSection = ({
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
           {filteredPublishers.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-4">
               {filteredPublishers.map((publisher) => {
                 const year = selectedDate.getFullYear();
                 const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
