@@ -9,6 +9,7 @@ export interface DraftState {
   sidebarQuotes: SidebarQuote[];
   lastSaved: string | null;
   isDirty: boolean;
+  isSaving: boolean; // 💡 임시 저장 진행 중 여부
   isPreviewMode: boolean; // 💡 AI 수정 제안 프리뷰 모드 여부
   previewContent: string | null; // 💡 AI 수정 제안 임시 하이라이트 HTML
   

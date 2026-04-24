@@ -31,17 +31,17 @@ const PublisherNewsSection = ({
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex flex-col mb-4">
+      <div className="flex flex-col mb-0">
         <div className="flex items-center justify-between h-8 mb-4">
           <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">
             각 언론사별 인기 뉴스에요
           </h2>
         </div>
         <div className="flex items-center gap-1.5 mb-3 text-[12px] text-slate-500 font-medium opacity-90">
-          <span className="material-symbols-outlined text-[14px] text-primary">info</span>
+          <span className="material-symbols-outlined text-[14px] text-primary">tune</span>
           필터를 선택하여 원하는 언론사의 인기 뉴스만 골라볼 수 있어요.
         </div>
-        <div className="w-full h-px bg-slate-100 mb-6"></div>
+        <div className="w-full h-px bg-slate-100 mb-0"></div>
       </div>
 
       {loading ? (
@@ -65,7 +65,7 @@ const PublisherNewsSection = ({
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
           {filteredPublishers.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-3 gap-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-1 gap-y-4 -mx-1">
               {filteredPublishers.map((publisher) => {
                 const year = selectedDate.getFullYear();
                 const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
@@ -76,7 +76,7 @@ const PublisherNewsSection = ({
                 const style = PUBLISHER_STYLES[publisher] ?? DEFAULT_STYLE;
                 
                 return (
-                  <div key={publisher} className="shadow-premium-card p-4 transition-all duration-300 group/card bg-white">
+                  <div key={publisher} className="shadow-premium-card px-2.5 py-4 transition-all duration-300 group/card bg-white">
                     <div className={`border-t-[3px] ${style.borderColor} mb-4`}></div>
                     <div className="flex items-center justify-between mb-5">
                       <h4 className="text-lg font-bold text-slate-700 flex items-center gap-1 group-hover/card:text-primary transition-colors">
@@ -90,7 +90,7 @@ const PublisherNewsSection = ({
                           href={article.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`${idx === 0 ? 'pb-6 pt-1 border-b border-slate-100 block' : 'py-2.5 flex gap-3 items-baseline'} group/item cursor-pointer`}
+                          className={`${idx === 0 ? 'pb-4 pt-1 border-b border-slate-100 block' : 'py-[7px] flex gap-3 items-baseline'} group/item cursor-pointer`}
                         >
                           {idx === 0 ? (
                             <>
@@ -103,14 +103,14 @@ const PublisherNewsSection = ({
                                 />
                                 <div className={`absolute top-2 left-2 size-7 ${style.color} text-white flex items-center justify-center font-bold rank-number rounded shadow-md text-xs`}>1</div>
                               </div>
-                              <h5 className={`text-[14px] font-bold text-slate-900 leading-snug group-hover/item:${style.textColor} transition-colors line-clamp-2`}>
+                              <h5 className={`text-[13px] font-bold text-slate-900 leading-snug group-hover/item:${style.textColor} transition-colors line-clamp-2`}>
                                 {article.title}
                               </h5>
                             </>
                           ) : (
                             <>
-                              <span className="rank-number text-xs font-bold text-slate-400 w-4 text-center shrink-0">{idx + 1}</span>
-                              <p className={`text-[12.5px] font-medium text-slate-700 truncate flex-1 group-hover/item:${style.textColor} transition-colors`}>
+                              <span className="rank-number text-[11px] font-bold text-slate-400 w-4 text-center shrink-0">{idx + 1}</span>
+                              <p className={`text-[12px] font-medium text-slate-700 truncate flex-1 group-hover/item:${style.textColor} transition-colors`}>
                                 {article.title}
                               </p>
                             </>
@@ -125,7 +125,7 @@ const PublisherNewsSection = ({
           ) : (
             <div className="flex flex-col items-center justify-center py-24 px-10 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
               <div className="size-16 rounded-full bg-slate-100 flex items-center justify-center mb-6 animate-bounce shadow-inner">
-                <span className="material-symbols-outlined text-3xl text-primary">touch_app</span>
+                <span className="material-symbols-outlined text-3xl text-primary font-bold">tune</span>
               </div>
               <p className="text-slate-800 font-bold text-[18px] mb-2 tracking-tight">언론사가 아직 선택되지 않았어요</p>
               <p className="text-slate-500 text-sm leading-relaxed text-center">

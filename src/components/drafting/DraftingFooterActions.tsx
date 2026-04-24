@@ -3,12 +3,13 @@ import Button from '../ui/Button'
 
 interface DraftingFooterActionsProps {
   lastSaved: string | null
+  isSaving: boolean
   saveDraft: () => void
   onFinalReview: () => void
   formatLastSaved: () => string
 }
 
-const DraftingFooterActions = ({ lastSaved, saveDraft, onFinalReview, formatLastSaved }: DraftingFooterActionsProps) => {
+const DraftingFooterActions = ({ lastSaved, isSaving, saveDraft, onFinalReview, formatLastSaved }: DraftingFooterActionsProps) => {
   return (
     <footer className="h-20 border-t border-slate-200 bg-white px-4 md:px-8 flex items-center justify-between z-30 shrink-0 shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.03)]">
       <div className="flex items-center gap-2">
@@ -18,8 +19,14 @@ const DraftingFooterActions = ({ lastSaved, saveDraft, onFinalReview, formatLast
         </span>
       </div>
       <div className="flex items-center gap-2 md:gap-3">
-        <Button variant="outline" icon="save" onClick={saveDraft}>
-          <span>임시저장</span>
+        <Button 
+          variant="outline" 
+          icon={isSaving ? "sync" : "save"} 
+          onClick={saveDraft}
+          disabled={isSaving}
+          className={isSaving ? "animate-spin-slow" : ""}
+        >
+          <span>{isSaving ? '저장 중...' : '임시저장'}</span>
         </Button>
         <Button 
           onClick={onFinalReview}

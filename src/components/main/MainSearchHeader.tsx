@@ -29,13 +29,13 @@ const MainSearchHeader = ({ selectedDate, onDateChange }: MainSearchHeaderProps)
               </div>
             </div>
           </div>
-          <p className="text-[12px] font-medium text-slate-400 tracking-tight leading-none">
+          <p className="text-[12px] font-medium text-slate-500 opacity-90 tracking-tight leading-none">
             지난 일주일 간의 트렌드를 한눈에 확인해 보세요
           </p>
         </div>
         
         {/* 우측 달력 영역 - 하단 카테고리 바 정렬 기준 중간 지점 조정 (w-1/2, pl-8) */}
-        <div className="calendar-container w-1/2 flex pl-8">
+        <div className="calendar-container w-1/2 flex justify-end">
           <FigmaHeaderCalendar 
             selectedDate={selectedDate}
             onDateChange={onDateChange}

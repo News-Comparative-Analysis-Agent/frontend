@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { DraftState } from '../types/store';
+import { saveDraft as saveDraftApi } from '../api/drafting';
 
 /**
  * 초안 작성 및 기사 분석 상태를 관리하는 전역 스토어입니다.
@@ -18,6 +19,7 @@ export const useDraftStore = create<DraftState>()(
       sidebarQuotes: [],
       lastSaved: null,
       isDirty: false,
+      isSaving: false,
       isPreviewMode: false,
 
       // 기본 상태 변경 액션
@@ -36,7 +38,7 @@ export const useDraftStore = create<DraftState>()(
         if (state.previewContent === newPreview) return state;
         return { 
           previewContent: newPreview, 
-          isDirty: true // 💡 프리뷰 도중 수정해도 변경된 것으로 간주
+          isDirty: true // 프리뷰 도중 수정해도 변경된 것으로 간주
         };
       }),
       setPreviewMode: (isPreviewMode) => set({ isPreviewMode }),
@@ -94,14 +96,37 @@ export const useDraftStore = create<DraftState>()(
       saveDraft: async () => {
         const state = get();
         
-        // 💡 [Option A] 프리뷰 모드일 경우 저장 차단
-        if (state.isPreviewMode) {
-          alert('현재 AI 수정 제안 프리뷰 중입니다.\n제안을 [적용]하거나 [취소]한 후에 임시저장해 주세요.');
+        // 프리뷰 모드거나 이미 저장 중이면 중단
+        if (state.isPreviewMode || state.isSaving) {
+          if (state.isPreviewMode) {
+            alert('현재 AI 수정 제안 프리뷰 중입니다.\n제안을 [적용]하거나 [취소]한 후에 임시저장해 주세요.');
+          }
           return;
         }
 
-        // 실제 API 연동 시 이곳에서 비동기 작업 수행 (현재는 더미 구현)
-        set({ lastSaved: new Date().toISOString(), isDirty: false })
+        // 이슈 ID가 없는 경우 저장 불가
+        if (!state.currentIssueId) {
+          alert('이슈 ID를 확인할 수 없어 저장에 실패했습니다.');
+          return;
+        }
+
+        set({ isSaving: true });
+        try {
+          // 서버로 전송할 데이터 조립 (ID는 숫자형으로 변환)
+          await saveDraftApi({
+            title: state.title,
+            content: state.content,
+            issue_id: Number(state.currentIssueId)
+          });
+
+          // 성공 시 로컬 상태 업데이트
+          set({ lastSaved: new Date().toISOString(), isDirty: false });
+        } catch (error) {
+          console.error('임시 저장 실패:', error);
+          alert('임시 저장 과정에서 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+        } finally {
+          set({ isSaving: false });
+        }
       },
       resetDraft: () => set({ 
         currentIssueId: null, 

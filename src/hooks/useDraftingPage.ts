@@ -19,7 +19,7 @@ export const useDraftingPage = () => {
   const {
     currentIssueId, title, content, sidebarQuotes,
     setIssueId, setTitle, setContent, setSidebarQuotes,
-    saveDraft, lastSaved, isDirty, setIsDirty,
+    saveDraft, lastSaved, isDirty, setIsDirty, isSaving,
     undo, pushHistory, setPreviewMode,
     previewContent, setPreviewContent, isPreviewMode // 💡 하단에서 위로 끌어올림
   } = useDraftStore()
@@ -292,6 +292,7 @@ export const useDraftingPage = () => {
     setContent,
     sidebarQuotes,
     lastSaved,
+    isSaving,
     saveDraft,
     formatLastSaved,
     draftImages,

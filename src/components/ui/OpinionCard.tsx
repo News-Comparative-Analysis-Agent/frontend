@@ -28,10 +28,10 @@ const OpinionCard = ({ media, color = 'slate', title, analysisTitle, description
       <StanceBadge color={color}>
         {media}
       </StanceBadge>
-      <h4 className="text-[20px] font-bold text-slate-900 leading-[1.3] mb-6 line-clamp-2 overflow-hidden" dangerouslySetInnerHTML={{ __html: title }}></h4>
+      <h4 className="text-[17px] font-bold text-slate-800 leading-[1.4] mb-5 line-clamp-2 overflow-hidden" dangerouslySetInnerHTML={{ __html: title }}></h4>
       <div className={`inner-analysis-box ${innerBoxStyles[color]}`}>
-        <div className="font-bold text-slate-900 text-[16px] mb-2">{analysisTitle}</div>
-        <p className="text-[15px] text-slate-600 leading-relaxed font-medium">{description}</p>
+        <div className="font-bold text-slate-800 text-[14px] mb-2">{analysisTitle}</div>
+        <p className="text-[13.5px] text-slate-600 leading-relaxed font-normal">{description}</p>
       </div>
       <details className="notion-toggle w-full">
         <summary className="notion-toggle-header">
@@ -47,7 +47,7 @@ const OpinionCard = ({ media, color = 'slate', title, analysisTitle, description
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span className="text-[13.5px] font-bold text-slate-700 flex-1 truncate group-hover/link:text-primary transition-colors">{source.title}</span>
+              <span className="text-[12px] font-bold text-slate-700 flex-1 truncate group-hover/link:text-primary transition-colors">{source.title}</span>
               <span className="material-symbols-outlined text-[16px] text-slate-400 group-hover/link:text-primary">open_in_new</span>
             </a>
           ))}

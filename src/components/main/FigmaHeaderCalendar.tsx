@@ -27,14 +27,14 @@ const FigmaHeaderCalendar: React.FC<FigmaHeaderCalendarProps> = ({ selectedDate,
   const currentMonth = selectedDate.getMonth() + 1;
 
   return (
-    <div className="flex items-center justify-between w-full px-0 py-1">
+    <div className="flex items-center justify-end gap-x-4 w-full py-0.1">
       {/* 🗓 월 표시 영역 (대폭 확대 및 정렬 수정) */}
-      <div className="flex flex-col items-center justify-center pr-6 shrink-0 border-r border-slate-200 mr-3">
+      <div className="flex flex-col items-center justify-center pr-8 shrink-0 border-r border-slate-200">
         <span className="text-[48px] font-black text-slate-800 leading-none tracking-tighter">{currentMonth}</span>
         <span className="text-[8px] font-black text-slate-400 mt-0 uppercase tracking-[0.2em] -mr-0.5">Month</span>
       </div>
 
-      <div className="flex flex-1 items-center justify-between">
+      <div className="flex items-center justify-center gap-x-2">
         {days.map((date, idx) => {
           const active = isSameDay(date, selectedDate);
           const day = date.getDay();
@@ -47,16 +47,16 @@ const FigmaHeaderCalendar: React.FC<FigmaHeaderCalendarProps> = ({ selectedDate,
                 onClick={() => onDateChange(date)}
                 className={`
                   flex flex-col items-center justify-center w-[48px] h-[72px] transition-all duration-300
-                  ${active ? 'border-[1.5px] border-slate-900 rounded-full shadow-sm' : 'hover:bg-slate-50 rounded-2xl'}
+                  ${active ? 'bg-primary/5 border-[1.5px] border-primary/30 rounded-2xl' : 'hover:bg-slate-50 rounded-2xl'}
                 `}
               >
                 <span 
-                  className={`text-[11px] font-bold mb-1 ${isSun ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-slate-400'}`}
+                  className={`text-[11px] font-bold mb-1 ${active ? 'text-primary' : isSun ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-slate-400'}`}
                 >
                   {daysOfWeek[day]}
                 </span>
                 <span 
-                  className={`text-[18px] font-black ${isSun ? 'text-rose-600' : isSat ? 'text-blue-600' : active ? 'text-slate-900' : 'text-slate-700'}`}
+                  className={`text-[18px] font-black ${active ? 'text-primary' : isSun ? 'text-rose-600' : isSat ? 'text-blue-600' : 'text-slate-700'}`}
                 >
                   {date.getDate()}
                 </span>

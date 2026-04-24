@@ -65,10 +65,10 @@ const PopularIssuesSection = ({
   }
 
   return (
-    <div className="w-full min-w-0 md:border-l border-slate-100 md:pl-8 flex flex-col text-left self-stretch transition-all duration-300">
-      <div className="flex flex-col mb-4">
+    <div className="w-full h-full min-w-0 md:border-l border-slate-100 md:pl-4 flex flex-col text-left self-stretch transition-all duration-300">
+      <div className="flex flex-col mb-0">
         <div className="flex items-center justify-between h-8 mb-4">
-          <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">
+          <h2 className="text-slate-800 text-[18px] font-bold tracking-tight section-highlight">
             언론사 공통으로 다루는 인기 뉴스에요
           </h2>
         </div>
@@ -76,7 +76,7 @@ const PopularIssuesSection = ({
           <span className="material-symbols-outlined text-[14px] text-primary">info</span>
           이곳은 이미 초안이 준비되어 있어요. 바로 편집을 시작하세요!
         </div>
-        <div className="w-full h-px bg-slate-100 mb-6"></div>
+        <div className="w-full h-px bg-slate-100 mb-0"></div>
         
       </div>
 
@@ -114,7 +114,7 @@ const PopularIssuesSection = ({
               return (
                 <>
                   <div 
-                    className="shadow-premium-card p-4 group cursor-pointer w-full mb-6" 
+                    className="shadow-premium-card p-4 group cursor-pointer w-full mb-1 -mx-1" 
                     onClick={() => onNavigateToAnalysis(topIssue.id)}
                   >
                     <div className="border-t-[3px] border-primary mb-4"></div>
@@ -146,21 +146,21 @@ const PopularIssuesSection = ({
                           <span className="text-[10px] font-bold text-slate-700">AI 초안 작성 완료</span>
                         </div>
                       </div>
-                      <h5 className="text-[15px] font-bold text-slate-900 leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                      <h5 className="text-[13px] font-bold text-slate-900 leading-snug group-hover:text-primary transition-colors line-clamp-2">
                         {topIssue.name}
                       </h5>
                     </div>
                   </div>
                   
-                  <div className="divide-y divide-slate-50 bg-white">
+                  <div className="divide-y divide-slate-50 bg-white -mx-1">
                     {issuesForDate.slice(1, 10).map((issue) => (
                       <div 
                         key={issue.id} 
-                        className="py-2.5 group cursor-pointer flex gap-4 items-baseline" 
+                        className="py-[7px] group cursor-pointer flex gap-4 items-baseline" 
                         onClick={() => onNavigateToAnalysis(issue.id)}
                       >
-                        <span className="rank-number text-xs font-bold text-slate-400 w-4 text-center shrink-0">{issue.rank}</span>
-                        <p className="text-[14px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary transition-colors">
+                        <span className="rank-number text-[11px] font-bold text-slate-400 w-4 text-center shrink-0">{issue.rank}</span>
+                        <p className="text-[12px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary transition-colors">
                           {issue.name}
                         </p>
                       </div>
@@ -173,7 +173,7 @@ const PopularIssuesSection = ({
         </div>
       </div>
 
-      <div className="mt-24 bg-[#FFFBF7] p-5 rounded-[32px] border border-orange-100/50 flex flex-col items-center shadow-[0_15px_40px_-15px_rgba(0,0,0,0.06)] relative overflow-hidden md:sticky top-[200px] z-20 transition-all duration-300">
+      <div className="mt-12 bg-[#FFFBF7] p-3.5 rounded-[32px] border border-orange-100/50 flex flex-col items-center shadow-[0_15px_40px_-15px_rgba(0,0,0,0.06)] relative overflow-hidden md:sticky top-24 z-20 transition-all duration-300">
         {/* 장식용 배경 요소 */}
         <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 rounded-full -ml-12 -mb-12 blur-3xl"></div>
@@ -191,7 +191,7 @@ const PopularIssuesSection = ({
         <div className="relative w-full max-w-[460px] group mb-4 relative z-10">
           <input
             id="search-input-content"
-            className="w-full pl-7 pr-16 py-3.5 border-2 border-slate-300 rounded-full focus:outline-none focus:ring-8 focus:ring-primary/5 focus:border-primary/40 transition-all bg-white shadow-[0_4px_12px_rgba(0,0,0,0.02)] placeholder:text-slate-400 font-medium text-[14px] text-slate-700"
+            className="w-full pl-6 pr-14 py-2 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-8 focus:ring-primary/5 focus:border-primary/40 transition-all bg-white shadow-[0_4px_12px_rgba(0,0,0,0.02)] placeholder:text-slate-400 font-medium text-[13px] text-slate-700"
             placeholder="직접 검색해보세요!"
             type="text"
             value={searchQuery}
@@ -199,7 +199,7 @@ const PopularIssuesSection = ({
             onKeyDown={(e) => e.key === 'Enter' && handleInternalSearch()}
           />
           <button
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[36px] h-[36px] bg-primary text-white rounded-full flex items-center justify-center shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all hover:scale-105 active:scale-95"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[30px] h-[30px] bg-primary text-white rounded-lg flex items-center justify-center shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all hover:scale-105 active:scale-95"
             onClick={handleInternalSearch}
             type="button"
           >

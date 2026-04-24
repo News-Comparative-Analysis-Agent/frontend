@@ -29,8 +29,8 @@ const SectionHeader = ({
   return (
     <header className={`${isCenter ? 'text-center' : 'text-left'} ${className}`}>
       {badge && (
-        <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-sm font-bold mb-6 border border-primary/10 ${isCenter ? 'mx-auto' : ''}`}>
-          <span className="material-symbols-outlined text-[16px]">info</span>
+        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 text-primary text-[12px] font-bold mb-5 border border-primary/10 ${isCenter ? 'mx-auto' : ''}`}>
+          <span className="material-symbols-outlined text-[15px]">info</span>
           {badge}
         </div>
       )}
@@ -47,9 +47,9 @@ const SectionHeader = ({
           </div>
         )}
         <h2 className={`${
-          isPageTitle ? 'text-[24px] md:text-[30px]' 
-          : titleSize === 'sm' ? 'text-base'
-          : 'text-[24px]'
+          isPageTitle ? 'text-[20px] md:text-[26px]' 
+          : titleSize === 'sm' ? 'text-[14px]'
+          : 'text-[20px]'
         } font-bold text-slate-900 tracking-tight leading-tight`}>{title}</h2>
       </div>
       {description && (
@@ -57,7 +57,7 @@ const SectionHeader = ({
           <div className="w-8 shrink-0 flex items-center justify-center">
             {!isCenter && <div className="size-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>}
           </div>
-          <p className="text-[13px] text-slate-400 font-medium leading-relaxed">{description}</p>
+          <p className="text-[12px] text-slate-400 font-medium leading-relaxed">{description}</p>
         </div>
       )}
     </header>

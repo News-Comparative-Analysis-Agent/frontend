@@ -16,24 +16,24 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
           <div className="flex items-center justify-center size-8 bg-primary rounded-full shadow-sm shadow-primary/20">
             <span className="material-symbols-outlined text-[18px] text-white">subject</span>
           </div>
-          <h3 className="text-[20px] font-bold text-slate-900">이슈 배경 상세</h3>
+          <h3 className="text-[17px] font-bold text-slate-800">이슈 배경 상세</h3>
         </div>
         
         <div className="pr-2 pt-1">
           <div className="bullet-point min-h-[85px]">
             <div className="bullet-dot mt-2"></div>
-            <p className="text-[15px] text-slate-600 leading-relaxed font-medium mt-0.5">{description}</p>
+            <p className="text-[14px] text-slate-600 leading-relaxed font-normal mt-0.5">{description}</p>
           </div>
           {background && (
             <div className="bullet-point min-h-[85px]">
               <div className="bullet-dot mt-2"></div>
-              <p className="text-[15px] text-slate-600 leading-relaxed font-medium mt-0.5">{background}</p>
+              <p className="text-[14px] text-slate-600 leading-relaxed font-normal mt-0.5">{background}</p>
             </div>
           )}
           {coreContentions && (
             <div className="bullet-point min-h-[85px]">
               <div className="bullet-dot mt-2"></div>
-              <p className="text-[15px] text-slate-600 leading-relaxed font-medium mt-0.5">{coreContentions}</p>
+              <p className="text-[14px] text-slate-600 leading-relaxed font-normal mt-0.5">{coreContentions}</p>
             </div>
           )}
         </div>
@@ -45,7 +45,7 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
           <div className="flex items-center justify-center size-8 bg-primary rounded-full shadow-sm shadow-primary/20">
             <span className="material-symbols-outlined text-[18px] text-white">calendar_today</span>
           </div>
-          <h3 className="text-[20px] font-bold text-slate-900">이슈 타임라인</h3>
+          <h3 className="text-[17px] font-bold text-slate-800">이슈 타임라인</h3>
         </div>
         
         <div className="relative pl-1 pt-1">
@@ -67,7 +67,7 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
                 }`}>
                   {item.date}
                 </span>
-                <p className={`text-[15px] leading-relaxed transition-colors font-medium ${
+                <p className={`text-[13.5px] leading-relaxed transition-colors font-medium ${
                   item.isCurrent ? 'text-slate-800' : 'text-slate-400'
                 }`}>
                   {item.content}

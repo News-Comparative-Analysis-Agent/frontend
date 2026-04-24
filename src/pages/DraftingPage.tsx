@@ -21,7 +21,7 @@ const DraftingPage = () => {
     title, setTitle,
     content,
     sidebarQuotes,
-    lastSaved, saveDraft, formatLastSaved,
+    lastSaved, isSaving, saveDraft, formatLastSaved,
     draftImages,
     isLeftSidebarOpen, setIsLeftSidebarOpen,
     isRightSidebarOpen, setIsRightSidebarOpen,
@@ -265,6 +265,7 @@ const DraftingPage = () => {
       {/* 4. 하단 푸터 액션바: 저장 및 다음 단계 이동 */}
       <DraftingFooterActions 
          lastSaved={lastSaved}
+         isSaving={isSaving}
          saveDraft={saveDraft}
          onFinalReview={async () => {
            await temporarySave();

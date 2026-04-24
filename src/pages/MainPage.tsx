@@ -79,9 +79,9 @@ const MainPage = () => {
           onClick={() => setIsPublisherSidebarOpen(true)}
           className="fixed left-0 top-1/2 -translate-y-1/2 z-40 group cursor-pointer"
         >
-          <div className="bg-white/80 backdrop-blur-md border border-slate-200 border-l-0 rounded-r-2xl py-6 px-1.5 shadow-2xl shadow-slate-200 hover:pr-4 transition-all duration-300 flex flex-col items-center gap-3">
-            <span className="material-symbols-outlined text-primary text-[20px] group-hover:scale-110 transition-transform">filter_list</span>
-            <span className="text-[11px] font-black text-slate-800 [writing-mode:vertical-lr] tracking-widest group-hover:text-primary">
+          <div className="bg-primary/5 backdrop-blur-md border-2 border-primary/40 border-l-0 rounded-r-full py-7 px-2 shadow-xl shadow-primary/10 hover:pr-5 transition-all duration-300 flex flex-col items-center gap-4">
+            <span className="material-symbols-outlined text-primary text-[22px] group-hover:scale-110 transition-transform">tune</span>
+            <span className="text-[11px] font-bold text-primary [writing-mode:vertical-lr] tracking-[0.2em] group-hover:tracking-[0.3em] transition-all">
               언론사 필터
             </span>
           </div>
@@ -108,7 +108,7 @@ const MainPage = () => {
 
           {/* 3. 메인 뉴스 컨텐츠 영역 */}
           <div className="max-w-[1280px] mx-auto px-6 pb-12 pt-1">
-            <div className="flex flex-col md:flex-row gap-8">
+            <div className="flex flex-col md:flex-row gap-4">
               
               {/* 좌측: 언론사별 인기 뉴스 (3열 구성을 위해 더 넓게 배치) */}
               <div className="w-full md:flex-[2.3] min-w-0">
@@ -126,7 +126,7 @@ const MainPage = () => {
               </div>
 
               {/* 우측: 실시간 통합 순위 (슬림하게 배치) */}
-              <div className="w-full md:flex-1 min-w-0">
+              <div className="w-full md:flex-1 min-w-0 flex flex-col items-stretch">
                 <PopularIssuesSection 
                   loading={loading}
                   dailyIssues={dailyIssues}

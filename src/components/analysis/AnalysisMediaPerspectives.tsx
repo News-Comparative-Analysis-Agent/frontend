@@ -22,7 +22,7 @@ const AnalysisMediaPerspectives = ({
             <span className="material-symbols-outlined text-[18px] text-white">newspaper</span>
           </div>
           <div className="flex flex-col">
-            <h3 className="text-[18px] md:text-[20px] font-bold text-slate-900 tracking-tight whitespace-nowrap">언론사별 주요 논조</h3>
+            <h3 className="text-[16px] md:text-[18px] font-bold text-slate-800 tracking-tight whitespace-nowrap">언론사별 주요 논조</h3>
             <p className="text-[12px] text-slate-500 font-medium hidden sm:block whitespace-nowrap">원하는 언론사의 관점만 골라보세요.</p>
           </div>
         </div>
@@ -31,7 +31,7 @@ const AnalysisMediaPerspectives = ({
           <div className="flex items-center gap-1.5 p-1 bg-slate-100/80 rounded-full border border-slate-200/50 shadow-inner no-scrollbar overflow-x-auto max-w-full">
             <button
               onClick={() => setActiveMedia('all')}
-              className={`px-4 md:px-5 py-2 rounded-full text-[13px] md:text-[14px] transition-all duration-300 whitespace-nowrap ${
+              className={`px-4 md:px-5 py-2 rounded-full text-[12px] md:text-[13px] transition-all duration-300 whitespace-nowrap ${
                 activeMedia === 'all'
                   ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
@@ -44,7 +44,7 @@ const AnalysisMediaPerspectives = ({
               <button
                 key={media}
                 onClick={() => setActiveMedia(media)}
-                className={`px-4 md:px-5 py-2 rounded-full text-[13px] md:text-[14px] transition-all duration-300 whitespace-nowrap ${
+                className={`px-4 md:px-5 py-2 rounded-full text-[12px] md:text-[13px] transition-all duration-300 whitespace-nowrap ${
                   activeMedia === media
                     ? 'bg-white text-slate-900 font-bold shadow-[2px_4px_12px_rgba(0,0,0,0.15)] border border-slate-100'
                     : 'text-slate-500 hover:text-slate-800 hover:bg-white/50 font-medium'
