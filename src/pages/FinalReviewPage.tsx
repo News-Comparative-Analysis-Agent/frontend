@@ -123,75 +123,67 @@ const FinalReviewPage = () => {
       </div>
 
       <main className="flex-1 flex flex-col md:flex-row min-h-0 animate-page-in overflow-hidden">
-        {/* Article Preview Section - 스크롤 및 하단 여백 최적화 */}
-        <section className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center pt-4 pb-32 md:pt-4 min-h-0 px-4 text-left bg-slate-50/30">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white text-primary text-sm font-bold mb-4 border border-slate-200 shadow-sm text-left">
-            <span className="material-symbols-outlined text-[16px]">info</span>
-            현재 단계 : 최종 검토
-          </div>
-
-          <div className="w-full max-w-[800px] bg-white border border-slate-200 rounded-xl shadow-md flex flex-col mb-10">
-            {/* Article Header */}
-            <div className="p-6 md:p-10 border-b border-slate-50">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="bg-slate-900 text-white px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded">발행 대기 중</div>
-                <div className="h-3 w-px bg-slate-200 mx-1"></div>
-                <span className="text-xs text-slate-500 font-medium tracking-tight">총 글자 수: {textLength.toLocaleString()}자</span>
-              </div>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 leading-[1.3] mb-8 tracking-tight text-left">
+        <section className="flex-1 overflow-y-auto custom-scrollbar flex flex-col min-h-0 text-left bg-slate-50/30">
+          {/* Full-width Header Section */}
+          <div className="w-full bg-white relative animate-fade-in-up shrink-0">
+            <div className="max-w-[900px] mx-auto pt-16 pb-16 px-8 md:px-16 text-left">
+              <h2 className="text-3xl md:text-[40px] font-bold text-slate-900 leading-[1.2] mb-6 tracking-tight break-keep">
                 {resolvedTitle}
               </h2>
-              <div className="flex items-center justify-between py-4 border-y border-slate-100">
-                <div className="flex items-center gap-4">
-                  <div className="flex flex-col text-left">
-                    <span className="text-xs font-bold text-slate-800">{user?.nickname ?? '기자'}</span>
-                    <span className="text-[11px] text-slate-400">{user?.email ?? 'editor@foc-us.com'}</span>
-                  </div>
+              
+              {reviewData?.description && (
+                <div className="text-primary font-medium text-lg md:text-xl mb-8 leading-snug break-keep flex items-start gap-1">
+                  <span className="shrink-0">[기고]</span>
+                  <span>{reviewData.description}</span>
                 </div>
-                <div className="text-right">
-                  <span className="text-xs text-slate-500 block">발행 일시</span>
-                  <span className="text-xs font-medium text-slate-800 tracking-tight">
-                    {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} 발행 예정
-                  </span>
-                </div>
-              </div>
-            </div>
+              )}
 
-            {/* Article Body */}
-            <article className="px-6 md:px-10 py-8">
-              <div
-                ref={articleContentRef}
-                className="space-y-6 text-[17px] leading-[1.85] text-slate-800 text-left article-content"
-                dangerouslySetInnerHTML={{ __html: safeContent }}
-              />
-              <div className="mt-16 pt-8 border-t border-slate-100 text-left">
-                <div className="bg-slate-50 border border-slate-200/60 rounded-lg p-4 flex items-center gap-3">
-                  <span className="material-symbols-outlined text-slate-400 text-[20px]">info</span>
-                  <p className="text-xs text-slate-500 font-medium">
-                    본 기사는 <span className="text-slate-700 font-bold">AI 분석 시스템</span>을 통해 주요 언론사별 시각차를 교차 검증하여 작성된 초안을 바탕으로 기자가 최종 편집을 완료했습니다.
-                  </p>
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-8 text-slate-800 text-[13px] font-light">
+                <div className="flex items-center gap-2">
+                  <div className="size-6 rounded-full bg-slate-50 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[14px] text-slate-400">person</span>
+                  </div>
+                  <span className="text-slate-800 font-medium">{user?.nickname ?? 'Guest 개발자'}</span>
                 </div>
+                <span className="hover:text-primary transition-colors cursor-pointer">{user?.email ?? 'dev@test.com'}</span>
+                <span className="tracking-tight">입력 {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.')} {new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false })}</span>
               </div>
-            </article>
+
+              {/* Zigzag Divider (Absolute inside relative header) */}
+              <div className="zigzag-divider" />
+            </div>
+          </div>
+
+          {/* Full-width Body Section */}
+          <div className="w-full bg-[#f5f5f5] flex-1">
+            <div className="max-w-[900px] mx-auto px-8 md:px-16 pt-16 pb-32 text-left">
+              <article className="article-content font-light">
+                <div
+                  ref={articleContentRef}
+                  className="space-y-8 text-[18px] leading-[1.9] text-slate-800"
+                  dangerouslySetInnerHTML={{ __html: safeContent }}
+                />
+              </article>
+            </div>
           </div>
         </section>
 
-        {/* ════════ Quality Review Sidebar ════════ */}
-        <aside className="w-full md:w-[320px] lg:w-[420px] border-t md:border-t-0 md:border-l border-slate-200 bg-white shrink-0 md:h-full overflow-y-auto custom-scrollbar select-none text-left">
+        <aside className="w-full md:w-[320px] lg:w-[420px] border-t md:border-t-0 md:border-l border-slate-200 bg-slate-50 shadow-[-10px_0_30px_-15px_rgba(0,0,0,0.05)] shrink-0 md:h-full overflow-y-auto custom-scrollbar select-none text-left z-10">
           {/* 고정 타이틀 바 */}
-          <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-slate-100 px-4 py-4 mb-2">
-            <div className="border-l-[3px] border-slate-900 pl-3.5">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">Quality Report</span>
-                <div className="h-[1px] w-4 bg-slate-200"></div>
+          <div className="sticky top-0 z-30 bg-white px-4 py-6 mb-2">
+              <div className="flex items-center gap-2 relative">
+                <h2 className="text-[22px] font-bold text-slate-800 tracking-tight leading-none">
+                  최종 검토 결과
+                </h2>
+                <button type="button" className="inline-flex items-center justify-center p-1 rounded-full hover:bg-slate-50 transition-colors group">
+                  <span className="material-symbols-outlined text-[20px] text-slate-300 group-hover:text-primary transition-colors">info</span>
+                </button>
               </div>
-              <h2 className="text-[15px] font-black text-slate-900 tracking-tight leading-none uppercase">
-                최종 품질 검토 리포트
-              </h2>
-            </div>
+              {/* Zigzag Divider for Sidebar */}
+              <div className="zigzag-divider" />
           </div>
 
-          <div className="px-4 pb-24">
+          <div className="px-4 pb-24 pt-4">
             {!reviewData ? (
               /* ── 현재 레이아웃에 맞춘 스켈레톤 ── */
               <div className="space-y-2 animate-pulse">

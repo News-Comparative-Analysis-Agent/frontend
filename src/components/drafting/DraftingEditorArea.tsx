@@ -129,14 +129,6 @@ const DraftingEditorArea = ({
           </div>
         </div>
         
-        <div className="mt-8 flex items-start gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-200/60 font-medium">
-          <div className="size-8 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0">
-            <span className="material-symbols-outlined text-slate-400 icon-md">info</span>
-          </div>
-          <p className="text-xs text-slate-500 leading-relaxed text-left">
-            <span className="font-bold text-slate-700">AI 생성 고지:</span> 본 기사는 생성형 AI 기술을 활용하여 작성된 초안을 바탕으로 기자의 최종 편집 및 검수를 거쳤습니다.
-          </p>
-        </div>
       </div>
     </section>
   )
