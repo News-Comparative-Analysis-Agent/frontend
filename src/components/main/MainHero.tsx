@@ -6,12 +6,12 @@ const MainHero = () => {
       <div className="max-w-[1280px] w-full px-6 flex flex-col lg:flex-row items-center lg:items-end justify-between lg:h-[160px]">
         
         {/* 1. 좌측 홍보 문구 (모바일 중앙 정렬 대응) */}
-        <div className="flex-1 pb-4 lg:pb-8 text-center lg:text-left">
-          <h2 className="flex flex-col items-start break-keep">
-            <span className="bg-white text-slate-900 text-2xl sm:text-3xl lg:text-[27px] font-black px-2 py-1 mb-2 leading-tight">
+        <div className="flex-1 pb-4 lg:pb-8 text-center lg:text-left w-full flex flex-col items-center lg:items-start">
+          <h2 className="flex flex-col items-center lg:items-start break-keep">
+            <span className="bg-white text-slate-900 text-xl sm:text-2xl lg:text-[24px] font-bold px-2 py-1 mb-2 leading-tight">
               원하는 주제를 골라주세요
             </span>
-            <span className="text-white text-lg sm:text-xl lg:text-[22px] font-light opacity-90 tracking-tight">
+            <span className="text-white text-base sm:text-lg lg:text-[20px] font-light opacity-90 tracking-tight">
               초안부터 검토까지 한번에 
             </span>
           </h2>

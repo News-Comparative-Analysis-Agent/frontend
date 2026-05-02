@@ -30,8 +30,8 @@ const FigmaHeaderCalendar: React.FC<FigmaHeaderCalendarProps> = ({ selectedDate,
     <div className="flex items-center justify-end gap-x-4 w-full py-0.1">
       {/* 🗓 월 표시 영역 (대폭 확대 및 정렬 수정) */}
       <div className="flex flex-col items-center justify-center pr-8 shrink-0 border-r border-slate-200">
-        <span className="text-[48px] font-black text-slate-800 leading-none tracking-tighter">{currentMonth}</span>
-        <span className="text-[8px] font-black text-slate-400 mt-0 uppercase tracking-[0.2em] -mr-0.5">Month</span>
+        <span className="text-[48px] font-bold text-slate-800 leading-none tracking-tighter">{currentMonth}</span>
+        <span className="text-[8px] font-bold text-slate-400 mt-0 uppercase tracking-[0.2em] -mr-0.5">Month</span>
       </div>
 
       <div className="flex items-center justify-center gap-x-[11px]">
@@ -51,12 +51,12 @@ const FigmaHeaderCalendar: React.FC<FigmaHeaderCalendarProps> = ({ selectedDate,
                 `}
               >
                 <span 
-                  className={`text-[11px] font-bold mb-1 ${active ? 'text-primary' : isSun ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-slate-400'}`}
+                  className={`text-[11px] font-semibold mb-1 ${active ? 'text-primary' : isSun ? 'text-rose-500' : isSat ? 'text-blue-500' : 'text-slate-400'}`}
                 >
                   {daysOfWeek[day]}
                 </span>
                 <span 
-                  className={`text-[18px] font-black ${active ? 'text-primary' : isSun ? 'text-rose-600' : isSat ? 'text-blue-600' : 'text-slate-700'}`}
+                  className={`text-[18px] font-bold ${active ? 'text-primary' : isSun ? 'text-rose-600' : isSat ? 'text-blue-600' : 'text-slate-700'}`}
                 >
                   {date.getDate()}
                 </span>

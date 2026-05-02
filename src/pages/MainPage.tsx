@@ -111,7 +111,7 @@ const MainPage = () => {
             <div className="flex flex-col md:flex-row gap-4">
               
               {/* 좌측: 실시간 통합 순위 (조정된 넓이 배치) */}
-              <div className="w-full md:flex-[1.5] min-w-0 flex flex-col items-stretch">
+              <div className="w-full md:flex-[5] lg:flex-1 min-w-0 flex flex-col items-stretch">
                 <PopularIssuesSection 
                   loading={loading}
                   dailyIssues={dailyIssues}
@@ -128,7 +128,7 @@ const MainPage = () => {
               </div>
 
               {/* 우측: 언론사별 인기 뉴스 (2열 구성을 위해 조정된 배치) */}
-              <div className="w-full md:flex-[2] min-w-0">
+              <div className="w-full md:flex-[5] lg:flex-1 min-w-0">
                 <PublisherNewsSection 
                   loading={loading}
                   error={error}

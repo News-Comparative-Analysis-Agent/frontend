@@ -28,7 +28,7 @@ const OpinionCard = ({ media, color = 'slate', title, analysisTitle, description
       <StanceBadge color={color}>
         {media}
       </StanceBadge>
-      <h4 className="text-[17px] font-bold text-slate-800 leading-[1.4] mb-5 line-clamp-2 overflow-hidden" dangerouslySetInnerHTML={{ __html: title }}></h4>
+      <h4 className="text-[15.5px] font-semibold text-slate-800 leading-[1.4] mt-0.5 mb-2.5" dangerouslySetInnerHTML={{ __html: title }}></h4>
       <div className={`inner-analysis-box ${innerBoxStyles[color]}`}>
         <div className="font-bold text-slate-800 text-[14px] mb-2">{analysisTitle}</div>
         <p className="text-[13.5px] text-slate-600 leading-relaxed font-normal">{description}</p>

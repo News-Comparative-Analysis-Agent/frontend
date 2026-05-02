@@ -15,7 +15,7 @@ const MainSearchHeader = ({ selectedDate, onDateChange }: MainSearchHeaderProps)
         {/* 좌측 타이틀 영역 (w-1/2로 고정하여 정렬 기준 마련) */}
         <div className="flex flex-col text-left shrink-0 h-[48px] justify-between relative w-1/2">
           <div className="flex items-center gap-2">
-            <h1 className="text-[22px] font-black text-slate-800 tracking-tight leading-none">
+            <h1 className="text-[18px] font-bold text-slate-800 tracking-tight leading-none section-highlight inline-block">
               주간 뉴스 트렌드
             </h1>
             <div className="group relative flex items-center">

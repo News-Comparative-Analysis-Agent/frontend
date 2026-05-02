@@ -67,12 +67,12 @@ const PopularIssuesSection = ({
   return (
     <div className="w-full h-full min-w-0 md:border-r border-slate-100 md:pr-4 flex flex-col text-left self-stretch transition-all duration-300">
       <div className="flex flex-col mb-0">
-        <div className="flex items-center justify-between h-8 mb-4">
-          <h2 className="text-slate-800 text-[18px] font-bold tracking-tight section-highlight">
+        <div className="flex items-center justify-between h-auto mb-1.5 mt-1">
+          <h2 className="text-slate-800 text-base font-bold tracking-tight">
             언론사 공통으로 다루는 인기 뉴스에요
           </h2>
         </div>
-        <div className="flex items-center gap-1.5 mb-3 text-[12px] text-slate-500 font-medium opacity-90">
+        <div className="flex items-center gap-1.5 mb-2 text-[12px] text-slate-500 font-medium opacity-90">
           <span className="material-symbols-outlined text-[14px] text-primary">info</span>
           이곳은 이미 초안이 준비되어 있어요. 바로 편집을 시작하세요!
         </div>
@@ -132,7 +132,7 @@ const PopularIssuesSection = ({
                           <h4 className="text-lg font-bold text-primary flex items-center gap-1 tracking-tight">통합 인기 1위</h4>
                         </div>
                         <div className="pb-4 pt-1 group cursor-pointer border-b border-slate-100">
-                          <div className="relative w-full aspect-[21/9] mb-3 overflow-hidden rounded-xl bg-slate-100">
+                          <div className="relative w-full aspect-[21/9] mb-3 overflow-hidden rounded-md bg-slate-100">
                             {topIssue.image_urls?.map((url, imgIdx) => (
                               <img 
                                 key={`${topIssue.id}-${imgIdx}`}
@@ -151,7 +151,15 @@ const PopularIssuesSection = ({
                                 src={DEFAULT_IMAGE}
                               />
                             )}
-                            <div className="absolute top-2 left-2 size-7 bg-primary text-white flex items-center justify-center font-black rank-number rounded shadow-glow z-10">1</div>
+                            <span 
+                              className="absolute bottom-1 left-2 font-black text-white/20 leading-none select-none z-20 pointer-events-none tracking-tighter text-[80px]" 
+                              style={{ 
+                                WebkitTextStroke: '2.5px rgba(255, 255, 255, 0.95)',
+                                filter: 'drop-shadow(0px 4px 8px rgba(0,0,0,0.8))'
+                              }}
+                            >
+                              1
+                            </span>
                             <div className="absolute top-2 right-2 px-2.5 py-1 bg-white/90 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center shadow-sm z-10">
                               <span className="text-[10px] font-bold text-slate-700">AI 초안 작성 완료</span>
                             </div>
@@ -167,17 +175,45 @@ const PopularIssuesSection = ({
                       </div>
                     )}
                     
-                    <div className="divide-y divide-slate-50 bg-white -mx-1">
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-4 mt-2 pb-2 -mx-1">
                       {listIssues.map((issue) => (
                         <div 
                           key={issue.id} 
-                          className="py-[7px] group cursor-pointer flex gap-4 items-baseline" 
+                          className="group cursor-pointer flex flex-col relative transition-all duration-300" 
                           onClick={() => onNavigateToAnalysis(issue.id)}
                         >
-                          <span className="rank-number text-[11px] font-bold text-slate-400 w-4 text-center shrink-0">{issue.rank}</span>
-                          <p className="text-[12px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary transition-colors">
-                            {issue.name}
-                          </p>
+                          {/* 넷플릭스 스타일 개선: 이미지는 크게, 숫자는 투명하게 이미지 위에 오버레이 */}
+                          <div className="relative flex items-end w-full pt-4">
+                            {/* 순위 숫자 (가독성 극대화: 흰색 외곽선 + 강한 그림자 + 반투명 채움) */}
+                            <span 
+                              className={`absolute bottom-[5px] left-[5px] font-black text-white/20 leading-none select-none z-20 pointer-events-none transition-all duration-300 group-hover:-translate-y-1 tracking-tighter ${
+                                issue.rank >= 10 ? 'text-[32px] tracking-[-0.05em]' : 'text-[38px]'
+                              }`} 
+                              style={{ 
+                                WebkitTextStroke: '1.5px rgba(255, 255, 255, 0.95)',
+                                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.8))'
+                              }}
+                            >
+                              {issue.rank}
+                            </span>
+                            
+                            {/* 썸네일 (카드를 꽉 채우기) */}
+                            <div className="relative z-10 w-full aspect-video rounded-md overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.1)] group-hover:shadow-[0_8px_20px_rgba(242,127,13,0.2)] transition-all duration-300 group-hover:-translate-y-1 bg-slate-100 border border-slate-200/50">
+                              <img 
+                                alt={issue.name} 
+                                className="w-full h-full object-cover" 
+                                src={(issue.image_urls && issue.image_urls.length > 0) ? issue.image_urls[0] : DEFAULT_IMAGE}
+                                onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* 하단 텍스트 영역 */}
+                          <div className="pt-3 px-1">
+                            <h5 className="text-[13px] font-bold text-slate-800 leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                              {issue.name}
+                            </h5>
+                          </div>
                         </div>
                       ))}
                     </div>

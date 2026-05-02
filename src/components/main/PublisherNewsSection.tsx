@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { NewsArticle } from '../../types'
 import MonthlyCalendar from './MonthlyCalendar'
 
@@ -14,14 +14,8 @@ interface PublisherNewsSectionProps {
   filteredPublishers: string[]
 }
 
-const PUBLISHER_STYLES: Record<string, { borderColor: string; color: string; textColor: string }> = {
-  '조선일보': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
-  '한겨레': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
-  '경향신문': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
-  '동아일보': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
-  '연합뉴스': { borderColor: 'border-slate-500', color: 'bg-slate-600', textColor: 'text-primary' },
-}
-const DEFAULT_STYLE = { borderColor: 'border-slate-400', color: 'bg-slate-400', textColor: 'text-primary' }
+// 모든 언론사에 동일한 스타일 적용 (진한 회색으로 통일)
+const DEFAULT_STYLE = { borderColor: 'border-slate-700', color: 'bg-slate-700', textColor: 'text-primary' }
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop'
 
 const PublisherNewsSection = ({
@@ -29,15 +23,30 @@ const PublisherNewsSection = ({
 }: PublisherNewsSectionProps) => {
   const formattedDate = `${selectedDate.getFullYear()}년 ${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`;
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  // 필터가 변경되면 1페이지로 리셋
+  // 배열 레퍼런스 변경으로 인한 불필요한 초기화를 막기 위해 문자열로 변환하여 비교
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredPublishers.join(',')]);
+
+  const totalPages = Math.ceil(filteredPublishers.length / itemsPerPage);
+  const currentPublishers = filteredPublishers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex flex-col mb-0">
-        <div className="flex items-center justify-between h-8 mb-4">
-          <h2 className="text-slate-800 text-[18px] font-bold tracking-tight section-highlight">
+        <div className="flex items-center justify-between h-auto mb-1.5 mt-1">
+          <h2 className="text-slate-800 text-base font-bold tracking-tight">
             각 언론사별 인기 뉴스에요
           </h2>
         </div>
-        <div className="flex items-center gap-1.5 mb-3 text-[12px] text-slate-500 font-medium opacity-90">
+        <div className="flex items-center gap-1.5 mb-2 text-[12px] text-slate-500 font-medium opacity-90">
           <span className="material-symbols-outlined text-[14px] text-primary">tune</span>
           필터를 선택하여 원하는 언론사의 인기 뉴스만 골라볼 수 있어요.
         </div>
@@ -49,7 +58,7 @@ const PublisherNewsSection = ({
           {[1, 2, 3].map(i => (
             <div key={i} className="animate-pulse space-y-3">
               <div className="h-3 w-20 bg-slate-200 rounded" />
-              <div className="w-full aspect-video bg-slate-200 rounded-xl" />
+              <div className="w-full aspect-video bg-slate-200 rounded-md" />
               <div className="h-4 bg-slate-200 rounded w-3/4" />
               {[...Array(5)].map((_, j) => <div key={j} className="h-3 bg-slate-100 rounded" />)}
             </div>
@@ -65,62 +74,93 @@ const PublisherNewsSection = ({
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
           {filteredPublishers.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 -mx-1">
-              {filteredPublishers.map((publisher) => {
+            <div className="flex flex-col min-h-[600px]">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-4 -mx-1">
+                {currentPublishers.map((publisher) => {
                 const year = selectedDate.getFullYear();
                 const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
                 const day = String(selectedDate.getDate()).padStart(2, '0');
                 const dateStr = `${year}-${month}-${day}`;
                 
                 const articles = newsData[dateStr]?.[publisher] || [];
-                const style = PUBLISHER_STYLES[publisher] ?? DEFAULT_STYLE;
+                const style = DEFAULT_STYLE;
                 
                 return (
-                  <div key={publisher} className="shadow-premium-card px-2.5 py-4 transition-all duration-300 group/card bg-white">
+                  <div key={publisher} className="shadow-premium-card px-2.5 py-4 transition-all duration-300 bg-white">
                     <div className={`border-t-[3px] ${style.borderColor} mb-4`}></div>
                     <div className="flex items-center justify-between mb-5">
-                      <h4 className="text-lg font-bold text-slate-700 flex items-center gap-1 group-hover/card:text-primary transition-colors">
-                        {publisher} <span className="material-symbols-outlined text-sm group-hover/card:translate-x-1 transition-transform">chevron_right</span>
+                      <h4 className="text-lg font-semibold text-slate-700 flex items-center gap-1">
+                        {publisher} <span className="material-symbols-outlined text-sm">chevron_right</span>
                       </h4>
                     </div>
                     <div className="space-y-0 divide-y divide-slate-50">
-                      {articles.slice(0, 10).map((article, idx) => (
-                        <a
-                          key={article.id}
-                          href={article.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`${idx === 0 ? 'pb-4 pt-1 border-b border-slate-100 block' : 'py-[7px] flex gap-3 items-baseline'} group/item cursor-pointer`}
-                        >
-                          {idx === 0 ? (
-                            <>
-                              <div className="relative w-full aspect-video mb-3 overflow-hidden rounded-xl bg-slate-100">
-                                <img
-                                  alt={article.title}
-                                  className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-500"
-                                  src={article.image_url || DEFAULT_IMAGE}
-                                  onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
-                                />
-                                <div className={`absolute top-2 left-2 size-7 ${style.color} text-white flex items-center justify-center font-bold rank-number rounded shadow-md text-xs`}>1</div>
-                              </div>
-                              <h5 className={`text-[13px] font-bold text-slate-900 leading-snug group-hover/item:${style.textColor} transition-colors line-clamp-2`}>
-                                {article.title}
-                              </h5>
-                            </>
-                          ) : (
-                            <>
-                              <span className="rank-number text-[11px] font-bold text-slate-400 w-4 text-center shrink-0">{idx + 1}</span>
-                              <p className={`text-[12px] font-medium text-slate-700 truncate flex-1 group-hover/item:${style.textColor} transition-colors`}>
-                                {article.title}
-                              </p>
-                            </>
-                          )}
-                        </a>
-                      ))}
+                      {articles.length > 0 ? (
+                        articles.slice(0, 10).map((article, idx) => (
+                          <a
+                            key={article.id}
+                            href={article.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`${idx === 0 ? 'pb-4 pt-1 border-b border-slate-100 block' : 'py-[7px] flex gap-3 items-baseline'} group/item cursor-pointer`}
+                          >
+                            {idx === 0 ? (
+                              <>
+                                <div className="relative w-full aspect-video mb-3 overflow-hidden rounded-md bg-slate-100">
+                                  <img
+                                    alt={article.title}
+                                    className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-500"
+                                    src={article.image_url || DEFAULT_IMAGE}
+                                    onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE; }}
+                                  />
+                                  <div className={`absolute top-2 left-2 size-7 ${style.color} text-white flex items-center justify-center font-bold rank-number rounded shadow-md text-xs`}>1</div>
+                                </div>
+                                <h5 className={`text-[13px] font-bold text-slate-900 leading-snug group-hover/item:text-primary transition-colors line-clamp-2`}>
+                                  {article.title}
+                                </h5>
+                              </>
+                            ) : (
+                              <>
+                                <span className="rank-number text-[11px] font-bold text-slate-400 w-4 text-center shrink-0">{idx + 1}</span>
+                                <p className={`text-[12px] font-medium text-slate-700 truncate flex-1 group-hover/item:text-primary transition-colors`}>
+                                  {article.title}
+                                </p>
+                              </>
+                            )}
+                          </a>
+                        ))
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-10 px-2 text-center bg-slate-50/50 rounded-xl mt-2 border border-dashed border-slate-200">
+                          <div className="size-10 rounded-full bg-white flex items-center justify-center mb-3 shadow-sm border border-slate-100">
+                            <span className="material-symbols-outlined text-slate-300 text-xl">article</span>
+                          </div>
+                          <p className="text-[13px] font-bold text-slate-500 mb-1">아직 집계된 뉴스가 없어요</p>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">언론사 인기 뉴스를 수집 중입니다.</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
               })}
+              </div>
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center mt-8 mb-6 gap-2">
+                  {Array.from({ length: totalPages }).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                        currentPage === i + 1 
+                          ? 'bg-primary text-white shadow-md scale-110' 
+                          : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 hover:text-primary'
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-24 px-10 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
