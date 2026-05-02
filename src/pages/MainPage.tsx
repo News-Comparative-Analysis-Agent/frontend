@@ -74,12 +74,12 @@ const MainPage = () => {
         {/* 로그인 모달: 비로그인 시 강제 노출 */}
         <LoginModal isOpen={!isLoggedIn} />
 
-        {/* 좌측 플로팅 탭 버튼 */}
+        {/* 우측 플로팅 탭 버튼 */}
         <div 
           onClick={() => setIsPublisherSidebarOpen(true)}
-          className="fixed left-0 top-1/2 -translate-y-1/2 z-40 group cursor-pointer"
+          className="fixed right-0 top-1/2 -translate-y-1/2 z-40 group cursor-pointer"
         >
-          <div className="bg-primary/5 backdrop-blur-md border-2 border-primary/40 border-l-0 rounded-r-full py-7 px-2 shadow-xl shadow-primary/10 hover:pr-5 transition-all duration-300 flex flex-col items-center gap-4">
+          <div className="bg-primary/5 backdrop-blur-md border-2 border-primary/40 border-r-0 rounded-l-full py-7 px-2 shadow-xl shadow-primary/10 hover:pl-5 transition-all duration-300 flex flex-col items-center gap-4">
             <span className="material-symbols-outlined text-primary text-[22px] group-hover:scale-110 transition-transform">tune</span>
             <span className="text-[11px] font-bold text-primary [writing-mode:vertical-lr] tracking-[0.2em] group-hover:tracking-[0.3em] transition-all">
               언론사 필터
@@ -110,23 +110,8 @@ const MainPage = () => {
           <div className="max-w-[1280px] mx-auto px-6 pb-12 pt-1">
             <div className="flex flex-col md:flex-row gap-4">
               
-              {/* 좌측: 언론사별 인기 뉴스 (3열 구성을 위해 더 넓게 배치) */}
-              <div className="w-full md:flex-[2.3] min-w-0">
-                <PublisherNewsSection 
-                  loading={loading}
-                  error={error}
-                  newsData={newsData}
-                  allPublishers={allPublishers}
-                  selectedMedia={selectedMedia}
-                  selectedDate={selectedDate}
-                  onDateChange={handleDateChange}
-                  handleMediaChange={handleMediaChange}
-                  filteredPublishers={filteredPublishers}
-                />
-              </div>
-
-              {/* 우측: 실시간 통합 순위 (슬림하게 배치) */}
-              <div className="w-full md:flex-1 min-w-0 flex flex-col items-stretch">
+              {/* 좌측: 실시간 통합 순위 (조정된 넓이 배치) */}
+              <div className="w-full md:flex-[1.5] min-w-0 flex flex-col items-stretch">
                 <PopularIssuesSection 
                   loading={loading}
                   dailyIssues={dailyIssues}
@@ -142,6 +127,20 @@ const MainPage = () => {
                 />
               </div>
 
+              {/* 우측: 언론사별 인기 뉴스 (2열 구성을 위해 조정된 배치) */}
+              <div className="w-full md:flex-[2] min-w-0">
+                <PublisherNewsSection 
+                  loading={loading}
+                  error={error}
+                  newsData={newsData}
+                  allPublishers={allPublishers}
+                  selectedMedia={selectedMedia}
+                  selectedDate={selectedDate}
+                  onDateChange={handleDateChange}
+                  handleMediaChange={handleMediaChange}
+                  filteredPublishers={filteredPublishers}
+                />
+              </div>
             </div>
           </div>
         </div>

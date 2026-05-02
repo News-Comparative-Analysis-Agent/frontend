@@ -68,3 +68,16 @@ export function apiPost<T>(
     body: JSON.stringify(body),
   });
 }
+
+/** PUT 요청 헬퍼 */
+export function apiPut<T>(
+  path: string,
+  body: unknown,
+  label: string
+): Promise<T> {
+  return fetchWithTimeout<T>(`${API_BASE_URL}${path}`, label, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}

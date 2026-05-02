@@ -65,7 +65,7 @@ const PopularIssuesSection = ({
   }
 
   return (
-    <div className="w-full h-full min-w-0 md:border-l border-slate-100 md:pl-4 flex flex-col text-left self-stretch transition-all duration-300">
+    <div className="w-full h-full min-w-0 md:border-r border-slate-100 md:pr-4 flex flex-col text-left self-stretch transition-all duration-300">
       <div className="flex flex-col mb-0">
         <div className="flex items-center justify-between h-8 mb-4">
           <h2 className="text-slate-800 text-[18px] font-bold tracking-tight section-highlight">
@@ -109,64 +109,130 @@ const PopularIssuesSection = ({
                 );
               }
 
-              const topIssue = issuesForDate[0];
-              
+              const ITEMS_PER_PAGE = 10;
+              const totalPages = Math.ceil(issuesForDate.length / ITEMS_PER_PAGE);
+              const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+              const endIndex = startIndex + ITEMS_PER_PAGE;
+              const currentIssues = issuesForDate.slice(startIndex, endIndex);
+
+              const isFirstPage = currentPage === 1;
+              const topIssue = isFirstPage && currentIssues.length > 0 ? currentIssues[0] : null;
+              const listIssues = isFirstPage ? currentIssues.slice(1) : currentIssues;
+
               return (
-                <>
-                  <div 
-                    className="shadow-premium-card p-4 group cursor-pointer w-full mb-1 -mx-1" 
-                    onClick={() => onNavigateToAnalysis(topIssue.id)}
-                  >
-                    <div className="border-t-[3px] border-primary mb-4"></div>
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-lg font-bold text-primary flex items-center gap-1 tracking-tight">통합 인기 1위</h4>
-                    </div>
-                    <div className="pb-4 pt-1 group cursor-pointer border-b border-slate-100">
-                      <div className="relative w-full aspect-[21/9] mb-3 overflow-hidden rounded-xl bg-slate-100">
-                        {topIssue.image_urls?.map((url, imgIdx) => (
-                          <img 
-                            key={`${topIssue.id}-${imgIdx}`}
-                            alt={topIssue.name} 
-                            className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ease-in-out ${
-                              imgIdx === topImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-                            }`} 
-                            src={url || DEFAULT_IMAGE}
-                            onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
-                          />
-                        ))}
-                        {(topIssue.image_urls?.length === 0 || !topIssue.image_urls) && (
-                          <img 
-                            alt={topIssue.name} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                            src={DEFAULT_IMAGE}
-                          />
-                        )}
-                        <div className="absolute top-2 left-2 size-7 bg-primary text-white flex items-center justify-center font-black rank-number rounded shadow-glow z-10">1</div>
-                        <div className="absolute top-2 right-2 px-2.5 py-1 bg-white/90 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center shadow-sm z-10">
-                          <span className="text-[10px] font-bold text-slate-700">AI 초안 작성 완료</span>
+                <div className="flex flex-col justify-between min-h-[680px]">
+                  <div>
+                    {topIssue ? (
+                      <div 
+                        className="shadow-premium-card py-4 group cursor-pointer w-full mb-1 -mx-1" 
+                        onClick={() => onNavigateToAnalysis(topIssue.id)}
+                      >
+                        <div className="border-t-[3px] border-primary mb-4"></div>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-lg font-bold text-primary flex items-center gap-1 tracking-tight">통합 인기 1위</h4>
+                        </div>
+                        <div className="pb-4 pt-1 group cursor-pointer border-b border-slate-100">
+                          <div className="relative w-full aspect-[21/9] mb-3 overflow-hidden rounded-xl bg-slate-100">
+                            {topIssue.image_urls?.map((url, imgIdx) => (
+                              <img 
+                                key={`${topIssue.id}-${imgIdx}`}
+                                alt={topIssue.name} 
+                                className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ease-in-out ${
+                                  imgIdx === topImageIndex ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+                                }`} 
+                                src={url || DEFAULT_IMAGE}
+                                onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
+                              />
+                            ))}
+                            {(topIssue.image_urls?.length === 0 || !topIssue.image_urls) && (
+                              <img 
+                                alt={topIssue.name} 
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                                src={DEFAULT_IMAGE}
+                              />
+                            )}
+                            <div className="absolute top-2 left-2 size-7 bg-primary text-white flex items-center justify-center font-black rank-number rounded shadow-glow z-10">1</div>
+                            <div className="absolute top-2 right-2 px-2.5 py-1 bg-white/90 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center shadow-sm z-10">
+                              <span className="text-[10px] font-bold text-slate-700">AI 초안 작성 완료</span>
+                            </div>
+                          </div>
+                          <h5 className="text-[13px] font-bold text-slate-900 leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                            {topIssue.name}
+                          </h5>
                         </div>
                       </div>
-                      <h5 className="text-[13px] font-bold text-slate-900 leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                        {topIssue.name}
-                      </h5>
+                    ) : (
+                      <div className="w-full mb-1 -mx-1 pt-4">
+                        <div className="border-t-[3px] border-primary mb-2"></div>
+                      </div>
+                    )}
+                    
+                    <div className="divide-y divide-slate-50 bg-white -mx-1">
+                      {listIssues.map((issue) => (
+                        <div 
+                          key={issue.id} 
+                          className="py-[7px] group cursor-pointer flex gap-4 items-baseline" 
+                          onClick={() => onNavigateToAnalysis(issue.id)}
+                        >
+                          <span className="rank-number text-[11px] font-bold text-slate-400 w-4 text-center shrink-0">{issue.rank}</span>
+                          <p className="text-[12px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary transition-colors">
+                            {issue.name}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  
-                  <div className="divide-y divide-slate-50 bg-white -mx-1">
-                    {issuesForDate.slice(1, 10).map((issue) => (
-                      <div 
-                        key={issue.id} 
-                        className="py-[7px] group cursor-pointer flex gap-4 items-baseline" 
-                        onClick={() => onNavigateToAnalysis(issue.id)}
+
+                  {totalPages > 1 && (
+                    <div className="flex justify-center items-center gap-1 mt-6">
+                      <button
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}
+                        className="size-8 flex items-center justify-center rounded-full hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-500"
                       >
-                        <span className="rank-number text-[11px] font-bold text-slate-400 w-4 text-center shrink-0">{issue.rank}</span>
-                        <p className="text-[12px] font-medium text-slate-700 truncate flex-1 group-hover:text-primary transition-colors">
-                          {issue.name}
-                        </p>
+                        <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                      </button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                          if (
+                            pageNum === 1 || 
+                            pageNum === totalPages || 
+                            (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                          ) {
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => setCurrentPage(pageNum)}
+                                className={`size-8 flex items-center justify-center rounded-full text-[13px] font-bold transition-all ${
+                                  currentPage === pageNum 
+                                    ? 'bg-primary text-white shadow-sm' 
+                                    : 'hover:bg-slate-100 text-slate-500'
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            )
+                          } else if (
+                            pageNum === currentPage - 2 ||
+                            pageNum === currentPage + 2
+                          ) {
+                            return <span key={pageNum} className="text-slate-300 px-1 text-[12px]">...</span>
+                          }
+                          return null;
+                        })}
                       </div>
-                    ))}
-                  </div>
-                </>
+
+                      <button
+                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                        disabled={currentPage === totalPages}
+                        className="size-8 flex items-center justify-center rounded-full hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-500"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               );
             })()
           )}

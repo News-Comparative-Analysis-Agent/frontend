@@ -5,7 +5,7 @@
  * TODO: 백엔드 API 명세 확정 후 실제 엔드포인트와 연동 필요
  */
 
-import { apiGet, apiPost } from './fetchWithTimeout';
+import { apiGet, apiPost, apiPut } from './fetchWithTimeout';
 
 export interface DraftGenerateRequest {
   issue_id: number;
@@ -52,13 +52,13 @@ export const generateDraft = (request: DraftGenerateRequest) =>
  * 작성 중인 초안을 임시 저장합니다.
  */
 export const saveDraft = (draft: Omit<SavedDraft, 'id' | 'last_saved'>) =>
-  apiPost<SavedDraft>('/drafts', draft, '임시 저장 실패');
+  apiPut<any>(`/api/draft/issue/${draft.issue_id}`, { content: draft.content }, '임시 저장 실패');
 
 /**
  * 내 임시 저장 초안 목록을 불러옵니다.
  */
 export const fetchMyDrafts = () =>
-  apiGet<SavedDraft[]>('/drafts/me', '초안 목록 조회 실패');
+  apiGet<SavedDraft[]>('/api/draft/workspace', '초안 목록 조회 실패');
 
 /**
  * AI 챗봇과 대화합니다.

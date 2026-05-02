@@ -8,22 +8,22 @@ const MainHero = () => {
         {/* 1. 좌측 홍보 문구 (모바일 중앙 정렬 대응) */}
         <div className="flex-1 pb-4 lg:pb-8 text-center lg:text-left">
           <h2 className="flex flex-col items-start break-keep">
-            <span className="bg-white text-slate-900 text-2xl sm:text-3xl lg:text-[30px] font-black px-2 py-1 mb-2 leading-tight">
-              더 쉽고 빠른 기사 작성,
+            <span className="bg-white text-slate-900 text-2xl sm:text-3xl lg:text-[27px] font-black px-2 py-1 mb-2 leading-tight">
+              원하는 주제를 골라주세요
             </span>
             <span className="text-white text-lg sm:text-xl lg:text-[22px] font-light opacity-90 tracking-tight">
-              시작부터 완성까지 함께해요
+              초안부터 검토까지 한번에 
             </span>
           </h2>
         </div>
 
         {/* 2. 우측 프로세스 영역 (모바일 줄바꿈 및 간격 최적화) */}
-        <div className="flex flex-wrap items-center justify-center lg:justify-end gap-x-4 sm:gap-x-9 gap-y-6 relative h-full pb-8 lg:pb-0">
+        <div className="flex flex-wrap items-center justify-center lg:justify-end gap-x-3 sm:gap-x-6 gap-y-6 relative h-full pb-8 lg:pb-0">
           {[
-            { num: '01', label: '주제 선택', desc: '원하는 주제를 선택하세요.' },
-            { num: '02', label: '심층 분석', desc: '언론사 별 관점을 분석하세요.' },
-            { num: '03', label: '초안 작성', desc: 'AI가 초안을 작성합니다.' },
-            { num: '04', label: '최종 검토', desc: '기사 품질을 검토하세요.' }
+            { num: '01', label: '주제 선택', desc: '작성 주제 선택' },
+            { num: '02', label: '심층 분석', desc: '언론사별 관점 비교' },
+            { num: '03', label: '초안 작성', desc: 'AI초안 자동 생성' },
+            { num: '04', label: '최종 검토', desc: '기사 품질 최종검토' }
           ].map((step, idx) => (
             <div key={idx} className="flex flex-col items-center text-center group min-w-[110px]">
               {/* 🎯 숫자 영역 (주황 배경에 맞춘 대비 조정) */}

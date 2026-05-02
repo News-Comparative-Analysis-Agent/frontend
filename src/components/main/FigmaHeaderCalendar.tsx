@@ -34,7 +34,7 @@ const FigmaHeaderCalendar: React.FC<FigmaHeaderCalendarProps> = ({ selectedDate,
         <span className="text-[8px] font-black text-slate-400 mt-0 uppercase tracking-[0.2em] -mr-0.5">Month</span>
       </div>
 
-      <div className="flex items-center justify-center gap-x-2">
+      <div className="flex items-center justify-center gap-x-[11px]">
         {days.map((date, idx) => {
           const active = isSameDay(date, selectedDate);
           const day = date.getDay();

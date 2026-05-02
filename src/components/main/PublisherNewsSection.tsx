@@ -33,7 +33,7 @@ const PublisherNewsSection = ({
     <div className="flex flex-col w-full h-full">
       <div className="flex flex-col mb-0">
         <div className="flex items-center justify-between h-8 mb-4">
-          <h2 className="text-slate-800 text-xl font-bold tracking-tight section-highlight">
+          <h2 className="text-slate-800 text-[18px] font-bold tracking-tight section-highlight">
             각 언론사별 인기 뉴스에요
           </h2>
         </div>
@@ -65,7 +65,7 @@ const PublisherNewsSection = ({
       ) : (
         <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
           {filteredPublishers.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-1 gap-y-4 -mx-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 -mx-1">
               {filteredPublishers.map((publisher) => {
                 const year = selectedDate.getFullYear();
                 const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
