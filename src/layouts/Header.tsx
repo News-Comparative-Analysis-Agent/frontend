@@ -39,21 +39,21 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
   }
 
   return (
-    <header className={`h-16 flex items-center justify-between ${isWhite ? 'border-b border-slate-100 bg-white' : 'bg-primary'} px-4 md:px-8 py-4 shrink-0 sticky top-0 z-[100] relative overflow-hidden`}>
-      <div className="flex items-center gap-4 w-1/4">
+    <header className={`h-14 xl:h-16 flex items-center justify-between ${isWhite ? 'border-b border-slate-100 bg-white' : 'bg-primary'} px-4 xl:px-8 py-3 xl:py-4 shrink-0 sticky top-0 z-[100] relative overflow-hidden`}>
+      <div className="flex items-center gap-4 shrink-0">
         <div onClick={() => navigate('/')} className="flex items-center gap-3 cursor-pointer group">
-          <div className={`size-8 md:size-9 ${isWhite ? 'bg-primary/10 text-primary' : 'bg-white text-primary'} flex items-center justify-center rounded-xl shadow-sm group-hover:scale-110 transition-transform`}>
+          <div className={`size-8 md:size-9 ${isWhite ? 'bg-primary/10 text-primary' : 'bg-white text-primary'} flex items-center justify-center rounded-xl shadow-sm group-hover:scale-110 transition-transform shrink-0`}>
             <span className="material-symbols-outlined text-xl md:text-2xl font-bold">center_focus_strong</span>
           </div>
-          <div>
-            <h1 className={`${isWhite ? 'text-slate-900' : 'text-white'} text-base md:text-lg font-bold leading-tight tracking-tight`}>FOC-US</h1>
+          <div className="hidden sm:block">
+            <h1 className={`${isWhite ? 'text-slate-900' : 'text-white'} text-base md:text-lg font-bold leading-tight tracking-tight whitespace-nowrap`}>FOC-US</h1>
           </div>
         </div>
         
         {activeStep && activeStep > 1 && (
           <button 
             onClick={handleBack}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all whitespace-nowrap shrink-0 ${
               isWhite 
                 ? 'border-slate-200 text-slate-600 hover:bg-slate-50' 
                 : 'border-white/20 text-white/90 hover:bg-white/10'
@@ -65,13 +65,13 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
         )}
       </div>
 
-      <nav className="hidden lg:flex flex-1 justify-center items-center">
+      <nav className="hidden lg:flex flex-1 justify-center items-center min-w-0">
         {activeStep && (
           <StepNavigation steps={[...STEPS]} activeStep={activeStep} />
         )}
       </nav>
 
-      <div className="flex items-center gap-2 md:gap-4 w-1/4 justify-end">
+      <div className="flex items-center gap-2 md:gap-4 shrink-0 justify-end">
         {isLoggedIn ? (
           <div className="flex items-center gap-2 sm:gap-4">
             <button 

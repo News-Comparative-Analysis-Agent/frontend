@@ -65,9 +65,9 @@ const PopularIssuesSection = ({
   }
 
   return (
-    <div className="w-full h-full min-w-0 md:border-r border-slate-100 md:pr-4 flex flex-col text-left self-stretch transition-all duration-300">
+    <div className="w-full h-full min-w-0 md:border-r border-slate-100 md:pr-2 flex flex-col text-left self-stretch transition-all duration-300">
       <div className="flex flex-col mb-0">
-        <div className="flex items-center justify-between h-auto mb-1.5 mt-1">
+        <div className="flex items-center justify-between h-9 mb-1.5 mt-1">
           <h2 className="text-slate-800 text-base font-bold tracking-tight">
             언론사 공통으로 다루는 인기 뉴스에요
           </h2>
@@ -83,11 +83,24 @@ const PopularIssuesSection = ({
       <div className="flex flex-col">
         <div className="divide-y divide-slate-100">
           {loading || !dailyIssues ? (
-            <div className="animate-pulse space-y-6">
-              <div className="h-[240px] bg-slate-100 rounded-xl w-full" />
-              <div className="space-y-3">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-6 bg-slate-50 rounded w-full" />
+            <div className="space-y-10">
+              {/* 1위 스켈레톤 */}
+              <div className="shadow-premium-card py-4 -mx-1 max-w-[500px] w-full">
+                <div className="h-0.5 bg-slate-100 mb-6 w-full" />
+                <div className="animate-pulse space-y-4">
+                  <div className="w-[120px] h-6 bg-slate-200 rounded-md mb-4" />
+                  <div className="w-full aspect-video bg-slate-200 rounded-xl" />
+                  <div className="h-5 bg-slate-200 rounded-md w-3/4" />
+                </div>
+              </div>
+
+              {/* 리스트 스켈레톤 */}
+              <div className="grid grid-cols-1 gap-y-8 mt-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="animate-pulse flex flex-col gap-3">
+                    <div className="w-[300px] aspect-video bg-slate-100 rounded-xl" />
+                    <div className="w-[200px] h-4 bg-slate-50 rounded-md" />
+                  </div>
                 ))}
               </div>
             </div>
@@ -124,15 +137,15 @@ const PopularIssuesSection = ({
                   <div>
                     {topIssue ? (
                       <div 
-                        className="shadow-premium-card py-4 group cursor-pointer w-full mb-1 -mx-1" 
+                        className="shadow-premium-card py-4 group cursor-pointer max-w-[500px] w-full mb-1 -mx-1" 
                         onClick={() => onNavigateToAnalysis(topIssue.id)}
                       >
-                        <div className="border-t-[3px] border-primary mb-4"></div>
+                        <div className="border-t-[3px] border-primary mb-4 max-w-[500px] w-full"></div>
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="text-lg font-bold text-primary flex items-center gap-1 tracking-tight">통합 인기 1위</h4>
                         </div>
                         <div className="pb-4 pt-1 group cursor-pointer border-b border-slate-100">
-                          <div className="relative w-full aspect-[21/9] mb-3 overflow-hidden rounded-md bg-slate-100">
+                          <div className="relative max-w-[500px] w-full aspect-video mb-3 overflow-hidden rounded-xl bg-slate-100 shadow-sm border border-slate-200/50">
                             {topIssue.image_urls?.map((url, imgIdx) => (
                               <img 
                                 key={`${topIssue.id}-${imgIdx}`}
@@ -171,48 +184,58 @@ const PopularIssuesSection = ({
                       </div>
                     ) : (
                       <div className="w-full mb-1 -mx-1 pt-4">
-                        <div className="border-t-[3px] border-primary mb-2"></div>
+                        <div className="border-t-[3px] border-primary mb-2 max-w-[500px] w-full"></div>
                       </div>
                     )}
                     
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-4 mt-2 pb-2 -mx-1">
+                    <div className="grid grid-cols-1 gap-y-4 mt-4 pb-2 -mx-1">
                       {listIssues.map((issue) => (
                         <div 
                           key={issue.id} 
-                          className="group cursor-pointer flex flex-col relative transition-all duration-300" 
+                          className="group cursor-pointer flex flex-row gap-5 p-2 rounded-2xl hover:bg-slate-50/50 transition-all duration-300" 
                           onClick={() => onNavigateToAnalysis(issue.id)}
                         >
-                          {/* 넷플릭스 스타일 개선: 이미지는 크게, 숫자는 투명하게 이미지 위에 오버레이 */}
-                          <div className="relative flex items-end w-full pt-4">
-                            {/* 순위 숫자 (가독성 극대화: 흰색 외곽선 + 강한 그림자 + 반투명 채움) */}
-                            <span 
-                              className={`absolute bottom-[5px] left-[5px] font-black text-white/20 leading-none select-none z-20 pointer-events-none transition-all duration-300 group-hover:-translate-y-1 tracking-tighter ${
-                                issue.rank >= 10 ? 'text-[32px] tracking-[-0.05em]' : 'text-[38px]'
-                              }`} 
-                              style={{ 
-                                WebkitTextStroke: '1.5px rgba(255, 255, 255, 0.95)',
-                                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.8))'
-                              }}
-                            >
-                              {issue.rank}
-                            </span>
-                            
-                            {/* 썸네일 (카드를 꽉 채우기) */}
-                            <div className="relative z-10 w-full aspect-video rounded-md overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.1)] group-hover:shadow-[0_8px_20px_rgba(242,127,13,0.2)] transition-all duration-300 group-hover:-translate-y-1 bg-slate-100 border border-slate-200/50">
+                          {/* 좌측: 이미지 + 랭킹 오버레이 */}
+                          <div className="relative shrink-0">
+                            {/* 썸네일 (300px) */}
+                            <div className="relative z-10 w-[300px] aspect-video rounded-xl overflow-hidden shadow-sm border border-slate-200/50 group-hover:shadow-md transition-all">
                               <img 
                                 alt={issue.name} 
-                                className="w-full h-full object-cover" 
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                                 src={(issue.image_urls && issue.image_urls.length > 0) ? issue.image_urls[0] : DEFAULT_IMAGE}
                                 onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
                               />
                             </div>
+
+                            {/* 순위 숫자 스타일 */}
+                            <span 
+                              className={`absolute bottom-[-5px] left-[-15px] font-black text-white/20 leading-none select-none z-20 pointer-events-none transition-all duration-300 group-hover:-translate-y-1 tracking-tighter ${
+                                issue.rank >= 10 ? 'text-[44px] tracking-[-0.05em]' : 'text-[54px]'
+                              }`} 
+                              style={{ 
+                                WebkitTextStroke: '2px rgba(255, 255, 255, 0.95)',
+                                filter: 'drop-shadow(0px 3px 6px rgba(0,0,0,0.8))'
+                              }}
+                            >
+                              {issue.rank}
+                            </span>
                           </div>
                           
-                          {/* 하단 텍스트 영역 */}
-                          <div className="pt-3 px-1">
-                            <h5 className="text-[13px] font-bold text-slate-800 leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                          {/* 우측: 텍스트 영역 (제목 + 수집 기사 수) */}
+                          <div className="flex-1 min-w-0 py-1 flex flex-col justify-center gap-2">
+                            <h5 className="text-[14px] font-bold text-slate-800 leading-snug group-hover:text-primary transition-colors line-clamp-2">
                               {issue.name}
                             </h5>
+                            
+                            {/* 수집 기사 수 뱃지 */}
+                            <div className="flex items-center gap-1.5">
+                              <div className="px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200/50 flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[12px] text-slate-400">description</span>
+                                <span className="text-[11px] font-bold text-slate-500">
+                                  수집 기사 수 <span className="text-primary">24건</span>
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -275,64 +298,6 @@ const PopularIssuesSection = ({
         </div>
       </div>
 
-      <div className="mt-12 bg-[#FFFBF7] p-3.5 rounded-[32px] border border-orange-100/50 flex flex-col items-center shadow-[0_15px_40px_-15px_rgba(0,0,0,0.06)] relative overflow-hidden md:sticky top-24 z-20 transition-all duration-300">
-        {/* 장식용 배경 요소 */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 rounded-full -ml-12 -mb-12 blur-3xl"></div>
-
-        <div className="flex flex-col items-center mb-4 text-center px-4 relative z-10">
-          <span className="flex items-center justify-center w-6 h-6 bg-primary/10 text-primary rounded-full mb-3 shadow-sm">
-            <span className="material-symbols-outlined text-[14px] font-bold">visibility</span>
-          </span>
-          <p className="text-[18px] font-bold text-slate-800 mb-1 tracking-tighter">
-            찾는 뉴스가 없으신가요?
-          </p>
-          <p className="text-[12px] font-normal text-slate-400">원하는 키워드를 입력하시면 관련 뉴스를 찾아드릴게요</p>
-        </div>
-        
-        <div className="relative w-full max-w-[460px] group mb-4 relative z-10">
-          <input
-            id="search-input-content"
-            className="w-full pl-6 pr-14 py-2 border-2 border-slate-300 rounded-xl focus:outline-none focus:ring-8 focus:ring-primary/5 focus:border-primary/40 transition-all bg-white shadow-[0_4px_12px_rgba(0,0,0,0.02)] placeholder:text-slate-400 font-medium text-[13px] text-slate-700"
-            placeholder="직접 검색해보세요!"
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleInternalSearch()}
-          />
-          <button
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[30px] h-[30px] bg-primary text-white rounded-lg flex items-center justify-center shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all hover:scale-105 active:scale-95"
-            onClick={handleInternalSearch}
-            type="button"
-          >
-            <span className="material-symbols-outlined text-[18px] font-bold">search</span>
-          </button>
-        </div>
-
-        {/* 최근 검색어 태그 */}
-        <div className="flex items-center gap-2 flex-wrap justify-center max-w-[400px]">
-          <span className="text-[11px] font-semibold text-slate-400 mr-1">최근 검색</span>
-          {recentSearches.length > 0 ? (
-            recentSearches.map((term, i) => (
-              <div
-                key={i}
-                onClick={() => handleHistoryClick(term)}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-white border border-slate-200 rounded-full cursor-pointer hover:border-primary/30 group transition-all"
-              >
-                <span className="text-[11px] font-medium text-slate-600 group-hover:text-primary">{term}</span>
-                <button
-                  onClick={(e) => removeSearch(e, term)}
-                  className="flex items-center text-slate-300 hover:text-rose-400 transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[13px]">close</span>
-                </button>
-              </div>
-            ))
-          ) : (
-            <span className="text-[11px] font-medium text-slate-300 italic">기록 없음</span>
-          )}
-        </div>
-      </div>
     </div>
   )
 }

@@ -180,19 +180,19 @@ const DraftingPage = () => {
           setComparisonLayout={setComparisonLayout}
         />
 
-        {/* 좌측 사이드바가 닫혔을 때 나타나는 플로팅 영역 (열기 버튼 + 언론사 칩 리스트) */}
+        {/* 좌측 사이드바가 닫혔을 때 나타나는 영역 (열기 버튼 + 언론사 칩 리스트) */}
         {!isLeftSidebarOpen && (
-          <div className="fixed top-[112px] left-6 z-40 flex flex-col items-center gap-4 animate-page-in">
+          <div className="flex flex-col items-center gap-4 py-4 px-3 self-stretch shrink-0 overflow-y-auto">
             {/* 사이드바 열기 버튼 */}
             <button 
               onClick={() => setIsLeftSidebarOpen(true)}
-              className="bg-white border border-slate-200 p-2.5 rounded-xl shadow-lg text-primary hover:bg-orange-50 hover:scale-110 active:scale-90 transition-all duration-200"
+              className="bg-white border border-slate-200 p-2.5 rounded-xl shadow-lg text-primary hover:bg-orange-50 hover:scale-110 active:scale-90 transition-all duration-200 shrink-0"
               title="사이드바 열기"
             >
               <span className="material-symbols-outlined icon-md">check</span>
             </button>
 
-            {/* 언론사 캡슐형(Pill) 리스트 */}
+            {/* 언론사 칩형(Pill) 리스트 */}
             <div className="flex flex-col items-start gap-2.5 py-3 border-t border-slate-100 mt-1">
               {uniqueMediaList.map((media, idx) => (
                 <button

@@ -65,4 +65,5 @@ export interface NewsArticle {
   publisher_id: number;
   publisher_name: string;
   image_url?: string;
+  issue_type?: 'editorial' | 'politics';
 }

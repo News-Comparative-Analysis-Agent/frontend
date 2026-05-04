@@ -24,6 +24,7 @@ const PublisherNewsSection = ({
   const formattedDate = `${selectedDate.getFullYear()}년 ${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일`;
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeIssueType, setActiveIssueType] = useState<'all' | 'politics' | 'editorial'>('all');
   const itemsPerPage = 6;
 
   // 필터가 변경되면 1페이지로 리셋
@@ -41,20 +42,54 @@ const PublisherNewsSection = ({
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex flex-col mb-0">
-        <div className="flex items-center justify-between h-auto mb-1.5 mt-1">
+        <div className="flex items-center justify-between h-9 mb-1.5 mt-1">
           <h2 className="text-slate-800 text-base font-bold tracking-tight">
             각 언론사별 인기 뉴스에요
           </h2>
+
+          {/* 이슈 타입 선택 탭 - 크기 확대 */}
+          <div className="flex items-center gap-1 p-1 bg-slate-50 rounded-xl border border-slate-100">
+            <button
+              onClick={() => setActiveIssueType('all')}
+              className={`px-5 py-1.5 rounded-lg text-[12px] font-bold transition-all ${
+                activeIssueType === 'all' 
+                  ? 'bg-white text-primary shadow-sm border border-slate-100' 
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              전체
+            </button>
+            <button
+              onClick={() => setActiveIssueType('politics')}
+              className={`px-5 py-1.5 rounded-lg text-[12px] font-bold transition-all ${
+                activeIssueType === 'politics' 
+                  ? 'bg-white text-primary shadow-sm border border-slate-100' 
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              정치
+            </button>
+            <button
+              onClick={() => setActiveIssueType('editorial')}
+              className={`px-5 py-1.5 rounded-lg text-[12px] font-bold transition-all ${
+                activeIssueType === 'editorial' 
+                  ? 'bg-white text-primary shadow-sm border border-slate-100' 
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              사설
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-1.5 mb-2 text-[12px] text-slate-500 font-medium opacity-90">
           <span className="material-symbols-outlined text-[14px] text-primary">tune</span>
-          필터를 선택하여 원하는 언론사의 인기 뉴스만 골라볼 수 있어요.
+          필터를 통해 원하는 언론사의 뉴스만 골라보세요.
         </div>
         <div className="w-full h-px bg-slate-100 mb-0"></div>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-4 gap-y-4 -mx-1">
           {[1, 2, 3].map(i => (
             <div key={i} className="animate-pulse space-y-3">
               <div className="h-3 w-20 bg-slate-200 rounded" />
@@ -75,14 +110,18 @@ const PublisherNewsSection = ({
         <div className="flex-1 min-h-0 overflow-y-auto pr-2 custom-scrollbar">
           {filteredPublishers.length > 0 ? (
             <div className="flex flex-col min-h-[600px]">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-4 -mx-1">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-4 gap-y-4 -mx-1">
                 {currentPublishers.map((publisher) => {
                 const year = selectedDate.getFullYear();
                 const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
                 const day = String(selectedDate.getDate()).padStart(2, '0');
                 const dateStr = `${year}-${month}-${day}`;
                 
-                const articles = newsData[dateStr]?.[publisher] || [];
+                const allArticles = newsData[dateStr]?.[publisher] || [];
+                const articles = activeIssueType === 'all' 
+                  ? allArticles 
+                  : allArticles.filter(a => a.issue_type === activeIssueType);
+                
                 const style = DEFAULT_STYLE;
                 
                 return (
@@ -145,20 +184,38 @@ const PublisherNewsSection = ({
               
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex justify-center items-center mt-8 mb-6 gap-2">
-                  {Array.from({ length: totalPages }).map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentPage(i + 1)}
-                      className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                        currentPage === i + 1 
-                          ? 'bg-primary text-white shadow-md scale-110' 
-                          : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 hover:text-primary'
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
+                <div className="flex justify-center items-center gap-1 mt-8 mb-6">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="size-8 flex items-center justify-center rounded-full hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-500"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                  </button>
+                  
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`size-8 flex items-center justify-center rounded-full text-[13px] font-bold transition-all ${
+                          currentPage === pageNum 
+                            ? 'bg-primary text-white shadow-sm' 
+                            : 'hover:bg-slate-100 text-slate-500'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="size-8 flex items-center justify-center rounded-full hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-500"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                  </button>
                 </div>
               )}
             </div>

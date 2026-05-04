@@ -81,7 +81,7 @@ const MainPage = () => {
         >
           <div className="bg-primary/5 backdrop-blur-md border-2 border-primary/40 border-r-0 rounded-l-full py-7 px-2 shadow-xl shadow-primary/10 hover:pl-5 transition-all duration-300 flex flex-col items-center gap-4">
             <span className="material-symbols-outlined text-primary text-[22px] group-hover:scale-110 transition-transform">tune</span>
-            <span className="text-[11px] font-bold text-primary [writing-mode:vertical-lr] tracking-[0.2em] group-hover:tracking-[0.3em] transition-all">
+            <span className="text-[11px] font-bold text-primary [writing-mode:vertical-lr] tracking-[0.15em] group-hover:tracking-[0.25em] transition-all whitespace-nowrap">
               언론사 필터
             </span>
           </div>
@@ -104,14 +104,17 @@ const MainPage = () => {
           <MainSearchHeader 
             selectedDate={selectedDate}
             onDateChange={handleDateChange}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearch={handleSearch}
           />
 
           {/* 3. 메인 뉴스 컨텐츠 영역 */}
-          <div className="max-w-[1280px] mx-auto px-6 pb-12 pt-1">
-            <div className="flex flex-col md:flex-row gap-4">
+          <div className="max-w-[1280px] mx-auto px-4 xl:px-6 pb-8 xl:pb-12 pt-1">
+            <div className="flex flex-row gap-8">
               
-              {/* 좌측: 실시간 통합 순위 (조정된 넓이 배치) */}
-              <div className="w-full md:flex-[5] lg:flex-1 min-w-0 flex flex-col items-stretch">
+              {/* 좌측: 실시간 통합 순위 (반반 비율 유지, 큰 화면에서만 고정 너비) */}
+              <div className="flex-1 xl:w-[520px] xl:shrink-0 xl:flex-none min-w-0 flex flex-col items-stretch">
                 <PopularIssuesSection 
                   loading={loading}
                   dailyIssues={dailyIssues}
@@ -127,8 +130,8 @@ const MainPage = () => {
                 />
               </div>
 
-              {/* 우측: 언론사별 인기 뉴스 (2열 구성을 위해 조정된 배치) */}
-              <div className="w-full md:flex-[5] lg:flex-1 min-w-0">
+              {/* 우측: 언론사별 인기 뉴스 (남은 공간을 모두 차지하도록 확장) */}
+              <div className="flex-1 min-w-0">
                 <PublisherNewsSection 
                   loading={loading}
                   error={error}

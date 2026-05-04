@@ -27,6 +27,11 @@
 }
 
 @layer base {
+  html {
+    /* 원할한 소수 화면 너비 강제 - 다양한 해상도/배율에서 레이아웃 깨짘 방지 */
+    min-width: 768px;
+  }
+
   body {
     @apply bg-background font-sans antialiased;
     color: rgb(var(--text-main));
@@ -34,6 +39,8 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
+
+
 
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined' !important;
@@ -109,7 +116,14 @@
 
 .section-highlight::after {
   content: '';
-  @apply absolute left-0 bottom-[-10px] w-12 h-1.5 bg-primary/20 rounded-full;
+  @apply absolute left-0 w-12 h-2 bg-primary/20 rounded-sm;
+  bottom: -10px;
+}
+
+@media (min-width: 1280px) {
+  .section-highlight::after {
+    bottom: -14px;
+  }
 }
 
 .capsule-tab-container {
@@ -432,4 +446,3 @@ details[open] .source-arrow {
   margin: 2rem auto;
   display: block;
 }
-
