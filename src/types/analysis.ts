@@ -61,6 +61,27 @@ export interface IssueAnalysisResponse {
   image_urls?: string[];
 }
 
+/** 인용 출처(Citation) 정보에 사용되는 타입입니다. */
+export interface CitationItem {
+  id: number;
+  press: string;
+  title: string;
+  url: string;
+  published_at: string;
+  article_id?: number | null;  // 💡 lazy-load용
+  quote: string;
+  full_evidence: string;
+}
+
+/** 인용 출처 데이터가 포함된 초안 응답 타입입니다. */
+export interface DraftWithCitationsResponse {
+  issue_id: number;
+  title: string;
+  article_body: string;
+  citations: CitationItem[];
+}
+
+
 /** 초안 작성 페이지 좌측 사이드바의 인용구 카드에 사용되는 타입입니다. */
 export interface SidebarQuote {
   id: number;

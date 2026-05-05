@@ -1,6 +1,7 @@
-import React, { RefObject } from 'react'
-import { DraftImage } from '../../types/analysis'
+import React, { RefObject, useState, useEffect, useRef } from 'react'
+import { DraftImage, CitationItem } from '../../types/analysis'
 import { useDraftStore } from '../../stores/useDraftStore'
+import { fetchArticleBody } from '../../api/issues'
 
 interface DraftingEditorAreaProps {
   title: string
@@ -22,11 +23,64 @@ const DraftingEditorArea = ({
   handleDragOver, handleDragLeave, handleDrop, dropIndicator, handleDragStart,
   draftImages, isCrossCheckMode
 }: DraftingEditorAreaProps) => {
-  const { isPreviewMode } = useDraftStore()
+  const { isPreviewMode, citations } = useDraftStore()
+  
+  // 💡 선택된 인용구 상태 (팝오버 표시용)
+  const [activeCitation, setActiveCitation] = useState<CitationItem | null>(null);
+  const [popoverPos, setPopoverPos] = useState({ top: 0, left: 0 });
+  const popoverRef = useRef<HTMLDivElement>(null);
+  // 💡 기사 원문 lazy-load 상태
+  const [articleContent, setArticleContent] = useState<string | null>(null);
+  const [isLoadingArticle, setIsLoadingArticle] = useState(false);
+
+  // 팝오버 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+        setActiveCitation(null);
+        setArticleContent(null);
+      }
+    };
+    if (activeCitation) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeCitation]);
 
   const handleEditorClick = (e: React.MouseEvent) => {
-    if (isPreviewMode) return; // 💡 프리뷰 중에는 클릭 동작 무시
+    if (isPreviewMode) return;
     const target = e.target as HTMLElement;
+
+    // 💡 1. 인용 마커 클릭 감지
+    const marker = target.closest('.citation-marker');
+    if (marker) {
+      const id = marker.getAttribute('data-id');
+      const citation = citations.find(c => c.id.toString() === id);
+      if (citation) {
+        // 에디터 컨테이너 기준 상대 좌표 계산
+        const editorWrapper = editorRef.current?.parentElement;
+        if (editorWrapper) {
+          const wrapperRect = editorWrapper.getBoundingClientRect();
+          const leftPos = Math.min(e.clientX - wrapperRect.left, wrapperRect.width - 410);
+          const topPos = e.clientY - wrapperRect.top + 15;
+          setPopoverPos({ top: topPos, left: Math.max(10, leftPos) });
+          setActiveCitation(citation);
+          setArticleContent(null); // 이전 내용 초기화
+
+          // 💡 article_id가 있으면 기사 원문 lazy-load
+          if (citation.article_id) {
+            setIsLoadingArticle(true);
+            fetchArticleBody(citation.article_id)
+              .then(res => setArticleContent(res.raw_content))
+              .catch(() => setArticleContent(null))
+              .finally(() => setIsLoadingArticle(false));
+          }
+          return;
+        }
+      }
+    }
+
+    // 2. 삭제 버튼 클릭 감지
     const deleteBtn = target.closest('.editor-delete-btn');
     if (deleteBtn) {
       const wrapper = deleteBtn.closest('.relative.group');
@@ -88,6 +142,96 @@ const DraftingEditorArea = ({
             suppressContentEditableWarning={true}
           />
 
+          {/* 💡 인용 출처 팝오버 */}
+          {activeCitation && (
+            <div 
+              ref={popoverRef}
+              className="absolute z-[100] w-[420px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-slate-200 overflow-hidden"
+              style={{ top: popoverPos.top, left: popoverPos.left }}
+            >
+              {/* 헤더 */}
+              <div className="bg-slate-50 px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Evidence</span>
+                  <span className="text-[13px] font-bold text-slate-800">{activeCitation.press}</span>
+                </div>
+                <button onClick={() => { setActiveCitation(null); setArticleContent(null); }}
+                  className="size-7 flex items-center justify-center rounded-full hover:bg-slate-200 transition-colors">
+                  <span className="material-symbols-outlined text-[18px] text-slate-400">close</span>
+                </button>
+              </div>
+
+              {/* 본문 */}
+              <div className="p-5">
+                <h4 className="text-[14px] font-bold text-slate-900 mb-3 leading-tight line-clamp-2">{activeCitation.title}</h4>
+                <div className="bg-slate-50 rounded-xl p-4 text-[13px] leading-[1.7] text-slate-600 max-h-[350px] overflow-y-auto custom-scrollbar border border-slate-100">
+                  {isLoadingArticle ? (
+                    // 로딩 중
+                    <div className="flex items-center justify-center gap-2 py-8 text-slate-400">
+                      <svg className="animate-spin size-4" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                      <span className="text-[12px]">기사 원문 불러오는 중...</span>
+                    </div>
+                  ) : (() => {
+                    const displayText = articleContent || activeCitation.full_evidence || "";
+                    if (!displayText) return <p className="text-slate-400 italic text-center py-4">표시할 기사 내용이 없습니다.</p>;
+
+                    const fullQuote = activeCitation.quote.trim();
+                    if (!fullQuote) return <span>{displayText}</span>;
+
+                    // 💡 개선된 하이라이트 로직: 인용구를 문장 단위로 쪼개어 각각 매칭
+                    // 마침표(.)를 기준으로 쪼개서 빈 문장이 아닌 것만 추출
+                    const quoteSentences = fullQuote.split('.').map(s => s.trim()).filter(s => s.length > 5);
+                    
+                    if (quoteSentences.length === 0) return <span>{displayText}</span>;
+
+                    // 모든 문장을 하이라이트하기 위해 누적 처리
+                    let segments: (string | JSX.Element)[] = [displayText];
+
+                    quoteSentences.forEach(sentence => {
+                      const newSegments: (string | JSX.Element)[] = [];
+                      const escaped = sentence.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+                      const regex = new RegExp(`(${escaped})`, 'g');
+
+                      segments.forEach(seg => {
+                        if (typeof seg !== 'string') {
+                          newSegments.push(seg);
+                          return;
+                        }
+
+                        const parts = seg.split(regex);
+                        parts.forEach((part, i) => {
+                          if (i % 2 === 1) { // 매칭된 부분
+                            newSegments.push(
+                              <mark key={`${sentence}-${i}`} className="bg-yellow-200 text-yellow-950 font-bold px-1 py-0.5 rounded-sm shadow-sm ring-1 ring-yellow-300">
+                                {part}
+                              </mark>
+                            );
+                          } else if (part) {
+                            newSegments.push(part);
+                          }
+                        });
+                      });
+                      segments = newSegments;
+                    });
+
+                    return <>{segments}</>;
+                  })()}
+                </div>
+
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-slate-400">{activeCitation.published_at}</span>
+                  <a href={activeCitation.url} target="_blank" rel="noreferrer"
+                    className="flex items-center gap-1.5 text-[12px] font-bold text-primary hover:underline">
+                    원문 기사 보기
+                    <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="mt-16 pt-8 border-t border-slate-100" contentEditable="false">

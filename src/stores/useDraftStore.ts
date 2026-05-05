@@ -17,13 +17,22 @@ export const useDraftStore = create<DraftState>()(
       pastContent: [],
       futureContent: [],
       sidebarQuotes: [],
+      citations: [], // 💡 추가
       lastSaved: null,
       isDirty: false,
       isSaving: false,
       isPreviewMode: false,
 
       // 기본 상태 변경 액션
-      setIssueId: (currentIssueId) => set({ currentIssueId, isDirty: false, pastContent: [], futureContent: [], isPreviewMode: false, previewContent: null }),
+      setIssueId: (currentIssueId) => set({ 
+        currentIssueId, 
+        isDirty: false, 
+        pastContent: [], 
+        futureContent: [], 
+        isPreviewMode: false, 
+        previewContent: null,
+        citations: [] // 💡 추가
+      }),
       setTitle: (title) => set({ title, isDirty: true }),
       
       setContent: (newContent, skipDirty = false) => set((state) => {
@@ -44,6 +53,8 @@ export const useDraftStore = create<DraftState>()(
       setPreviewMode: (isPreviewMode) => set({ isPreviewMode }),
 
       setSidebarQuotes: (sidebarQuotes) => set({ sidebarQuotes, isDirty: true }),
+      
+      setCitations: (citations) => set({ citations }), // 💡 추가
       
       // History 액션 (챗봇 전용으로 활용 예정)
       undo: () => set((state) => {
@@ -134,6 +145,7 @@ export const useDraftStore = create<DraftState>()(
         content: '', 
         previewContent: null,
         sidebarQuotes: [], 
+        citations: [], // 💡 추가
         lastSaved: null,
         isDirty: false,
         isPreviewMode: false

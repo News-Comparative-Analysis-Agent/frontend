@@ -7,6 +7,32 @@ interface MediaColorScheme {
 }
 
 /**
+ * 텍스트 내의 [1], [2] 마커를 스타일링된 span 태그로 변환합니다.
+ */
+export const applyCitationMarkers = (content: string): string => {
+  if (!content) return '';
+  return content.replace(/\[(\d+)\]/g, '<span class="citation-marker" data-id="$1">[$1]</span>');
+};
+
+/**
+ * 평문 텍스트를 마커와 줄바꿈이 적용된 안전한 HTML로 변환합니다.
+ */
+export const sanitizeDraftHtml = (content: string): string => {
+  let html = applyCitationMarkers(content);
+  
+  // 줄바꿈 처리
+  const paragraphs = html.split('\n').filter(p => p.trim());
+  const finalHtml = paragraphs.map(p => `<p class="mb-5 leading-[1.8] text-slate-700">${p.trim().replace(/\n/g, '<br/>')}</p>`).join('');
+
+  const sanitize = (DOMPurify.sanitize || (DOMPurify as any).default?.sanitize);
+
+  return sanitize(finalHtml, {
+    ADD_TAGS: ['span', 'h4', 'div', 'br', 'p'],
+    ADD_ATTR: ['class', 'data-id']
+  });
+};
+
+/**
  * 백엔드 데이터 순서를 최대한 존중하여 초안 HTML을 생성합니다.
  */
 export const buildDraftHtml = (
@@ -18,12 +44,13 @@ export const buildDraftHtml = (
   // 0. 단순 문자열인 경우 처리 (신규 포맷 대응)
   if (typeof draft === 'string') {
     let content = applyMediaBolding(draft, mediaNames);
+    content = applyCitationMarkers(content); // 💡 추가
 
     const paragraphs = content.split('\n').filter((p: string) => p.trim());
     const html = paragraphs.map((p: string) => `<p class="mb-5 leading-[1.8] text-slate-700">${p.trim().replace(/\n/g, '<br/>')}</p>`).join('');
     return DOMPurify.sanitize(html, {
       ADD_TAGS: ['span', 'h4', 'div', 'br', 'p'],
-      ADD_ATTR: ['class']
+      ADD_ATTR: ['class', 'data-id'] // 💡 data-id 허용
     });
   }
 
@@ -71,6 +98,7 @@ export const buildDraftHtml = (
   // 5. 기사 본문 (article_body) - 백엔드 순서상 가장 마지막에 오는 경우가 많음
   if (draft.article_body) {
     let content = applyMediaBolding(draft.article_body, mediaNames);
+    content = applyCitationMarkers(content); // 💡 추가
 
     const paragraphs = content.split('\n\n').filter((p: string) => p.trim());
     html += paragraphs.map((p: string) => `<p class="mb-5 leading-[1.8] text-slate-700">${p.trim().replace(/\n/g, '<br/>')}</p>`).join('');
@@ -89,8 +117,9 @@ export const buildDraftHtml = (
   }
 
   // XSS 방지를 하되, 우리가 사용하는 특정 클래스와 태그는 허용하도록 설정
-  return DOMPurify.sanitize(html, {
+  const sanitize = (DOMPurify.sanitize || (DOMPurify as any).default?.sanitize);
+  return sanitize(html, {
     ADD_TAGS: ['span', 'h4', 'div', 'br', 'p'],
-    ADD_ATTR: ['class']
+    ADD_ATTR: ['class', 'data-id']
   })
 }

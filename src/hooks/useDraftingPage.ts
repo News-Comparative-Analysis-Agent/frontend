@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDraftStore } from '../stores/useDraftStore'
-import { fetchIssueDraft, fetchDraftImages } from '../api/issues'
-import { PreGeneratedDraft, SidebarQuote, DraftImage } from '../types/analysis'
+import { fetchIssueDraft, fetchDraftImages, fetchDraftCitations } from '../api/issues'
+import { PreGeneratedDraft, SidebarQuote, DraftImage, CitationItem } from '../types/analysis'
 import { buildMediaColorMap } from '../utils/mediaColors'
-import { buildDraftHtml } from '../utils/buildDraftHtml'
+import { buildDraftHtml, sanitizeDraftHtml } from '../utils/buildDraftHtml'
 
 import { useUnsavedChangesGuard } from './useUnsavedChangesGuard'
 import { usePanelResize } from './usePanelResize'
@@ -17,8 +17,8 @@ export const useDraftingPage = () => {
   const issueId = searchParams.get('id') || '1'
 
   const {
-    currentIssueId, title, content, sidebarQuotes,
-    setIssueId, setTitle, setContent, setSidebarQuotes,
+    currentIssueId, title, content, sidebarQuotes, citations,
+    setIssueId, setTitle, setContent, setSidebarQuotes, setCitations,
     saveDraft, lastSaved, isDirty, setIsDirty, isSaving,
     undo, pushHistory, setPreviewMode,
     previewContent, setPreviewContent, isPreviewMode // 💡 하단에서 위로 끌어올림
@@ -141,23 +141,37 @@ export const useDraftingPage = () => {
 
       setSidebarQuotes(mappedQuotes)
 
-      // 제목 및 본문 설정
-      if (draft) {
-        // 우선순위: 구조화된 데이터의 title -> 전체 응답의 name
-        setTitle(draft.title || data.name || '')
-        const safeHtml = buildDraftHtml(draft, mediaColorMap)
-        setContent(safeHtml, true)
-      } else {
-        setTitle(data.name || '')
-        setContent('<p class="text-slate-400">생성된 초안 내용이 없습니다.</p>', true)
+      try {
+        const citData = await fetchDraftCitations(issueId)
+        if (citData && citData.article_body) {
+          // 서버에서 마커([1])가 찍힌 본문을 보내주면 가공하여 사용
+          const safeHtml = sanitizeDraftHtml(citData.article_body);
+          
+          setTitle(citData.title || '') // 💡 제목 설정 추가
+          setContent(safeHtml, true)
+          setCitations(citData.citations || [])
+          console.log(`📎 Citation API 연동 완료: ${citData.citations?.length}개 마커 발견`)
+        }
+      } catch (citError) {
+        console.warn('Citation API failed, falling back to original draft loading:', citError)
+        // 실패 시 기존 로직(buildDraftHtml)으로 제목 및 본문 설정 (이미 위에서 수행됨)
+        if (draft) {
+          setTitle(draft.title || data.name || '')
+          const safeHtml = buildDraftHtml(draft, mediaColorMap)
+          setContent(safeHtml, true)
+        } else {
+          setTitle(data.name || '')
+          setContent('<p class="text-slate-400">생성된 초안 내용이 없습니다.</p>', true)
+        }
       }
+
     } catch (e) {
       console.error('Failed to load draft:', e)
     } finally {
       loadingRef.current = null
       setIsDirty(false) // 로딩 완료 후 최종적으로 수정되지 않은 상태로 설정
     }
-  }, [issueId, setSidebarQuotes, setTitle, setContent, setIsDirty])
+  }, [issueId, setSidebarQuotes, setCitations, setTitle, setContent, setIsDirty])
   
   // --- 이미지 로딩 ---
   const loadImages = useCallback(async () => {
@@ -297,6 +311,7 @@ export const useDraftingPage = () => {
     content,
     setContent,
     sidebarQuotes,
+    citations,
     lastSaved,
     isSaving,
     saveDraft,

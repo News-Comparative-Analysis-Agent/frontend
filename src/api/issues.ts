@@ -21,6 +21,20 @@ export const fetchIssueDraft = (id: string) =>
   apiGet<IssueAnalysisResponse>(`/issues/${id}/draft`, '초안 데이터를 불러오는 데 실패했습니다');
 
 /**
+ * 특정 이슈의 인용 출처(Citations) 데이터를 가져오는 API 서비스입니다.
+ */
+export const fetchDraftCitations = (id: string) =>
+  apiGet<any>(`/api/draft/citations/${id}`, '인용 출처 데이터를 불러오는 데 실패했습니다');
+
+/**
+ * 인용 마커 클릭 시 기사 원문을 lazy-load하는 API 서비스입니다.
+ */
+export const fetchArticleBody = (articleId: number) =>
+  apiGet<{ article_id: number; raw_content: string }>(`/api/draft/article-body/${articleId}`, '기사 원문을 불러오는 데 실패했습니다');
+
+
+
+/**
  * 특정 이슈의 관련 뉴스 미디어 이미지를 가져오는 API 서비스입니다.
  */
 export const fetchDraftImages = (id: string) =>

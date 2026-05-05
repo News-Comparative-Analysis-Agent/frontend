@@ -1,4 +1,4 @@
-import { SidebarQuote } from './analysis';
+import { SidebarQuote, CitationItem } from './analysis';
 
 export interface DraftState {
   currentIssueId: string | null;
@@ -7,6 +7,7 @@ export interface DraftState {
   pastContent: string[];
   futureContent: string[];
   sidebarQuotes: SidebarQuote[];
+  citations: CitationItem[]; // 💡 인용 출처 목록
   lastSaved: string | null;
   isDirty: boolean;
   isSaving: boolean; // 💡 임시 저장 진행 중 여부
@@ -20,6 +21,7 @@ export interface DraftState {
   setPreviewContent: (content: string | null) => void; // 💡 프리뷰 내용 설정
   setPreviewMode: (val: boolean) => void; // 💡 프리뷰 상태 설정
   setSidebarQuotes: (quotes: SidebarQuote[]) => void;
+  setCitations: (citations: CitationItem[]) => void; // 💡 인용 출처 설정
   saveDraft: () => Promise<void>;
   resetDraft: () => void;
   setIsDirty: (isDirty: boolean) => void;
@@ -33,3 +35,4 @@ export interface DraftState {
   addSidebarQuote: (quote: SidebarQuote) => void;
   removeSidebarQuote: (quoteId: number) => void;
 }
+
