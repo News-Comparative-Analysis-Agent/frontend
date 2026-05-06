@@ -16,11 +16,19 @@ export const applyCitationMarkers = (content: string): string => {
 
 /**
  * 평문 텍스트를 마커와 줄바꿈이 적용된 안전한 HTML로 변환합니다.
+ * @param content 원본 텍스트
+ * @param mediaNames 볼드 처리할 언론사 이름 목록
  */
-export const sanitizeDraftHtml = (content: string): string => {
-  let html = applyCitationMarkers(content);
+export const sanitizeDraftHtml = (content: string, mediaNames: string[] = []): string => {
+  if (!content) return '';
   
-  // 줄바꿈 처리
+  // 1. 언론사 이름 볼드 처리
+  let html = applyMediaBolding(content, mediaNames);
+  
+  // 2. 인용 마커 스타일링
+  html = applyCitationMarkers(html);
+  
+  // 3. 줄바꿈을 문단(<p>) 태그로 변환
   const paragraphs = html.split('\n').filter(p => p.trim());
   const finalHtml = paragraphs.map(p => `<p class="mb-5 leading-[1.8] text-slate-700">${p.trim().replace(/\n/g, '<br/>')}</p>`).join('');
 
@@ -43,20 +51,11 @@ export const buildDraftHtml = (
 
   // 0. 단순 문자열인 경우 처리 (신규 포맷 대응)
   if (typeof draft === 'string') {
-    let content = applyMediaBolding(draft, mediaNames);
-    content = applyCitationMarkers(content); // 💡 추가
-
-    const paragraphs = content.split('\n').filter((p: string) => p.trim());
-    const html = paragraphs.map((p: string) => `<p class="mb-5 leading-[1.8] text-slate-700">${p.trim().replace(/\n/g, '<br/>')}</p>`).join('');
-    return DOMPurify.sanitize(html, {
-      ADD_TAGS: ['span', 'h4', 'div', 'br', 'p'],
-      ADD_ATTR: ['class', 'data-id'] // 💡 data-id 허용
-    });
+    return sanitizeDraftHtml(draft, mediaNames);
   }
 
   let html = ''
-  let mediaViewsRendered = false;
-
+  
   // 1. 도입부 (있을 경우만)
   const intro = draft.intro || draft.introduction || ''
   if (intro) {
@@ -68,17 +67,15 @@ export const buildDraftHtml = (
     html += `<p class="mb-5 text-slate-700">${draft.conflict_summary}</p>`;
   }
 
-  // 3. 언론사별 개별 입장 (media_views) - 백엔드 순서상 본문 앞에 위치하는 경우가 많음
+  // 3. 언론사별 개별 입장 (media_views)
   const rootMediaViews = draft.media_views || [];
   if (rootMediaViews.length > 0) {
-    mediaViewsRendered = true;
     rootMediaViews.forEach((view: any) => {
-      // 하이라이트 대신 볼드체 적용
       html += `<p class="mb-4 leading-relaxed"><span class="font-bold text-slate-900">${view.press || ''}</span> ${view.narrative || ''}</p>`
     });
   }
 
-  // 4. 계층형 섹션 (sections/contentions) - 순서상 중간에 위치
+  // 4. 계층형 섹션 (sections/contentions)
   const sections = draft.sections || draft.contentions || []
   sections.forEach((section: any) => {
     const title = section.section_title || section.contention_title || ''
@@ -89,37 +86,15 @@ export const buildDraftHtml = (
     
     if (section.media_views && section.media_views.length > 0) {
       section.media_views.forEach((view: any) => {
-        // 하이라이트 대신 볼드체 적용
         html += `<p class="mb-4 leading-relaxed"><span class="font-bold text-slate-900">${view.press || ''}</span> ${view.narrative || ''}</p>`
       })
     }
   });
 
-  // 5. 기사 본문 (article_body) - 백엔드 순서상 가장 마지막에 오는 경우가 많음
+  // 5. 기사 본문 (article_body)
   if (draft.article_body) {
-    let content = applyMediaBolding(draft.article_body, mediaNames);
-    content = applyCitationMarkers(content); // 💡 추가
-
-    const paragraphs = content.split('\n\n').filter((p: string) => p.trim());
-    html += paragraphs.map((p: string) => `<p class="mb-5 leading-[1.8] text-slate-700">${p.trim().replace(/\n/g, '<br/>')}</p>`).join('');
-  } 
-
-  // 6. 맺음말
-  const conclusion = draft.conclusion || draft.summary || ''
-  if (conclusion && !html.includes(conclusion.substring(0, 20))) {
-    html += `<p class="mt-8 pt-4 border-t border-slate-100 text-slate-500 italic">${conclusion}</p>`
+    html += sanitizeDraftHtml(draft.article_body, mediaNames);
   }
 
-  // 7. 폴백 (데이터 전무할 경우)
-  if (!html.trim()) {
-    const fallback = draft.description || draft.background || '생성된 초안 내용이 없습니다.';
-    html = `<p class="text-slate-400">${fallback}</p>`;
-  }
-
-  // XSS 방지를 하되, 우리가 사용하는 특정 클래스와 태그는 허용하도록 설정
-  const sanitize = (DOMPurify.sanitize || (DOMPurify as any).default?.sanitize);
-  return sanitize(html, {
-    ADD_TAGS: ['span', 'h4', 'div', 'br', 'p'],
-    ADD_ATTR: ['class', 'data-id']
-  })
-}
+  return html;
+};

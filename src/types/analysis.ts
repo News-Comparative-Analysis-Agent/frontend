@@ -70,7 +70,7 @@ export interface CitationItem {
   published_at: string;
   article_id?: number | null;  // 💡 lazy-load용
   quote: string;
-  full_evidence: string;
+  evidence?: string;
 }
 
 /** 인용 출처 데이터가 포함된 초안 응답 타입입니다. */

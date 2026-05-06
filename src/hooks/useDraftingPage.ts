@@ -145,7 +145,7 @@ export const useDraftingPage = () => {
         const citData = await fetchDraftCitations(issueId)
         if (citData && citData.article_body) {
           // 서버에서 마커([1])가 찍힌 본문을 보내주면 가공하여 사용
-          const safeHtml = sanitizeDraftHtml(citData.article_body);
+          const safeHtml = sanitizeDraftHtml(citData.article_body, allMedia);
           
           setTitle(citData.title || '') // 💡 제목 설정 추가
           setContent(safeHtml, true)

@@ -175,16 +175,18 @@ const DraftingEditorArea = ({
                       <span className="text-[12px]">기사 원문 불러오는 중...</span>
                     </div>
                   ) : (() => {
-                    const displayText = articleContent || activeCitation.full_evidence || "";
+                    const displayText = articleContent || "";
                     if (!displayText) return <p className="text-slate-400 italic text-center py-4">표시할 기사 내용이 없습니다.</p>;
 
-                    const fullQuote = activeCitation.quote.trim();
+                    // 💡 하이라이팅 대상 문장 결정: 본문 인용구(quote)만 정교하게 사용
+                    const fullQuote = (activeCitation.quote || "").trim();
                     if (!fullQuote) return <span>{displayText}</span>;
-
-                    // 💡 개선된 하이라이트 로직: 인용구를 문장 단위로 쪼개어 각각 매칭
-                    // 마침표(.)를 기준으로 쪼개서 빈 문장이 아닌 것만 추출
-                    const quoteSentences = fullQuote.split('.').map(s => s.trim()).filter(s => s.length > 5);
-                    
+ 
+                    // 💡 마침표(.)를 기준으로 쪼개서 각 문장을 하이라이팅 대상으로 등록
+                    const sentences = fullQuote.split('.').map(s => s.trim()).filter(s => s.length > 5);
+                    if (sentences.length === 0) return <span>{displayText}</span>;
+ 
+                    const quoteSentences = Array.from(new Set(sentences));
                     if (quoteSentences.length === 0) return <span>{displayText}</span>;
 
                     // 모든 문장을 하이라이트하기 위해 누적 처리
