@@ -44,7 +44,7 @@ const MainHero = ({ activeIssueType, stats }: MainHeroProps) => {
 
   return (
     <section className="bg-primary w-full flex flex-col items-center shadow-md relative z-10 pt-8 lg:pt-0">
-      <div className="max-w-[1280px] w-full px-4 xl:px-6 flex flex-col lg:flex-row items-center lg:items-end justify-between lg:h-[130px] xl:h-[160px]">
+      <div className="max-w-[1280px] w-full px-4 xl:px-6 flex flex-col lg:flex-row items-center lg:items-end justify-between lg:h-[130px] xl:h-[140px]">
         
         {/* 1. 좌측 홍보 문구 */}
         <div className="flex-1 pb-4 lg:pb-6 xl:pb-8 text-center lg:text-left w-full flex flex-col items-center lg:items-start">
@@ -54,10 +54,10 @@ const MainHero = ({ activeIssueType, stats }: MainHeroProps) => {
               {...fadeScaleVariant}
               className="flex flex-col items-center lg:items-start break-keep"
             >
-              <span className="bg-white text-slate-900 text-xl sm:text-2xl lg:text-[22px] xl:text-[28px] font-bold px-3 py-1.5 mb-2 xl:mb-3 leading-tight tracking-tight shadow-sm">
+              <span className="bg-white text-slate-900 text-xl sm:text-2xl lg:text-[22px] xl:text-[24px] font-bold px-3 py-1.5 mb-2 xl:mb-3 leading-tight tracking-tight shadow-sm">
                 {isEditorial ? '원하는 주제를 골라주세요' : '지금 가장 뜨거운 이슈'}
               </span>
-              <span className="text-white text-base sm:text-lg lg:text-[19px] xl:text-[22px] font-light opacity-95 tracking-tight mt-0.5">
+              <span className="text-white text-base sm:text-lg lg:text-[19px] xl:text-[19px] font-light opacity-95 tracking-tight mt-0.5">
                 {isEditorial ? '초안부터 검토까지 한번에' : '실시간 미디어 트렌드를 확인하세요'}
               </span>
             </motion.h2>
@@ -72,12 +72,12 @@ const MainHero = ({ activeIssueType, stats }: MainHeroProps) => {
               <motion.div 
                 key="stats-ui"
                 {...fadeScaleVariant}
-                className="flex flex-wrap items-center justify-center lg:justify-end gap-x-4 sm:gap-x-6 xl:gap-x-8 gap-y-4"
+                className="flex flex-wrap items-center justify-center lg:justify-end gap-x-4 sm:gap-x-6 xl:gap-x-7 gap-y-4"
               >
                 {statItems.map((stat, idx) => (
-                  <div key={idx} className="flex items-center gap-3 px-4 py-2 xl:py-2.5 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 min-w-[140px] xl:min-w-[160px] group hover:bg-white/15 transition-all">
-                    <div className={`size-10 xl:size-11 rounded-xl ${stat.color} flex items-center justify-center`}>
-                      <span className={`material-symbols-outlined text-white text-[22px] xl:text-[24px]`}>
+                  <div key={idx} className="flex items-center gap-3 px-4 py-2 xl:py-2.5 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 min-w-[140px] xl:min-w-[150px] group hover:bg-white/15 transition-all">
+                    <div className={`size-10 xl:size-10 rounded-xl ${stat.color} flex items-center justify-center`}>
+                      <span className={`material-symbols-outlined text-white text-[22px] xl:text-[22px]`}>
                         {stat.icon}
                       </span>
                     </div>

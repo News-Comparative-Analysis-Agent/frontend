@@ -66,7 +66,7 @@ const MainSearchHeader = ({
         <div className="flex flex-col gap-1.5 shrink-0">
           {/* 1층: 타이틀 영역 */}
           <div className="flex items-center gap-3">
-            <h1 className="text-[20px] xl:text-[17px] font-bold text-slate-800 tracking-tight leading-none inline-block">
+            <h1 className="text-[16px] lg:text-[18px] xl:text-[20px] font-bold text-slate-800 tracking-tight leading-none inline-block">
               주간 뉴스 트렌드
             </h1>
             <div className="group relative flex items-center">
