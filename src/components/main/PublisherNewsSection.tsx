@@ -19,9 +19,16 @@ interface PublisherNewsSectionProps {
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop'
 
 const PUBLISHER_LOGOS: Record<string, string> = {
-  'YTN': 'https://upload.wikimedia.org/wikipedia/commons/4/4b/YTN_Logo.svg',
-  '한국일보': 'https://www.hankookilbo.com/Common/Img/logo.png',
+  '경향신문': 'https://upload.wikimedia.org/wikipedia/commons/b/b2/Kyunghyang_Shinmun_logo.png',
+  '국민일보': 'https://upload.wikimedia.org/wikipedia/ko/6/60/Kookmin_Ilbo_logo.png',
+  '동아일보': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Dong-a_Ilbo_logo.svg/512px-Dong-a_Ilbo_logo.svg.png',
+  '조선일보': 'https://upload.wikimedia.org/wikipedia/ko/archive/5/5a/20121112023528%21Chosun_Ilbo_logo.png',
   '중앙일보': 'https://static.joongang.co.kr/logo/joongang_logo.png',
+  '한겨레': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/The_Hankyoreh_logo.svg/512px-The_Hankyoreh_logo.svg.png',
+  '한국일보': 'https://www.hankookilbo.com/Common/Img/logo.png',
+  'JTBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/JTBC_logo.svg/512px-JTBC_logo.svg.png',
+  'MBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/MBC_Logo_2005.svg/512px-MBC_Logo_2005.svg.png',
+  'YTN': 'https://upload.wikimedia.org/wikipedia/commons/4/4b/YTN_Logo.svg',
 }
 
 const PublisherNewsSection = ({
@@ -47,28 +54,48 @@ const PublisherNewsSection = ({
     currentPage * itemsPerPage
   );
 
+  const fadeScaleVariant = {
+    initial: { opacity: 0, scale: 0.98, filter: 'blur(2px)' },
+    animate: { opacity: 1, scale: 1, filter: 'blur(0px)' },
+    exit: { opacity: 0, scale: 1.02, filter: 'blur(2px)' },
+    transition: { duration: 0.15, ease: 'easeOut' as const }
+  };
+
   return (
-    <div className="flex flex-col w-full h-full bg-slate-50/30 p-2 rounded-3xl">
-      <div className="flex flex-col mb-0 px-2">
-        <div className="flex items-center justify-between h-9 mb-1 mt-1">
-          <h2 className="text-slate-800 text-base font-semibold tracking-tight">
-            각 언론사별 인기 뉴스에요
-          </h2>
-        </div>
-        <div className="flex items-center justify-between text-[12px] text-slate-500 font-medium opacity-90 mb-1">
-          <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[14px] text-primary">info</span>
-            이미지가 포함된 컴팩트한 리스트로 한눈에 확인하세요.
+    <div className="flex flex-col w-full h-full bg-slate-50/30 p-2 rounded-3xl overflow-hidden">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeIssueType}
+          {...fadeScaleVariant}
+          className="flex flex-col w-full"
+        >
+          <div className="flex flex-col mb-0 px-2 w-full">
+            <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between w-full mb-2 mt-2 gap-4 md:gap-0">
+              
+              {/* [좌측 정렬 영역] 타이틀 + 안내문구 */}
+              <div className="flex flex-col justify-center z-10 w-full md:w-auto gap-1.5 lg:gap-2 text-left py-1">
+                <h2 className="text-slate-800 text-[17px] lg:text-[18px] xl:text-[19px] font-bold tracking-tight whitespace-nowrap">
+                  각 언론사별 인기 뉴스에요
+                </h2>
+                <div className="flex items-center gap-1.5 text-[11px] xl:text-[12px] text-slate-500 font-medium opacity-80">
+                  <span className="material-symbols-outlined text-[15px] text-primary">info</span>
+                  이미지가 포함된 컴팩트한 리스트로 한눈에 확인하세요.
+                </div>
+              </div>
+
+              {/* [우측 정렬 영역] 언론사 필터 */}
+              <div className="flex items-center justify-end w-full md:w-auto">
+                <button 
+                  onClick={onOpenFilter}
+                  className="flex items-center gap-1.5 px-3 lg:px-4 py-1.5 lg:py-2 rounded-xl bg-white border border-slate-200 hover:border-primary/50 hover:text-primary transition-all shadow-sm active:scale-95 group"
+                >
+                  <span className="material-symbols-outlined text-[16px] lg:text-[18px] text-primary transition-colors">tune</span>
+                  <span className="text-[12px] lg:text-[13px] font-bold">언론사 필터</span>
+                </button>
+              </div>
+
+            </div>
           </div>
-          <button 
-            onClick={onOpenFilter}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-primary/50 hover:text-primary transition-all shadow-sm active:scale-95 group"
-          >
-            <span className="material-symbols-outlined text-[14px] text-slate-400 group-hover:text-primary transition-colors">tune</span>
-            <span className="text-[11px] font-bold">언론사 필터</span>
-          </button>
-        </div>
-      </div>
 
       {/* 검은색 포인트 구분선 (길게) */}
       <div className="border-t-[3px] border-slate-800 w-full mb-4 mt-4"></div>
@@ -247,6 +274,8 @@ const PublisherNewsSection = ({
         </div>
       )}
 
+        </motion.div>
+      </AnimatePresence>
     </div>
   )
 }

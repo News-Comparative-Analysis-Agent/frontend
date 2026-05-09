@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout'
 import Button from '../components/ui/Button'
 import { useAnalysisPageData } from '../hooks/useAnalysisPageData'
 import Loader from '../components/ui/Loader'
+import { useIssueStore } from '../stores/useIssueStore'
 
 // 하위 컴포넌트 임포트
 import AnalysisHeader from '../components/analysis/AnalysisHeader'
@@ -30,6 +31,9 @@ const AnalysisPage = () => {
     setActiveMedia,
     navigate
   } = useAnalysisPageData(issueId)
+
+  const { activeIssueType } = useIssueStore()
+  const isPolitics = activeIssueType === 'politics'
 
   // 로딩 상태 UI
   if (loading) return (
@@ -99,10 +103,12 @@ const AnalysisPage = () => {
         <div className="h-32"></div>
       </section>
 
-      {/* 4. 하단 스틱키 도크 */}
-      <AnalysisStickyDock 
-        onDraftStart={() => navigate(`/drafting?id=${issueId}`)} 
-      />
+      {/* 4. 하단 스틱키 도크 (최신 이슈인 경우 초안 작성 제한) */}
+      {!isPolitics && (
+        <AnalysisStickyDock 
+          onDraftStart={() => navigate(`/drafting?id=${issueId}`)} 
+        />
+      )}
     </Layout>
   )
 }

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { DailyIssuesResponse } from '../../types/issues'
-import FigmaHeaderCalendar from './FigmaHeaderCalendar'
+import CompactHeaderCalendar from './CompactHeaderCalendar'
 
 interface PopularIssuesSectionProps {
   loading: boolean
@@ -51,57 +51,119 @@ const PopularIssuesSection = ({
     onSearch()
   }
 
+  const removeSearch = (e: React.MouseEvent, query: string) => {
+    e.stopPropagation()
+    const newSearches = recentSearches.filter(s => s !== query)
+    setRecentSearches(newSearches)
+    localStorage.setItem('recent_searches', JSON.stringify(newSearches))
+  }
+
+  const handleHistoryClick = (query: string) => {
+    setSearchQuery(query)
+    saveSearch(query)
+    setTimeout(() => onSearch(), 10)
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleInternalSearch()
     }
   }
 
+  const fadeScaleVariant = {
+    initial: { opacity: 0, scale: 0.98, filter: 'blur(2px)' },
+    animate: { opacity: 1, scale: 1, filter: 'blur(0px)' },
+    exit: { opacity: 0, scale: 1.02, filter: 'blur(2px)' },
+    transition: { duration: 0.10, ease: 'easeOut' as const }
+  };
+
   return (
-    <div className="w-full h-full min-w-0 md:border-r border-slate-100 md:pr-2 flex flex-col text-left self-stretch transition-all duration-300">
-      <div className="flex flex-col mb-0">
-        {/* 헤더: 타이틀 + 달력(중앙) + 검색바(우측) */}
-        <div className="flex items-center justify-between w-full h-14 mb-2 mt-1 gap-4">
-          <h2 className="text-slate-800 text-[15px] xl:text-[16px] font-semibold tracking-tight shrink-0 whitespace-nowrap">
-            언론사 공통으로 다루는 인기 뉴스에요
-          </h2>
-
-          {/* 중앙: 달력 */}
-          <div className="flex-1 flex justify-center scale-90">
-            <FigmaHeaderCalendar 
-              selectedDate={selectedDate}
-              onDateChange={onDateChange}
-            />
+    <div className="w-full h-full min-w-0 md:border-r border-slate-100 md:pr-2 flex flex-col text-left self-stretch overflow-hidden">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeIssueType}
+          {...fadeScaleVariant}
+          className="flex flex-col flex-1 w-full"
+        >
+          <div className="flex flex-col mb-0 w-full">
+            {/* 헤더: 타이틀(좌) + 달력(중) + 검색바(우) */}
+        <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between w-full mb-6 lg:mb-2 mt-2 gap-6 md:gap-0 min-h-[100px]">
+          
+          {/* [좌측 정렬 영역] 타이틀 + 안내문구 */}
+          <div className="flex flex-col justify-center z-10 w-full md:w-1/2 lg:w-1/3 gap-1.5 lg:gap-2 text-left pl-1 py-1">
+            <h2 className="text-slate-800 text-[17px] lg:text-[18px] xl:text-[19px] font-bold tracking-tight whitespace-nowrap">
+              언론사 공통으로 다루는 인기 뉴스에요
+            </h2>
+            <div className="flex items-center gap-1.5 text-[11px] xl:text-[12px] text-slate-500 font-medium opacity-80">
+              <span className="material-symbols-outlined text-[15px] text-primary">info</span>
+              {activeIssueType === 'politics' 
+                ? '다수의 언론사에서 공통으로 꼽은 주요 소식입니다.'
+                : '이곳은 초안이 이미 준비되어 있어요. 바로 편집하세요!'
+              }
+            </div>
           </div>
 
-          {/* 우측: 검색바 (길이 축소) */}
-          <div className="w-[280px] shrink-0 relative group">
-            <input
-              className="w-full pl-9 pr-10 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/30 transition-all bg-white shadow-sm placeholder:text-slate-400 font-medium text-[12px] text-slate-700"
-              placeholder="뉴스 검색..."
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-slate-400">search</span>
-            <button
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 text-[10px] font-bold text-primary hover:bg-primary/5 rounded transition-colors"
-              onClick={handleInternalSearch}
-            >
-              GO
-            </button>
+          {/* [우측 정렬 영역] 달력 + 검색바 (세로로 쌓일 때도 우측 정렬 유지) */}
+          <div className="flex flex-col items-center md:items-end lg:contents w-full md:w-1/2 lg:w-auto gap-4 md:gap-2 lg:gap-0">
+            
+            {/* 콤팩트 달력 영역 */}
+            <div className="w-full lg:w-auto lg:absolute lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 flex justify-center md:justify-end lg:justify-center z-0">
+              <div className="bg-slate-50/50 border border-slate-200/60 rounded-2xl px-2 py-1 shadow-sm backdrop-blur-[2px] transition-all hover:bg-white hover:border-primary/20 hover:shadow-md group">
+                <CompactHeaderCalendar 
+                  selectedDate={selectedDate}
+                  onDateChange={onDateChange}
+                  isWhite={true}
+                />
+              </div>
+            </div>  {/* 검색바 영역: 무조건 우측 정렬 유지 */}
+            <div className="w-full lg:w-1/3 flex flex-col items-center md:items-end justify-center gap-1 z-10">
+              <span className="hidden xl:block text-[12px] font-bold text-primary/60 px-1 uppercase tracking-wider">찾는 뉴스가 있으신가요?</span>
+              
+              <div className="w-full max-w-[320px] md:max-w-none md:w-[240px] xl:w-[280px] shrink-0 relative group">
+                <input
+                  className="w-full pl-9 pr-12 py-2.5 xl:py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/30 transition-all bg-white shadow-sm placeholder:text-slate-400 font-medium text-[12px] text-slate-700"
+                  placeholder="원하는 기사를 검색해보세요!"
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-slate-400">search</span>
+                <button
+                  className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-[10px] font-black text-primary hover:bg-primary/5 rounded-lg transition-colors border border-primary/20"
+                  onClick={handleInternalSearch}
+                >
+                  GO
+                </button>
+              </div>
+
+              {/* 검색 히스토리 (md 이상에서 우측 정렬 노출) */}
+              <div className="hidden md:flex items-center gap-1.5 overflow-hidden max-w-[240px] xl:max-w-[280px] px-1 h-3.5 mt-0.5">
+                <span className="text-[9px] font-bold text-slate-400 shrink-0">RECENT</span>
+                <div className="flex gap-1 overflow-x-auto no-scrollbar">
+                  {recentSearches.map((term, i) => (
+                    <div
+                      key={i}
+                      onClick={() => handleHistoryClick(term)}
+                      className="flex items-center gap-1 px-1.5 py-0 bg-slate-50 border border-slate-100 rounded-md cursor-pointer hover:border-primary/20 group transition-all shrink-0"
+                    >
+                      <span className="text-[9px] font-medium text-slate-500 group-hover:text-primary whitespace-nowrap">{term}</span>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); removeSearch(e, term); }}
+                        className="text-slate-300 hover:text-rose-400 flex items-center"
+                      >
+                        <span className="material-symbols-outlined text-[10px]">close</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-
-        <div className="flex items-center gap-1.5 mb-2 text-[12px] text-slate-500 font-medium opacity-90">
-          <span className="material-symbols-outlined text-[14px] text-primary">info</span>
-          이곳은 이미 초안이 준비되어 있어요. 바로 편집을 시작하세요!
-        </div>
-        <div className="w-full h-px bg-slate-100 mb-0"></div>
       </div>
 
-      <div className="flex flex-col mt-4">
+      <div className="flex flex-col mt-2">
         <div className="divide-y divide-slate-100">
           {loading ? (
             <div className="space-y-10">
@@ -243,7 +305,6 @@ const PopularIssuesSection = ({
                           return null;
                         })}
                       </div>
-
                       <button
                         onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
@@ -257,10 +318,12 @@ const PopularIssuesSection = ({
               );
             })()
           )}
+          </div>
         </div>
-      </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
-  );
-};
+  )
+}
 
-export default PopularIssuesSection;
+export default PopularIssuesSection

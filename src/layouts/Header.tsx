@@ -7,6 +7,7 @@ import { useIssueStore } from '../stores/useIssueStore'
 interface HeaderProps {
   variant?: 'primary' | 'white'
   activeStep?: 1 | 2 | 3 | 4
+  headerExtra?: React.ReactNode
 }
 
 const STEPS = [
@@ -16,7 +17,7 @@ const STEPS = [
   { id: 4, label: '최종 검토', path: '/final-review' },
 ] as const
 
-const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
+const Header = ({ variant = 'primary', activeStep, headerExtra }: HeaderProps) => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { user, isLoggedIn, logout } = useUserStore()
@@ -62,41 +63,52 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
             }`}
           >
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-            <span className="text-xs font-bold">뒤로</span>
+            <span className="text-xs font-semibold">뒤로</span>
           </button>
         )}
       </div>
 
-      <nav className="hidden lg:flex flex-1 justify-center items-center min-w-0">
-        {activeStep ? (
+      <nav className="hidden md:flex flex-1 justify-center items-center min-w-0 px-2">
+        {activeIssueType === 'politics' && activeStep ? (
+          null
+        ) : activeStep ? (
           <StepNavigation steps={[...STEPS]} activeStep={activeStep} />
         ) : (
-          /* 메인 페이지 전용 전역 탭 */
-          <div className={`flex items-center gap-1 p-1 rounded-xl border transition-all ${
-            isWhite ? 'bg-slate-100/50 border-slate-200' : 'bg-white/10 border-white/10'
-          }`}>
-            <button
-              onClick={() => setActiveIssueType('politics')}
-              className={`px-6 py-1.5 rounded-lg text-[13px] font-bold transition-all flex items-center gap-2 ${
-                activeIssueType === 'politics' 
-                  ? (isWhite ? 'bg-white text-primary shadow-sm' : 'bg-white text-primary shadow-lg scale-105')
-                  : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">bolt</span>
-              최신 이슈
-            </button>
-            <button
-              onClick={() => setActiveIssueType('editorial')}
-              className={`px-6 py-1.5 rounded-lg text-[13px] font-bold transition-all flex items-center gap-2 ${
-                activeIssueType === 'editorial' 
-                  ? (isWhite ? 'bg-white text-primary shadow-sm' : 'bg-white text-primary shadow-lg scale-105')
-                  : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">auto_stories</span>
-              사설/컬럼
-            </button>
+          <div className="flex items-center gap-2 lg:gap-4 w-full justify-center">
+            {/* 메인 페이지 전용 전역 탭 */}
+            <div className={`flex items-center gap-0.5 p-1 rounded-xl border transition-all ${
+              isWhite ? 'bg-slate-100/50 border-slate-200' : 'bg-white/10 border-white/10'
+            }`}>
+              <button
+                onClick={() => setActiveIssueType('politics')}
+                className={`px-3 lg:px-6 py-1.5 rounded-lg text-[12px] lg:text-[13px] font-medium transition-all flex items-center gap-1.5 lg:gap-2 ${
+                  activeIssueType === 'politics' 
+                    ? (isWhite ? 'bg-white text-slate-900 shadow-sm' : 'bg-white text-slate-900 shadow-lg scale-105')
+                    : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px] lg:text-[18px]">whatshot</span>
+                최신 이슈
+              </button>
+              <button
+                onClick={() => setActiveIssueType('editorial')}
+                className={`px-3 lg:px-6 py-1.5 rounded-lg text-[12px] lg:text-[13px] font-medium transition-all flex items-center gap-1.5 lg:gap-2 ${
+                  activeIssueType === 'editorial' 
+                    ? (isWhite ? 'bg-white text-slate-900 shadow-sm' : 'bg-white text-slate-900 shadow-lg scale-105')
+                    : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px] lg:text-[18px]">auto_stories</span>
+                사설/컬럼
+              </button>
+            </div>
+
+            {/* 캘린더 등 추가 헤더 요소 영역 */}
+            {headerExtra && (
+              <div className="hidden lg:flex items-center">
+                {headerExtra}
+              </div>
+            )}
           </div>
         )}
       </nav>
@@ -109,7 +121,7 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
                 logout();
                 navigate('/login');
               }}
-              className={`text-[10px] md:text-[11px] font-bold px-3 py-1.5 rounded-lg border transition-all ${
+              className={`text-[10px] md:text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-all ${
                 isWhite 
                   ? 'border-slate-200 text-slate-500 hover:bg-slate-50' 
                   : 'border-white/20 text-white/90 hover:bg-white/10'
