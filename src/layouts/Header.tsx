@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useUserStore } from '../stores/useUserStore'
 import StepNavigation from '../components/ui/StepNavigation'
 import UserAvatar from '../components/ui/UserAvatar'
+import { useIssueStore } from '../stores/useIssueStore'
 
 interface HeaderProps {
   variant?: 'primary' | 'white'
@@ -19,6 +20,7 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { user, isLoggedIn, logout } = useUserStore()
+  const { activeIssueType, setActiveIssueType } = useIssueStore()
 
   const issueId = searchParams.get('id') || '1'
   const isWhite = variant === 'white'
@@ -66,8 +68,36 @@ const Header = ({ variant = 'primary', activeStep }: HeaderProps) => {
       </div>
 
       <nav className="hidden lg:flex flex-1 justify-center items-center min-w-0">
-        {activeStep && (
+        {activeStep ? (
           <StepNavigation steps={[...STEPS]} activeStep={activeStep} />
+        ) : (
+          /* 메인 페이지 전용 전역 탭 */
+          <div className={`flex items-center gap-1 p-1 rounded-xl border transition-all ${
+            isWhite ? 'bg-slate-100/50 border-slate-200' : 'bg-white/10 border-white/10'
+          }`}>
+            <button
+              onClick={() => setActiveIssueType('politics')}
+              className={`px-6 py-1.5 rounded-lg text-[13px] font-bold transition-all flex items-center gap-2 ${
+                activeIssueType === 'politics' 
+                  ? (isWhite ? 'bg-white text-primary shadow-sm' : 'bg-white text-primary shadow-lg scale-105')
+                  : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">bolt</span>
+              최신 이슈
+            </button>
+            <button
+              onClick={() => setActiveIssueType('editorial')}
+              className={`px-6 py-1.5 rounded-lg text-[13px] font-bold transition-all flex items-center gap-2 ${
+                activeIssueType === 'editorial' 
+                  ? (isWhite ? 'bg-white text-primary shadow-sm' : 'bg-white text-primary shadow-lg scale-105')
+                  : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">auto_stories</span>
+              사설/컬럼
+            </button>
+          </div>
         )}
       </nav>
 
