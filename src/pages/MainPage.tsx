@@ -170,16 +170,7 @@ const MainPage = () => {
             }}
           />
 
-          {/* 2. 주간 트렌드 헤더 (검색 기능 제거됨) */}
-          <MainSearchHeader 
-            selectedDate={selectedDate}
-            onDateChange={handleDateChange}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onSearch={handleSearch}
-          />
-
-          {/* 3. 메인 뉴스 컨텐츠 영역 */}
+          {/* 2. 메인 뉴스 컨텐츠 영역 */}
           <div className="max-w-[1280px] mx-auto px-4 xl:px-6 pb-8 xl:pb-12 pt-6 relative">
             
             {/* 메인 콘텐츠 영역 */}
@@ -188,49 +179,47 @@ const MainPage = () => {
                 
                 {/* 상단: 실시간 통합 순위 (전체 너비 사용) */}
                 <div id="section-common" className="w-full min-w-0 flex flex-col items-stretch scroll-mt-32">
-                <PopularIssuesSection 
-                  loading={loading}
-                  dailyIssues={dailyIssues}
-                  activeIssueType={activeIssueType}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  topImageIndex={topImageIndex}
-                  selectedDate={selectedDate}
-                  onDateChange={handleDateChange}
-                  onNavigateToAnalysis={(id) => navigate(`/analysis?id=${id}`)}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  onSearch={handleSearch}
-                />
-              </div>
-              
-              {/* 섹션 구분선 */}
-              <div className="py-6">
+                  <PopularIssuesSection 
+                    loading={loading}
+                    dailyIssues={dailyIssues}
+                    activeIssueType={activeIssueType}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    topImageIndex={topImageIndex}
+                    selectedDate={selectedDate}
+                    onDateChange={handleDateChange}
+                    onNavigateToAnalysis={(id) => navigate(`/analysis?id=${id}`)}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    onSearch={handleSearch}
+                  />
+                </div>
+                
+                {/* 3. 섹션 구분선 */}
                 <div className="w-full h-px bg-slate-200"></div>
-              </div>
 
-              {/* 하단: 언론사별 인기 뉴스 (전체 너비 사용) */}
-              <div id="section-publisher" className="w-full min-w-0 scroll-mt-32">
-                <PublisherNewsSection 
-                  loading={loading}
-                  error={error}
-                  newsData={newsData}
-                  activeIssueType={activeIssueType}
-                  allPublishers={allPublishers}
-                  selectedMedia={selectedMedia}
-                  selectedDate={selectedDate}
-                  onDateChange={handleDateChange}
-                  handleMediaChange={handleMediaChange}
-                  filteredPublishers={filteredPublishers}
-                  onOpenFilter={() => setIsPublisherSidebarOpen(true)}
-                />
+                {/* 하단: 언론사별 인기 뉴스 (전체 너비 사용) */}
+                <div id="section-publisher" className="w-full min-w-0 scroll-mt-32">
+                  <PublisherNewsSection 
+                    loading={loading}
+                    error={error}
+                    newsData={newsData}
+                    activeIssueType={activeIssueType}
+                    allPublishers={allPublishers}
+                    selectedMedia={selectedMedia}
+                    selectedDate={selectedDate}
+                    onDateChange={handleDateChange}
+                    handleMediaChange={handleMediaChange}
+                    filteredPublishers={filteredPublishers}
+                    onOpenFilter={() => setIsPublisherSidebarOpen(true)}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </Layout>
+    </Layout>
   )
 }
 

@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import WeeklyCalendar from './WeeklyCalendar'
-import MonthlyCalendar from './MonthlyCalendar'
 import { DailyIssuesResponse } from '../../types/issues'
+import FigmaHeaderCalendar from './FigmaHeaderCalendar'
 
 interface PopularIssuesSectionProps {
   loading: boolean
@@ -52,28 +51,50 @@ const PopularIssuesSection = ({
     onSearch()
   }
 
-  const removeSearch = (e: React.MouseEvent, query: string) => {
-    e.stopPropagation()
-    const newSearches = recentSearches.filter(s => s !== query)
-    setRecentSearches(newSearches)
-    localStorage.setItem('recent_searches', JSON.stringify(newSearches))
-  }
-
-  const handleHistoryClick = (query: string) => {
-    setSearchQuery(query)
-    saveSearch(query)
-    setTimeout(() => onSearch(), 10)
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleInternalSearch()
+    }
   }
 
   return (
     <div className="w-full h-full min-w-0 md:border-r border-slate-100 md:pr-2 flex flex-col text-left self-stretch transition-all duration-300">
       <div className="flex flex-col mb-0">
-        <div className="flex items-center justify-between h-9 mb-1 mt-1">
-          <h2 className="text-slate-800 text-base font-bold tracking-tight">
+        {/* 헤더: 타이틀 + 달력(중앙) + 검색바(우측) */}
+        <div className="flex items-center justify-between w-full h-14 mb-2 mt-1 gap-4">
+          <h2 className="text-slate-800 text-[15px] xl:text-[16px] font-semibold tracking-tight shrink-0 whitespace-nowrap">
             언론사 공통으로 다루는 인기 뉴스에요
           </h2>
+
+          {/* 중앙: 달력 */}
+          <div className="flex-1 flex justify-center scale-90">
+            <FigmaHeaderCalendar 
+              selectedDate={selectedDate}
+              onDateChange={onDateChange}
+            />
+          </div>
+
+          {/* 우측: 검색바 (길이 축소) */}
+          <div className="w-[280px] shrink-0 relative group">
+            <input
+              className="w-full pl-9 pr-10 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/30 transition-all bg-white shadow-sm placeholder:text-slate-400 font-medium text-[12px] text-slate-700"
+              placeholder="뉴스 검색..."
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-slate-400">search</span>
+            <button
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 text-[10px] font-bold text-primary hover:bg-primary/5 rounded transition-colors"
+              onClick={handleInternalSearch}
+            >
+              GO
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5 mb-1 text-[12px] text-slate-500 font-medium opacity-90">
+
+        <div className="flex items-center gap-1.5 mb-2 text-[12px] text-slate-500 font-medium opacity-90">
           <span className="material-symbols-outlined text-[14px] text-primary">info</span>
           이곳은 이미 초안이 준비되어 있어요. 바로 편집을 시작하세요!
         </div>
@@ -158,22 +179,22 @@ const PopularIssuesSection = ({
                               )}
                             </div>
 
-                            <div className="flex flex-col gap-2 px-1">
-                              <h6 className="text-[14px] xl:text-[15px] font-bold text-slate-800 leading-snug group-hover:text-primary transition-colors line-clamp-2 min-h-[2.5rem]">
+                            <div className="flex flex-col gap-1 px-1">
+                              <h6 className="text-[14px] xl:text-[15px] font-semibold text-slate-800 leading-tight group-hover:text-primary transition-colors line-clamp-2 min-h-[2.2rem]">
                                 {issue.name}
                               </h6>
-                              <div className="flex flex-col gap-1.5 mt-1 pt-2 border-t border-slate-50">
+                              <div className="flex flex-col gap-1 mt-0.5 pt-1.5 border-t border-slate-50">
                                 {[
                                   { title: `${issue.name} 관련 긴급 뉴스...`, press: '연합뉴스' },
                                   { title: `실시간 이슈 리포트: ${issue.name}`, press: 'KBS' },
                                   { title: `주요 언론사별 분석 데이터 요약`, press: 'MBC' }
                                 ].map((art, artIdx) => (
-                                  <div key={artIdx} className="flex flex-col gap-0 group/art">
-                                    <p className="text-[11px] text-slate-600 font-medium line-clamp-1 group-hover/art:text-primary transition-colors">
-                                      {art.title}
-                                    </p>
-                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tight">
+                                  <div key={artIdx} className="flex items-center gap-2 group/art overflow-hidden py-0.5">
+                                    <span className="shrink-0 text-[9px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 group-hover/art:border-primary/20 group-hover/art:text-primary transition-colors">
                                       {art.press}
+                                    </span>
+                                    <p className="text-[11px] text-slate-600 font-medium truncate group-hover/art:text-primary transition-colors">
+                                      {art.title}
                                     </p>
                                   </div>
                                 ))}

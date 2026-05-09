@@ -51,7 +51,7 @@ const PublisherNewsSection = ({
     <div className="flex flex-col w-full h-full bg-slate-50/30 p-2 rounded-3xl">
       <div className="flex flex-col mb-0 px-2">
         <div className="flex items-center justify-between h-9 mb-1 mt-1">
-          <h2 className="text-slate-800 text-base font-bold tracking-tight">
+          <h2 className="text-slate-800 text-base font-semibold tracking-tight">
             각 언론사별 인기 뉴스에요
           </h2>
         </div>
@@ -120,7 +120,7 @@ const PublisherNewsSection = ({
                               <span className="text-[10px] font-bold text-slate-400">{publisher[0]}</span>
                             )}
                           </div>
-                          <h4 className="text-[14px] font-bold text-slate-800 truncate leading-none group-hover/header:text-primary transition-colors">
+                          <h4 className="text-[14px] font-semibold text-slate-800 truncate leading-none group-hover/header:text-primary transition-colors">
                             {publisher}
                           </h4>
                         </div>
