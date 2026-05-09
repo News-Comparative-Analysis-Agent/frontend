@@ -107,7 +107,7 @@ const PopularIssuesSection = ({
           <div className="flex flex-col items-center md:items-end lg:contents w-full md:w-1/2 lg:w-auto gap-4 md:gap-2 lg:gap-0">
             
             {/* 콤팩트 달력 영역 */}
-            <div className="w-full lg:w-auto lg:absolute lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 flex justify-center md:justify-end lg:justify-center z-0">
+            <div className="w-full lg:w-auto lg:absolute lg:left-[51.5%] lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 flex justify-center md:justify-end lg:justify-center z-0">
               <div className="bg-slate-50/50 border border-slate-200/60 rounded-2xl px-2 py-1 shadow-sm backdrop-blur-[2px] transition-all hover:bg-white hover:border-primary/20 hover:shadow-md group">
                 <CompactHeaderCalendar 
                   selectedDate={selectedDate}
@@ -237,6 +237,14 @@ const PopularIssuesSection = ({
                                   >
                                     {globalRank}
                                   </span>
+                                </div>
+                              )}
+                              {activeIssueType === 'editorial' && (
+                                <div className="absolute top-2 right-2 z-20">
+                                  <div className="flex items-center gap-1 bg-white text-primary px-1.5 py-0.5 rounded-md shadow-md border border-slate-100 opacity-95 group-hover:opacity-100 transition-opacity">
+                                    <span className="material-symbols-outlined text-[13px] font-bold">verified</span>
+                                    <span className="text-[10px] font-bold whitespace-nowrap tracking-tight">초안 완료</span>
+                                  </div>
                                 </div>
                               )}
                             </div>

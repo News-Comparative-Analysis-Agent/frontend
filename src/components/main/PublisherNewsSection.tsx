@@ -151,8 +151,8 @@ const PublisherNewsSection = ({
                             {publisher}
                           </h4>
                         </div>
-                        <div className="flex items-center gap-1 text-slate-300 group-hover/header:text-primary transition-colors">
-                          <span className="text-[10px] font-bold uppercase tracking-tighter transition-opacity">
+                        <div className="flex items-center gap-1 text-slate-400 group-hover/header:text-primary transition-colors">
+                          <span className="text-[10px] font-medium uppercase tracking-tight transition-opacity text-slate-500 group-hover/header:text-primary/80">
                             {isExpanded ? 'Fold' : 'More'}
                           </span>
                           <span className={`material-symbols-outlined text-[18px] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>

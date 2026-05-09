@@ -98,6 +98,12 @@
   display: none;
 }
 
+@keyframes subtle-pulse {
+  0% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.95; }
+}
+
 .drafting-editor .editor-delete-btn {
   display: flex !important;
 }
