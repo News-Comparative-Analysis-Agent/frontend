@@ -20,7 +20,7 @@ export const useDraftingPage = () => {
     currentIssueId, title, content, sidebarQuotes, citations,
     setIssueId, setTitle, setContent, setSidebarQuotes, setCitations,
     saveDraft, lastSaved, isDirty, setIsDirty, isSaving,
-    undo, pushHistory, setPreviewMode,
+    undo, redo, pushHistory, setPreviewMode,
     previewContent, setPreviewContent, isPreviewMode // 💡 하단에서 위로 끌어올림
   } = useDraftStore()
 
@@ -40,20 +40,23 @@ export const useDraftingPage = () => {
     if (editorRef.current) {
       const newHtml = editorRef.current.innerHTML;
       
-      // 💡 프리뷰 모드면 임시 공간에, 아니면 진짜 본문에 저장
       if (isPreviewMode) {
         if (newHtml !== previewContent) {
           setPreviewContent(newHtml);
         }
       } else {
         if (newHtml !== content) {
+          // 💡 입력 시작 시점에 이전 상태를 한 번 기록 (연속 입력은 하나의 히스토리로 취급)
+          if (!historyTimeoutRef.current) {
+            pushHistory(content);
+          }
+          
           setContent(newHtml);
           
-          // 1초간 입력이 없으면 현재 상태를 히스토리에 기록 (Ctrl+Z용 스냅샷)
           if (historyTimeoutRef.current) clearTimeout(historyTimeoutRef.current)
           historyTimeoutRef.current = setTimeout(() => {
-            pushHistory()
-          }, 1000)
+            historyTimeoutRef.current = null; // 1.2초 후 타이머 해제
+          }, 1200)
         }
       }
     }
@@ -266,9 +269,15 @@ export const useDraftingPage = () => {
       }
       
       // Ctrl + Z (타이핑 되돌리기)
-      if (key === 'z') {
+      if (key === 'z' && !e.shiftKey) {
         e.preventDefault();
         undo();
+      }
+
+      // Ctrl + Y 또는 Ctrl + Shift + Z (다시 실행)
+      if (key === 'y' || (key === 'z' && e.shiftKey)) {
+        e.preventDefault();
+        redo();
       }
     };
 
@@ -341,6 +350,8 @@ export const useDraftingPage = () => {
     applySuggestion,
     cancelSuggestion, // 💡 신규 추가
     undoSuggestion,
+    undo,
+    redo,
     navigate,
     isDirty,
     setIsDirty,

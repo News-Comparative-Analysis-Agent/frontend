@@ -46,22 +46,22 @@ export interface ChatResponse {
  * AI를 이용해 기사 초안을 생성합니다.
  */
 export const generateDraft = (request: DraftGenerateRequest) =>
-  apiPost<DraftGenerateResponse>('/drafts/generate', request, '초안 생성 실패');
+  apiPost<DraftGenerateResponse>('/draft/generate', request, '초안 생성 실패');
 
 /**
  * 작성 중인 초안을 임시 저장합니다.
  */
 export const saveDraft = (draft: Omit<SavedDraft, 'id' | 'last_saved'>) =>
-  apiPut<any>(`/api/draft/issue/${draft.issue_id}`, { content: draft.content }, '임시 저장 실패');
+  apiPut<any>(`/draft/issue/${draft.issue_id}`, { content: draft.content }, '임시 저장 실패');
 
 /**
  * 내 임시 저장 초안 목록을 불러옵니다.
  */
 export const fetchMyDrafts = () =>
-  apiGet<SavedDraft[]>('/api/draft/workspace', '초안 목록 조회 실패');
+  apiGet<SavedDraft[]>('/draft/workspace', '초안 목록 조회 실패');
 
 /**
  * AI 챗봇과 대화합니다.
  */
 export const chatWithAI = (request: ChatRequest) =>
-  apiPost<ChatResponse>('/api/draft/chat', request, '챗봇 응답 실패');
+  apiPost<ChatResponse>('/draft/chat', request, '챗봇 응답 실패');

@@ -43,7 +43,7 @@ export interface PreGeneratedDraft {
 }
 
 export const fetchFinalReview = (issueId: number) =>
-  apiGet<FinalReviewResponse>(`/api/draft/final-review/${issueId}`, '최종 검토 데이터 조회 실패')
+  apiGet<FinalReviewResponse>(`/draft/final-review/${issueId}`, '최종 검토 데이터 조회 실패')
 
 export const parsePreGeneratedDraft = (raw?: string): PreGeneratedDraft | null => {
   if (!raw) return null

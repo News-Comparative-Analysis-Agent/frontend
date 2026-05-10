@@ -85,10 +85,17 @@ export const useDraftStore = create<DraftState>()(
         };
       }),
 
-      // 명시적으로 히스토리에 현재 상태 기록 (챗봇 반영 직전 호출용)
-      pushHistory: () => set((state) => {
-        const newPast = [...state.pastContent, state.content];
-        if (newPast.length > 20) newPast.shift();
+      // 명시적으로 히스토리에 상태 기록 (타이핑 시작 또는 챗봇 반영 직전 호출)
+      pushHistory: (explicitContent?: string) => set((state) => {
+        const contentToPush = explicitContent !== undefined ? explicitContent : state.content;
+        
+        // 마지막 기록과 동일하면 중복 기록 방지
+        if (state.pastContent.length > 0 && state.pastContent[state.pastContent.length - 1] === contentToPush) {
+          return state;
+        }
+
+        const newPast = [...state.pastContent, contentToPush];
+        if (newPast.length > 50) newPast.shift(); // 히스토리 제한 확장
         return { pastContent: newPast, futureContent: [] };
       }),
       

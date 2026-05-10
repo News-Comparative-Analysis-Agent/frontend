@@ -29,7 +29,7 @@ export interface DraftState {
   // History Actions
   undo: () => void;
   redo: () => void;
-  pushHistory: () => void;
+  pushHistory: (explicitContent?: string) => void;
   
   // Advanced Actions (Logic Migration)
   addSidebarQuote: (quote: SidebarQuote) => void;
