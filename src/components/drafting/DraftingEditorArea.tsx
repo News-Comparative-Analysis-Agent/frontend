@@ -16,12 +16,13 @@ interface DraftingEditorAreaProps {
   handleDragStart: (e: React.DragEvent, url: string, media: string) => void
   draftImages: DraftImage[]
   isCrossCheckMode: boolean
+  windowWidth: number
 }
 
 const DraftingEditorArea = ({
   title, setTitle, content, editorRef, handleEditorInput,
   handleDragOver, handleDragLeave, handleDrop, dropIndicator, handleDragStart,
-  draftImages, isCrossCheckMode
+  draftImages, isCrossCheckMode, windowWidth
 }: DraftingEditorAreaProps) => {
   const { isPreviewMode, citations } = useDraftStore()
   
@@ -153,7 +154,7 @@ const DraftingEditorArea = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div className="max-w-3xl px-4 sm:px-8 mx-auto py-12 relative">
+      <div className={`${windowWidth < 1100 ? 'max-w-none px-6' : 'max-w-3xl px-4 sm:px-8'} mx-auto py-12 relative transition-all duration-500`}>
         {(dropIndicator.index !== -1 || dropIndicator.range) && dropIndicator.rect && (
           <div 
             className="absolute left-8 right-8 h-1 bg-primary rounded-full z-50 pointer-events-none shadow-[0_0_10px_rgba(242,127,13,0.5)] transition-all duration-75"

@@ -49,6 +49,9 @@ const DraftingPage = () => {
   const [isCrossCheckMode, setIsCrossCheckMode] = useState(false)
   const [selectedQuote, setSelectedQuote] = useState<any>(null)
 
+  // 윈도우 너비 감지 (배너 위치 계산용)
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
   // 팝업 감시를 위한 Ref
   const popupRef = useRef<Window | null>(null)
   const popupTimerRef = useRef<any>(null)
@@ -94,10 +97,13 @@ const DraftingPage = () => {
     }
   };
 
-  // 언마운트 시 타이머 정리
+  // 언마운트 및 리사이즈 이벤트 정리
   useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth)
+    window.addEventListener('resize', handleResize)
     return () => {
-      if (popupTimerRef.current) clearInterval(popupTimerRef.current);
+      if (popupTimerRef.current) clearInterval(popupTimerRef.current)
+      window.removeEventListener('resize', handleResize)
     }
   }, []);
 
@@ -125,7 +131,10 @@ const DraftingPage = () => {
       <main className="flex-1 flex overflow-hidden min-h-0 relative">
         {/* 💡 기사 비교 가이드 배너 (팝업창이 왼쪽 50%를 가리므로, 오른쪽 50% 영역의 중앙인 75% 지점으로 배치) */}
         {showGuide && isCrossCheckMode && selectedQuote && (
-          <div className="fixed top-28 inset-x-0 z-[100] animate-bounce-subtle pointer-events-none flex justify-center">
+          <div 
+            className="fixed top-28 right-0 z-[100] animate-bounce-subtle pointer-events-none flex justify-center transition-all duration-300"
+            style={{ left: (windowWidth > 1100) ? '50%' : '0' }}
+          >
             <div className="bg-slate-900/95 backdrop-blur-md text-white px-8 py-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col gap-3 border border-white/20 pointer-events-auto w-[90%] max-w-[450px]">
               <div className="flex items-center gap-5">
                 <div className="size-10 rounded-full bg-primary/20 text-primary flex items-center justify-center shadow-inner">
@@ -182,7 +191,7 @@ const DraftingPage = () => {
 
         {/* 좌측 사이드바가 닫혔을 때 나타나는 영역 (원본 디자인 유지) */}
         {!isLeftSidebarOpen && (
-          <div className="flex flex-col items-center gap-4 py-4 px-3 self-stretch shrink-0 overflow-y-auto">
+          <div className={`flex flex-col items-center gap-4 py-4 ${windowWidth < 1100 ? 'px-2' : 'px-3'} self-stretch shrink-0 overflow-y-auto transition-all`}>
             {/* 사이드바 열기 버튼 (원본 둥근 사각형 디자인 복구) */}
             <button 
               onClick={() => setIsLeftSidebarOpen(true)}
@@ -203,7 +212,7 @@ const DraftingPage = () => {
                     setIsRightSidebarOpen(false); // 💡 아이콘 클릭 시 우측 챗봇도 자동으로 닫기
                     openArticlePopup(media.links?.[0]);
                   }}
-                  className={`h-9 px-4 rounded-full flex items-center justify-center font-black text-[12px] border-2 transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm whitespace-nowrap ${
+                  className={`${windowWidth < 1100 ? 'h-7 px-2.5 text-[10px]' : 'h-9 px-4 text-[12px]'} rounded-full flex items-center justify-center font-black border-2 transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm whitespace-nowrap ${
                     selectedQuote?.media === media.media 
                       ? `${media.bg} ${media.borderColor} ${media.textColor} scale-105 shadow-md ring-2 ring-primary/20` 
                       : 'bg-white border-slate-200 text-slate-400 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 hover:border-primary/30'
@@ -218,7 +227,7 @@ const DraftingPage = () => {
         )}
 
         {/* 2. 중앙 에디터 영역: 제목 및 본문 편집 (좌우 버튼 공간 확보를 위해 조건부 여백 유지) */}
-        <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${!isLeftSidebarOpen ? 'pl-12 md:pl-0' : ''} ${!isRightSidebarOpen ? 'pr-12 md:pr-0' : ''}`}>
+        <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${!isLeftSidebarOpen ? (windowWidth < 1100 ? 'pl-4' : 'pl-12 md:pl-0') : ''} ${!isRightSidebarOpen ? (windowWidth < 1100 ? 'pr-4' : 'pr-12 md:pr-0') : ''}`}>
           <DraftingEditorArea 
             title={title}
             setTitle={setTitle}
@@ -232,6 +241,7 @@ const DraftingPage = () => {
             handleDragStart={handleDragStart}
             draftImages={draftImages}
             isCrossCheckMode={isCrossCheckMode}
+            windowWidth={windowWidth}
           />
         </div>
 
