@@ -22,7 +22,7 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
         <div className="pr-2 pt-1 space-y-8">
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-4 bg-primary/40 rounded-full"></div>
+              <div className="size-2 bg-primary/50 rounded-full"></div>
               <h4 className="text-[14px] font-bold text-slate-800">이슈 설명</h4>
             </div>
             <p className="text-[14px] text-slate-500 leading-relaxed font-medium pl-3.5 border-l border-slate-100">{description}</p>
@@ -31,7 +31,7 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
           {background && (
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-4 bg-primary/40 rounded-full"></div>
+                <div className="size-2 bg-primary/50 rounded-full"></div>
                 <h4 className="text-[14px] font-bold text-slate-800">이슈 배경</h4>
               </div>
               <p className="text-[14px] text-slate-500 leading-relaxed font-medium pl-3.5 border-l border-slate-100">{background}</p>
@@ -41,7 +41,7 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
           {coreContentions && (
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-4 bg-primary/40 rounded-full"></div>
+                <div className="size-2 bg-primary/50 rounded-full"></div>
                 <h4 className="text-[14px] font-bold text-slate-800">주요 쟁점</h4>
               </div>
               <p className="text-[14px] text-slate-500 leading-relaxed font-medium pl-3.5 border-l border-slate-100">{coreContentions}</p>

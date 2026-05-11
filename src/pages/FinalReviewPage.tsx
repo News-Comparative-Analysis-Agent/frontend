@@ -57,12 +57,30 @@ const FinalReviewPage = () => {
   )
 
   const { resolvedTitle, resolvedBody, textLength, safeContent } = useMemo(() => {
-    const body = content || draftFromApi?.article_body || ''
+    let body = content || draftFromApi?.article_body || ''
+    
+    // ── 최종 검토용 클리닝: 인용 마커, 하이라이트, 굵은 글씨 제거 (실제 기사처럼 평이하게) ──
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(body, 'text/html')
+    
+    // 1. [1], [2] 형태의 인용 마커 완전 제거
+    doc.querySelectorAll('.citation-marker').forEach(el => el.remove())
+    
+    // 2. 하이라이트 태그 및 굵은 글씨(strong, b) 태그 제거 (텍스트는 유지)
+    // - span[class*="hl-"]: 배경색 하이라이트
+    // - strong, b: 굵은 글씨 강조 (언론사명 등)
+    const decorators = doc.querySelectorAll('span[class*="hl-"], span[class*="text-highlight-"], strong, b')
+    decorators.forEach(el => {
+      el.replaceWith(...Array.from(el.childNodes))
+    })
+    
+    const cleanedBody = doc.body.innerHTML
+    
     return {
       resolvedTitle: title || draftFromApi?.title || reviewData?.name || '제목 없음',
-      resolvedBody: body,
-      textLength: stripHtml(body).length,
-      safeContent: DOMPurify.sanitize(body),
+      resolvedBody: cleanedBody,
+      textLength: stripHtml(cleanedBody).length,
+      safeContent: DOMPurify.sanitize(cleanedBody),
     }
   }, [title, content, draftFromApi, reviewData?.name])
 
@@ -152,7 +170,7 @@ const FinalReviewPage = () => {
           {/* Full-width Body Section */}
           <div className="w-full bg-[#f5f5f5] flex-1">
             <div className="max-w-[900px] mx-auto px-8 md:px-16 pt-16 pb-32 text-left">
-              <article className="article-content font-light">
+              <article className="article-content font-light review-clean-mode">
                 <div
                   ref={articleContentRef}
                   className="space-y-8 text-[18px] leading-[1.9] text-slate-800"
@@ -317,15 +335,18 @@ const FinalReviewPage = () => {
         </aside>
       </main>
 
-      {/* 하단 고정 액션 바 */}
-      <div className="fixed bottom-0 left-0 right-0 h-20 border-t border-slate-200 bg-white/90 backdrop-blur-xl px-4 md:px-8 flex items-center justify-between z-[1000] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <div className="flex items-center gap-2 text-slate-400">
-          <span className="material-symbols-outlined text-[20px]">visibility</span>
-          <span className="text-[12px] font-medium tracking-tight whitespace-nowrap">발행 시 실제 뉴스 사이트에 적용될 레이아웃입니다.</span>
+      {/* 하단 고정 액션 바 (Unified Standard) */}
+      <div className="fixed bottom-0 left-0 right-0 h-14 md:h-16 border-t border-slate-200 bg-white/90 backdrop-blur-xl px-4 md:px-8 flex items-center justify-between z-[1000] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <div className="flex items-center gap-3 flex-1 min-w-0 mr-4">
+          <div className="size-2.5 rounded-full bg-slate-300 shrink-0"></div>
+          <div className="flex flex-col min-w-0 text-left">
+            <p className="text-[13px] md:text-[15px] font-bold text-slate-800 tracking-tight leading-tight">최종 검토 중</p>
+            <p className="hidden sm:block text-[11px] md:text-[12px] text-slate-500 font-medium tracking-tight mt-0.5 truncate">발행 시 실제 뉴스 사이트에 적용될 레이아웃입니다.</p>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <Button variant="outline" icon="edit" onClick={() => navigate(`/drafting?id=${issueId}`)} className="px-8">수정하러 돌아가기</Button>
-          <Button size="lg" icon="publish" className="px-10">최종 발행 확정</Button>
+        <div className="flex items-center gap-2 md:gap-3 shrink-0">
+          <Button variant="outline" icon="edit" onClick={() => navigate(`/drafting?id=${issueId}`)} className="h-8 md:h-10 px-3 md:px-4 text-[12px] md:text-[14px] font-bold transition-all">수정</Button>
+          <Button icon="publish" className="h-8 md:h-10 px-6 md:px-10 text-[12px] md:text-[14px] font-bold shadow-lg hover:shadow-primary/20 transition-all">최종 발행</Button>
         </div>
       </div>
     </Layout>

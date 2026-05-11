@@ -180,10 +180,10 @@ const DraftingPage = () => {
           setComparisonLayout={setComparisonLayout}
         />
 
-        {/* 좌측 사이드바가 닫혔을 때 나타나는 영역 (열기 버튼 + 언론사 칩 리스트) */}
+        {/* 좌측 사이드바가 닫혔을 때 나타나는 영역 (원본 디자인 유지) */}
         {!isLeftSidebarOpen && (
           <div className="flex flex-col items-center gap-4 py-4 px-3 self-stretch shrink-0 overflow-y-auto">
-            {/* 사이드바 열기 버튼 */}
+            {/* 사이드바 열기 버튼 (원본 둥근 사각형 디자인 복구) */}
             <button 
               onClick={() => setIsLeftSidebarOpen(true)}
               className="bg-white border border-slate-200 p-2.5 rounded-xl shadow-lg text-primary hover:bg-orange-50 hover:scale-110 active:scale-90 transition-all duration-200 shrink-0"
@@ -217,21 +217,23 @@ const DraftingPage = () => {
           </div>
         )}
 
-        {/* 2. 중앙 에디터 영역: 제목 및 본문 편집 */}
-        <DraftingEditorArea 
-          title={title}
-          setTitle={setTitle}
-          content={content}
-          editorRef={editorRef}
-          handleEditorInput={handleEditorInput}
-          handleDragOver={handleDragOver}
-          handleDragLeave={handleDragLeave}
-          handleDrop={handleDrop}
-          dropIndicator={dropIndicator}
-          handleDragStart={handleDragStart}
-          draftImages={draftImages}
-          isCrossCheckMode={isCrossCheckMode}
-        />
+        {/* 2. 중앙 에디터 영역: 제목 및 본문 편집 (좌우 버튼 공간 확보를 위해 조건부 여백 유지) */}
+        <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${!isLeftSidebarOpen ? 'pl-12 md:pl-0' : ''} ${!isRightSidebarOpen ? 'pr-12 md:pr-0' : ''}`}>
+          <DraftingEditorArea 
+            title={title}
+            setTitle={setTitle}
+            content={content}
+            editorRef={editorRef}
+            handleEditorInput={handleEditorInput}
+            handleDragOver={handleDragOver}
+            handleDragLeave={handleDragLeave}
+            handleDrop={handleDrop}
+            dropIndicator={dropIndicator}
+            handleDragStart={handleDragStart}
+            draftImages={draftImages}
+            isCrossCheckMode={isCrossCheckMode}
+          />
+        </div>
 
         {/* 3. 우측 챗봇 사이드바: AI 어시스턴트 및 리사이징 핸들 */}
         <DraftingChatbot 
@@ -251,13 +253,15 @@ const DraftingPage = () => {
           onMouseDown={handleMouseDown}
         />
 
-        {/* 우측 사이드바가 닫혔을 때 나타나는 플로팅 열기 버튼 */}
+        {/* 우측 사이드바가 닫혔을 때 나타나는 플로팅 열기 버튼 (화면 끝에 완벽 밀착 및 테두리 제거) */}
         {!isRightSidebarOpen && (
           <button 
             onClick={() => setIsRightSidebarOpen(true)}
-            className="fixed top-[112px] right-6 z-40 bg-white border border-slate-200 p-2.5 rounded-xl shadow-lg text-primary hover:bg-orange-50 hover:scale-110 active:scale-90 transition-all duration-200"
+            className="fixed top-1/2 -translate-y-1/2 right-0 z-40 bg-white pl-2.5 pr-1 py-5 rounded-l-2xl shadow-[-10px_0_30px_rgba(0,0,0,0.05)] text-primary hover:bg-orange-50 hover:pl-4 transition-all duration-300 group flex flex-col items-center gap-1.5"
+            title="AI 챗봇 열기"
           >
-            <span className="material-symbols-outlined icon-md">chat_bubble</span>
+            <span className="material-symbols-outlined text-[22px]">chat_bubble</span>
+            <span className="[writing-mode:vertical-lr] text-[10px] font-black tracking-widest text-slate-400 group-hover:text-primary">AI CHAT</span>
           </button>
         )}
       </main>
