@@ -24,6 +24,7 @@ const MainPage = () => {
     error,
     newsData,
     dailyIssues,
+    dailyStats,
     allPublishers,
     selectedMedia,
     currentPage,
@@ -154,6 +155,7 @@ const MainPage = () => {
           <div className="flex flex-col">
             <MainHero 
               activeIssueType={activeIssueType} 
+              dailyStats={dailyStats}
               stats={{
                 totalArticles: Object.values(newsData[dateKey] || {}).reduce((sum, list) => sum + list.length, 0),
                 totalIssues: (dailyIssues?.data?.[dateKey] || []).length,

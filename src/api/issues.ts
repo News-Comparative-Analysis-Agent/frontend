@@ -41,7 +41,13 @@ export const fetchDraftImages = (id: string) =>
   apiGet<DraftImage[]>(`/draft/images/${id}`, '이미지 데이터를 불러오는 데 실패했습니다');
 
 /**
- * 특정 이슈의 타임라인 데이터를 가져오는 API 서비스입니다.
+ * 타임라인 데이터를 가져오는 API 서비스입니다.
  */
 export const fetchIssueTimeline = (id: string) =>
   apiGet<IssueTimelineResponse>(`/issues/${id}/timeline`, '타임라인 데이터를 불러오는 데 실패했습니다');
+
+/**
+ * 오늘의 서비스 통계 데이터를 가져오는 API 서비스입니다.
+ */
+export const fetchTodayStats = () =>
+  apiGet<any>('/issues/stats/today', '통계 데이터를 불러오는 데 실패했습니다');

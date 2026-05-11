@@ -22,3 +22,11 @@ export interface DailyIssue {
 export interface DailyIssuesResponse {
   data: Record<string, DailyIssue[]>;
 }
+
+export interface DailyStats {
+  article_count: number;
+  issue_count: number;
+  publisher_count: number;
+  critique_count: number;
+  last_updated_at: string;
+}

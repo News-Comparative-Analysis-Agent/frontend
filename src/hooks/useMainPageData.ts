@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchTopNewsByPublisher } from '../api/news'
-import { fetchDailyIssues } from '../api/issues'
+import { fetchDailyIssues, fetchTodayStats } from '../api/issues'
 import { NewsArticle } from '../types'
-import { DailyIssuesResponse } from '../types/issues'
+import { DailyIssuesResponse, DailyStats } from '../types/issues'
 
 // 12개 핵심 언론사 설정 (가나다 순)
 export const PRESS_NAMES = [
@@ -20,6 +20,7 @@ export const useMainPageData = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [newsData, setNewsData] = useState<Record<string, Record<string, NewsArticle[]>>>({})
   const [dailyIssues, setDailyIssues] = useState<DailyIssuesResponse | null>(null)
+  const [dailyStats, setDailyStats] = useState<DailyStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [topImageIndex, setTopImageIndex] = useState(0)
@@ -38,10 +39,14 @@ export const useMainPageData = () => {
         setLoading(true)
         setError(null)
         
-        const [newsResponse, issuesResponse] = await Promise.all([
+        const [newsResponse, issuesResponse, statsResponse] = await Promise.all([
           fetchTopNewsByPublisher().catch(() => ({})),
           fetchDailyIssues().catch((err) => {
             console.warn('이슈 API 호출 실패:', err);
+            return null;
+          }),
+          fetchTodayStats().catch((err) => {
+            console.warn('통계 API 호출 실패:', err);
             return null;
           })
         ])
@@ -71,9 +76,14 @@ export const useMainPageData = () => {
         } else {
            setDailyIssues(issuesResponse);
         }
+
+        if (statsResponse) {
+          setDailyStats(statsResponse);
+        }
       } catch (e) {
         setError('데이터를 불러오는 중 오류가 발생했습니다.')
         setDailyIssues(null);
+        setDailyStats(null);
         console.error(e)
       } finally {
         setLoading(false)
@@ -144,6 +154,7 @@ export const useMainPageData = () => {
     setSearchQuery,
     newsData,
     dailyIssues,
+    dailyStats,
     loading,
     error,
     topImageIndex,

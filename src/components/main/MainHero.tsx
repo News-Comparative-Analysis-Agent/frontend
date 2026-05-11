@@ -1,8 +1,10 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { DailyStats } from '../../types/issues'
 
 interface MainHeroProps {
   activeIssueType: 'politics' | 'editorial'
+  dailyStats?: DailyStats | null
   stats?: {
     totalArticles: number
     totalIssues: number
@@ -10,25 +12,32 @@ interface MainHeroProps {
   }
 }
 
-const MainHero = ({ activeIssueType, stats }: MainHeroProps) => {
+const MainHero = ({ activeIssueType, stats, dailyStats }: MainHeroProps) => {
   const isEditorial = activeIssueType === 'editorial';
+
+  // 업데이트 시간 포맷팅 (예: 5/11 10시)
+  const formatUpdateTime = (dateStr?: string) => {
+    if (!dateStr) return `${new Date().getMonth() + 1}/${new Date().getDate()} ${new Date().getHours()}시`;
+    const d = new Date(dateStr);
+    return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}시`;
+  };
 
   const statItems = [
     { 
       label: '오늘 수집된 기사', 
-      value: `${stats?.totalArticles || 0}건`, 
+      value: `${dailyStats?.article_count ?? stats?.totalArticles ?? 0}건`, 
       icon: 'article',
       color: 'bg-white/15'
     },
     { 
       label: '참여 언론사', 
-      value: `${stats?.totalPublishers || 12}곳`, 
+      value: `${dailyStats?.publisher_count ?? stats?.totalPublishers ?? 12}곳`, 
       icon: 'newspaper',
       color: 'bg-white/15'
     },
     { 
       label: '최근 업데이트', 
-      value: `${new Date().getMonth() + 1}/${new Date().getDate()} ${new Date().getHours()}시`, 
+      value: formatUpdateTime(dailyStats?.last_updated_at), 
       icon: 'update',
       color: 'bg-white/15'
     }
