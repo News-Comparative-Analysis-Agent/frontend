@@ -20,8 +20,6 @@ const SearchResultsPage = () => {
   const [searchData, setSearchData] = useState<NlpSearchData | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [hoveredCitation, setHoveredCitation] = useState<string | null>(null)
-  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
-  const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null)
   const [publisherPage, setPublisherPage] = useState(1)
   const [sliderIndex, setSliderIndex] = useState(0)
   const itemsPerPage = 10
@@ -62,8 +60,6 @@ const SearchResultsPage = () => {
     return null;
   };
 
-  const selectedArticle = selectedArticleId ? getArticleById(selectedArticleId) : null;
-  const selectedTopic = selectedTopicId !== null ? searchData?.ai_summary_structured?.topics.find(t => t.id === selectedTopicId) : null;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,8 +83,6 @@ const SearchResultsPage = () => {
 
     fetchData()
     setInputValue(query)
-    setSelectedArticleId(null)
-    setSelectedTopicId(null)
   }, [query])
 
   const handleSearch = () => {
@@ -97,26 +91,6 @@ const SearchResultsPage = () => {
     }
   }
 
-  const toggleSelectArticle = (id: string, topicId: number | null = null) => {
-    if (topicId !== null) {
-      // 토픽 선택 시
-      if (selectedTopicId === topicId) {
-        setSelectedTopicId(null);
-        setSelectedArticleId(null);
-      } else {
-        setSelectedTopicId(topicId);
-        setSelectedArticleId(id);
-      }
-    } else {
-      // 기사 개별 선택 시
-      if (selectedArticleId === id && selectedTopicId === null) {
-        setSelectedArticleId(null);
-      } else {
-        setSelectedArticleId(id);
-        setSelectedTopicId(null);
-      }
-    }
-  }
 
   // 페이지네이션 로직
   const totalArticles = searchData?.articles || []
@@ -195,31 +169,26 @@ const SearchResultsPage = () => {
                 {searchData.ai_summary_structured ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10">
                     {searchData.ai_summary_structured.topics.map((topic, idx) => {
-                      const isTopicSelected = selectedTopicId === topic.id;
                       const primaryArticleId = topic.related_articles[0];
                       
                       return (
                         <div 
                           key={topic.id} 
                           className="group cursor-pointer flex flex-col gap-3 transition-all duration-300"
-                          onClick={() => primaryArticleId && toggleSelectArticle(primaryArticleId, topic.id)}
+                          onClick={() => primaryArticleId && navigate(`/analysis?id=${primaryArticleId}`)}
                         >
-                          <div className={`relative w-full aspect-video rounded-2xl overflow-hidden shadow-sm border transition-all ${
-                            isTopicSelected ? 'border-primary ring-2 ring-primary/20' : 'border-slate-200/50 bg-slate-50 group-hover:shadow-md group-hover:border-primary/20'
-                          }`}>
+                          <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-sm border border-slate-200/50 bg-slate-50 group-hover:shadow-md group-hover:border-primary/20 transition-all">
                             <img 
                               alt={topic.title} 
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100" 
                               src={`https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop&sig=${idx}`}
                             />
                             
-                            {/* 선택 표시 아이콘 */}
+                            {/* 화살표 아이콘 */}
                             <div className="absolute top-3 right-3 z-20">
-                              <div className={`size-8 rounded-full flex items-center justify-center transition-all border shadow-md ${
-                                isTopicSelected ? 'bg-primary text-white border-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]' : 'bg-white/80 backdrop-blur-sm text-slate-300 border-slate-100 group-hover:text-primary/50'
-                              }`}>
+                              <div className="size-8 rounded-full flex items-center justify-center transition-all border shadow-md bg-white/80 backdrop-blur-sm text-slate-300 border-slate-100 group-hover:text-primary group-hover:bg-white group-hover:border-primary/20">
                                 <span className="material-symbols-outlined text-[20px] font-bold">
-                                  {isTopicSelected ? 'check' : 'touch_app'}
+                                  arrow_forward
                                 </span>
                               </div>
                             </div>
@@ -229,15 +198,10 @@ const SearchResultsPage = () => {
                           </div>
 
                           <div className="flex flex-col gap-1.5 px-1">
-                            <h6 className={`text-[15px] font-bold leading-tight transition-colors line-clamp-2 min-h-[2.5rem] ${
-                              isTopicSelected ? 'text-primary' : 'text-slate-800 group-hover:text-primary'
-                            }`}>
+                            <h6 className="text-[15px] font-bold leading-tight transition-colors line-clamp-2 min-h-[2.5rem] text-slate-800 group-hover:text-primary">
                               {topic.title}
                             </h6>
                             
-                            <p className="text-[13px] text-slate-500 leading-relaxed line-clamp-2 mb-1">
-                              {topic.content}
-                            </p>
 
                             <div className="flex flex-col gap-1.5 mt-1 pt-2 border-t border-slate-100">
                               {topic.related_articles.slice(0, 2).map((articleId, artIdx) => {
@@ -280,11 +244,13 @@ const SearchResultsPage = () => {
                 <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-bold text-slate-900 mb-1 text-left">찾으시는 뉴스가 없으신가요?</h3>
-                    <p className="text-slate-500 text-sm text-left">아래의 각 언론사 뉴스 목록에서 기사를 더 찾아볼 수 있어요.</p>
+                    <p className="text-slate-500 text-sm text-left">
+                      아래의 각 언론사 개별 뉴스 목록은 <strong className="text-primary font-bold">기사 원문 읽기</strong>만 가능하며, AI 심층 분석 기능은 제공되지 않습니다.
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2 text-primary font-bold text-sm">
-                    <span className="material-symbols-outlined">arrow_downward</span>
-                    목록 확인하기
+                  <div className="flex items-center gap-2 text-slate-400 font-bold text-sm">
+                    <span className="material-symbols-outlined">info</span>
+                    원문 링크만 제공
                   </div>
                 </div>
               </div>
@@ -375,35 +341,25 @@ const SearchResultsPage = () => {
 
                                 {/* News List (Main Page Exact Style) */}
                                 <div className="flex flex-col divide-y divide-slate-50 flex-1">
-                                  {articles.map((article) => {
-                                    const isSelected = selectedArticleId === article.id && selectedTopicId === null;
-                                    return (
+                                  {articles.map((article) => (
                                       <div 
                                         key={article.id}
-                                        className={`group/item flex gap-3 p-3 transition-colors items-center relative cursor-pointer ${isSelected ? 'bg-orange-50/30' : 'hover:bg-slate-50'}`}
-                                        onClick={() => toggleSelectArticle(article.id)}
+                                        className="group/item flex gap-3 p-3 transition-colors items-center relative cursor-pointer hover:bg-slate-50"
+                                        onClick={() => window.open(article.url, '_blank')}
+                                        title="기사 원문 보기"
                                       >
-                                        <div className="shrink-0">
-                                          <span className={`material-symbols-outlined text-[20px] transition-all font-bold ${
-                                            isSelected ? 'text-primary' : 'text-slate-200 group-hover/item:text-primary/40'
-                                          }`}>
-                                            {isSelected ? 'check_circle' : 'radio_button_unchecked'}
-                                          </span>
-                                        </div>
-
-                                        <div className="flex-1 min-w-0 flex flex-col gap-1">
-                                          <h5 
-                                            className={`text-[12px] font-normal leading-[1.3] tracking-tight transition-colors line-clamp-3 ${
-                                              isSelected ? 'text-primary' : 'text-slate-800 group-hover/item:text-primary'
-                                            }`}
-                                          >
-                                            {article.title}
-                                          </h5>
-                                          <div className="flex items-center gap-1 text-slate-400">
-                                            <span className="material-symbols-outlined text-[12px]">schedule</span>
-                                            <span className="text-[10px] font-medium">
-                                              {new Date(article.pubDate).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
-                                            </span>
+                                        <div className="flex-1 min-w-0 flex flex-col gap-1 text-left">
+                                            <h5 className="text-[12px] font-normal leading-[1.3] tracking-tight transition-colors line-clamp-3 text-slate-800 group-hover/item:text-primary mb-1">
+                                              {article.title}
+                                            </h5>
+                                          <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-1 text-slate-400">
+                                              <span className="material-symbols-outlined text-[12px]">schedule</span>
+                                              <span className="text-[10px] font-medium">
+                                                {new Date(article.pubDate).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                                              </span>
+                                            </div>
+                                            <span className="material-symbols-outlined text-[16px] text-slate-300 group-hover/item:text-primary transition-all">open_in_new</span>
                                           </div>
                                         </div>
 
@@ -416,8 +372,7 @@ const SearchResultsPage = () => {
                                           />
                                         </div>
                                       </div>
-                                    );
-                                  })}
+                                  ))}
                                 </div>
                               </div>
                             );
@@ -438,50 +393,6 @@ const SearchResultsPage = () => {
         </div>
       </section>
 
-      {/* 하단 고정 액션 바 (Unified Standard) */}
-      <div className="fixed bottom-0 left-0 right-0 h-14 md:h-16 z-[1000] bg-white/90 backdrop-blur-xl border-t border-slate-200 px-4 md:px-8 flex items-center justify-between shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <div className="flex items-center gap-3 flex-1 min-w-0 mr-4">
-          <div className={`size-2.5 rounded-full shrink-0 ${
-            selectedArticleId ? 'bg-primary animate-pulse' : 'bg-slate-300'
-          }`}></div>
-          <div className="flex flex-col min-w-0 text-left">
-            <p className="text-[13px] md:text-[15px] font-bold text-slate-800 tracking-tight truncate leading-tight">
-              {selectedArticleId ? '기사 선택 완료' : '분석할 기사를 선택해 주세요'}
-            </p>
-            <p className="hidden sm:block text-[11px] md:text-[12px] text-slate-500 font-medium tracking-tight mt-0.5 truncate">
-              {selectedArticleId 
-                ? (selectedArticle?.title || '선택된 기사의 심층 분석을 시작합니다.') 
-                : '가장 핵심적인 기사 하나를 선택하면 AI가 분석을 시작합니다.'}
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2 md:gap-3 shrink-0">
-          {selectedArticleId && (
-            <Button 
-              variant="outline" 
-              className="h-8 md:h-10 px-3 md:px-4 text-[12px] md:text-[14px] font-bold"
-              onClick={() => {
-                setSelectedArticleId(null);
-                setSelectedTopicId(null);
-              }}
-            >
-              선택 해제
-            </Button>
-          )}
-          <Button 
-            disabled={!selectedArticleId}
-            className={`h-8 md:h-10 px-4 md:px-8 text-[12px] md:text-[14px] font-bold transition-all ${
-              selectedArticleId 
-              ? 'bg-primary hover:bg-primary-dark shadow-lg shadow-primary/20 scale-105' 
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
-            }`}
-            onClick={() => selectedArticleId && navigate(`/analysis?id=${selectedArticleId}`)}
-          >
-            심층 분석 시작
-          </Button>
-        </div>
-      </div>
     </Layout>
   )
 }
