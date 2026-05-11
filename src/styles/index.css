@@ -481,13 +481,35 @@ details[open] .source-arrow {
   margin: 0 1px;
   user-select: none;
   transition: all 0.2s;
-  padding: 0 2px;
+  padding: 0 4px;
   display: inline-block;
   line-height: 1;
+  position: relative;
+  pointer-events: auto;
 }
 
 .citation-marker:hover {
   color: #1d4ed8;
   background-color: #eff6ff;
   border-radius: 4px;
+}
+
+/* 최종 검토 페이지 전용: 모든 장식 요소 강제 초기화 */
+.review-clean-mode span, 
+.review-clean-mode strong, 
+.review-clean-mode b, 
+.review-clean-mode mark {
+  background: transparent !important;
+  background-color: transparent !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
+.review-clean-mode .citation-marker {
+  display: none !important;
 }

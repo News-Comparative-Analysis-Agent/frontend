@@ -60,90 +60,109 @@ const PublisherSidebar = ({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* 사이드바 본체 (배경 어둡게 하지 않음) */}
+          {/* 상단 드롭다운 본체 (최대한 세로로 작게 구성) */}
           <motion.div
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 h-full w-[320px] bg-white/95 backdrop-blur-md shadow-[20px_0_50px_rgba(0,0,0,0.1)] z-[100] border-r border-slate-100 flex flex-col pt-16 pb-8 px-8"
+            initial={{ y: '-100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '-100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="fixed top-14 xl:top-16 left-0 w-full bg-white shadow-[0_12px_30px_rgba(0,0,0,0.06)] z-[90] border-b border-slate-200 rounded-b-[20px] flex flex-col pt-4 pb-4 px-6 xl:px-12"
           >
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex items-center justify-center size-7 bg-primary rounded-lg shadow-sm">
-                    <span className="material-symbols-outlined text-[18px] text-white">tune</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-800 tracking-tight leading-none">언론사 필터</h3>
-                </div>
-                <p className="text-[13px] text-slate-500 font-normal ml-0">원하시는 언론사를 선택해 주세요.</p>
-              </div>
-              <button 
-                onClick={onClose}
-                className="size-8 mt-[-4px] flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors"
-              >
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-              <div className="space-y-5">
-                {/* '전체' 선택 섹션 */}
-                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100 group cursor-pointer" onClick={() => handleMediaChange('전체')}>
-                  <span className="text-sm font-medium text-slate-700">전체 언론사 선택</span>
-                  <div className={`size-5 rounded-md border-2 transition-all flex items-center justify-center ${
-                    selectedMedia.length === allPublishers.length 
-                      ? 'bg-primary border-primary' 
-                      : 'bg-white border-slate-300'
-                  }`}>
-                    {selectedMedia.length === allPublishers.length && (
-                      <span className="material-symbols-outlined text-white text-[16px] font-bold">check</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* 초성 그룹별 리스트 */}
-                {sortedInitials.map(initial => (
-                  <div key={initial} className="space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-primary/40 w-5">{initial}</span>
-                      <div className="h-px flex-1 bg-slate-100"></div>
+            <div className="max-w-[1440px] mx-auto w-full">
+              {/* 헤더 영역: 타이틀과 전체선택을 한 줄에 배치 */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-5">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center size-6 bg-primary rounded-lg shadow-sm">
+                      <span className="material-symbols-outlined text-[16px] text-white">tune</span>
                     </div>
-                    <div className="grid grid-cols-1 gap-2 pl-5">
-                      {groupedPublishers[initial].map(pub => (
-                        <div 
-                          key={pub}
-                          onClick={() => handleMediaChange(pub)}
-                          className="flex items-center justify-between py-0.5 cursor-pointer group"
-                        >
-                          <span className={`text-[14px] transition-colors ${
-                            selectedMedia.includes(pub) ? 'font-medium text-slate-900' : 'text-slate-500 font-normal group-hover:text-slate-700'
-                          }`}>
-                            {pub}
-                          </span>
-                          <div className={`size-4 rounded border transition-all flex items-center justify-center ${
-                            selectedMedia.includes(pub) 
-                              ? 'bg-primary border-primary' 
-                              : 'bg-white border-slate-200 group-hover:border-slate-300'
-                          }`}>
-                            {selectedMedia.includes(pub) && (
-                              <span className="material-symbols-outlined text-white text-[12px] font-bold">check</span>
-                            )}
+                    <h3 className="text-[16px] font-bold text-slate-800 tracking-tight leading-none">언론사 필터</h3>
+                  </div>
+                  
+                  <div className="h-4 w-px bg-slate-200 mx-1"></div>
+
+                  <div className="flex items-center gap-2.5 px-3 py-1 bg-slate-50 rounded-lg border border-slate-200/60 cursor-pointer group hover:bg-slate-100 transition-colors" onClick={() => handleMediaChange('전체')}>
+                    <span className="text-[12px] font-bold text-slate-600">전체 언론사 선택</span>
+                    <div className={`size-4 rounded border-2 transition-all flex items-center justify-center ${
+                      selectedMedia.length === allPublishers.length 
+                        ? 'bg-primary border-primary' 
+                        : 'bg-white border-slate-300'
+                    }`}>
+                      {selectedMedia.length === allPublishers.length && (
+                        <span className="material-symbols-outlined text-white text-[12px] font-bold">check</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <button 
+                  onClick={onClose}
+                  className="size-7 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[18px]">close</span>
+                </button>
+              </div>
+
+              {/* 그리드 영역: 세로 구분선 추가로 다단 가독성 극대화 */}
+              <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar max-h-[42vh]">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-y-8 py-2">
+                  {sortedInitials.map((initial, index) => (
+                    <div 
+                      key={initial} 
+                      className={`space-y-2 px-4 border-r border-slate-100 last:border-r-0
+                        ${(index + 1) % 2 === 0 ? 'border-r-0' : ''} 
+                        md:${(index + 1) % 2 === 0 ? 'border-r' : ''} 
+                        md:${(index + 1) % 4 === 0 ? 'border-r-0' : ''}
+                        lg:${(index + 1) % 4 === 0 ? 'border-r' : ''}
+                        lg:${(index + 1) % 6 === 0 ? 'border-r-0' : ''}
+                        xl:${(index + 1) % 6 === 0 ? 'border-r' : ''}
+                        xl:${(index + 1) % 8 === 0 ? 'border-r-0' : ''}
+                      `}
+                    >
+                      {/* 초성 강조 배지 - 부드러운 컬러로 변경 */}
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="flex items-center justify-center size-5 bg-primary/10 text-primary text-[11px] font-black rounded-md">{initial}</span>
+                        <div className="h-px flex-1 bg-slate-100"></div>
+                      </div>
+                      <div className="space-y-1">
+                        {groupedPublishers[initial].map(pub => (
+                          <div 
+                            key={pub}
+                            onClick={() => handleMediaChange(pub)}
+                            className="flex items-center justify-between py-1 cursor-pointer group hover:bg-slate-50/80 px-1 rounded transition-colors"
+                          >
+                            <span className={`text-[12px] transition-colors ${
+                              selectedMedia.includes(pub) ? 'font-bold text-slate-900' : 'text-slate-500 font-medium group-hover:text-slate-800'
+                            }`}>
+                              {pub}
+                            </span>
+                            <div className={`size-3.5 rounded border transition-all flex items-center justify-center ${
+                              selectedMedia.includes(pub) 
+                                ? 'bg-primary border-primary' 
+                                : 'bg-white border-slate-200 group-hover:border-slate-300'
+                            }`}>
+                              {selectedMedia.includes(pub) && (
+                                <span className="material-symbols-outlined text-white text-[10px] font-bold">check</span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+
+              {/* 푸터 영역: 버튼 크기 줄이고 우측 정렬 */}
+              <div className="mt-3 flex justify-end">
+                <button 
+                  onClick={onClose}
+                  className="px-6 py-1.5 bg-primary text-white shadow-sm rounded-lg font-bold text-[12px] tracking-tight hover:bg-primary/90 transition-all"
+                >
+                  적용하기
+                </button>
               </div>
             </div>
-
-            <button 
-              onClick={onClose}
-              className="mt-10 w-full py-3 bg-primary/5 text-primary border-2 border-primary/40 rounded-full font-bold text-[13px] tracking-tight hover:bg-primary/10 transition-all active:scale-[0.98]"
-            >
-              선택 완료
-            </button>
           </motion.div>
         </>
       )}

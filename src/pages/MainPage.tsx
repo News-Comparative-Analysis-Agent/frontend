@@ -113,31 +113,31 @@ const MainPage = () => {
         <LoginModal isOpen={!isLoggedIn} />
 
         {/* 우측 스티키 내비게이션 (Scroll Spy) */}
-        <aside className="hidden xl:block fixed right-5 2xl:right-10 top-1/2 -translate-y-1/2 z-30">
-          <div className="flex flex-col gap-8 items-center pl-4">
+        <aside className="hidden xl:block fixed right-2 2xl:right-4 top-1/2 -translate-y-1/2 z-30">
+          <div className="flex flex-col gap-8 items-end">
             <div 
               onClick={() => scrollToSection('section-common')}
-              className="group cursor-pointer flex items-center justify-end w-40 relative"
+              className="group cursor-pointer flex items-center justify-end w-auto relative"
             >
-              <span className={`mr-4 text-[13px] font-normal transition-all duration-500 ${activeSection === 'common' ? 'text-slate-900 opacity-100 translate-x-0' : 'text-slate-400 opacity-0 translate-x-2'}`}>
+              <span className={`mr-1.5 text-[11px] font-medium transition-all duration-500 ${activeSection === 'common' ? 'text-slate-900 opacity-100 translate-x-0' : 'text-slate-400 opacity-0 translate-x-2'}`}>
                 언론사 공통
               </span>
               <div className="relative flex items-center justify-center">
-                <div className={`transition-all duration-500 rounded-full border ${activeSection === 'common' ? 'size-6 border-primary/30' : 'size-0 border-slate-900/20'}`}></div>
-                <div className={`absolute rounded-full transition-all duration-300 ${activeSection === 'common' ? 'size-1.5 bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]' : 'size-1.5 bg-slate-300 group-hover:bg-slate-400'}`}></div>
+                <div className={`transition-all duration-500 rounded-full border ${activeSection === 'common' ? 'size-5 border-primary/30' : 'size-0 border-slate-900/20'}`}></div>
+                <div className={`absolute rounded-full transition-all duration-300 ${activeSection === 'common' ? 'size-1 bg-primary shadow-[0_0_6px_rgba(var(--primary-rgb),0.4)]' : 'size-1 bg-slate-300 group-hover:bg-slate-400'}`}></div>
               </div>
             </div>
 
             <div 
               onClick={() => scrollToSection('section-publisher')}
-              className="group cursor-pointer flex items-center justify-end w-40 relative"
+              className="group cursor-pointer flex items-center justify-end w-auto relative"
             >
-              <span className={`mr-4 text-[13px] font-normal transition-all duration-500 ${activeSection === 'publisher' ? 'text-slate-900 opacity-100 translate-x-0' : 'text-slate-400 opacity-0 translate-x-2'}`}>
+              <span className={`mr-1.5 text-[11px] font-medium transition-all duration-500 ${activeSection === 'publisher' ? 'text-slate-900 opacity-100 translate-x-0' : 'text-slate-400 opacity-0 translate-x-2'}`}>
                 각 언론사별
               </span>
               <div className="relative flex items-center justify-center">
-                <div className={`transition-all duration-500 rounded-full border border-slate-900/20 ${activeSection === 'publisher' ? 'size-6' : 'size-0'}`}></div>
-                <div className={`absolute rounded-full transition-all duration-300 ${activeSection === 'publisher' ? 'size-1.5 bg-slate-900' : 'size-1.5 bg-slate-300 group-hover:bg-slate-400'}`}></div>
+                <div className={`transition-all duration-500 rounded-full border border-slate-900/20 ${activeSection === 'publisher' ? 'size-5' : 'size-0'}`}></div>
+                <div className={`absolute rounded-full transition-all duration-300 ${activeSection === 'publisher' ? 'size-1 bg-slate-900' : 'size-1 bg-slate-300 group-hover:bg-slate-400'}`}></div>
               </div>
             </div>
           </div>

@@ -47,6 +47,48 @@ const DraftingEditorArea = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [activeCitation]);
 
+  // 💡 인용 마커 수정 방지 로직 (MutationObserver를 이용한 실시간 강제 부여)
+  useEffect(() => {
+    if (!editorRef.current) return;
+
+    const enforceNonEditable = () => {
+      const markers = editorRef.current?.querySelectorAll('.citation-marker');
+      markers?.forEach(marker => {
+        // 💡 오염된 내용 자가 치유 로직 (숫자 이외의 문자 제거)
+        const currentText = marker.textContent || "";
+        // 숫자가 포함되어 있고, 형식이 [숫자]가 아니거나 이상한 문자가 섞인 경우
+        if (currentText && /[^0-9[\]]/.test(currentText)) {
+          const numbers = currentText.replace(/[^0-9]/g, "");
+          if (numbers) {
+            marker.textContent = `[${numbers}]`;
+            // 수정 후 에디터 입력 이벤트 발생시켜 저장 유도
+            setTimeout(() => handleEditorInput(), 0);
+          }
+        }
+
+        if (marker.getAttribute('contenteditable') !== 'false') {
+          marker.setAttribute('contenteditable', 'false');
+        }
+      });
+    };
+
+    // 초기 마커 처리
+    enforceNonEditable();
+
+    // 실시간 감시 (사용자가 입력하는 중에도 강제 적용)
+    const observer = new MutationObserver((mutations) => {
+      enforceNonEditable();
+    });
+
+    observer.observe(editorRef.current, { 
+      childList: true, 
+      subtree: true,
+      characterData: true 
+    });
+
+    return () => observer.disconnect();
+  }, []); // 컴포넌트 마운트 시 한 번만 등록
+
   const handleEditorClick = (e: React.MouseEvent) => {
     if (isPreviewMode) return;
     const target = e.target as HTMLElement;

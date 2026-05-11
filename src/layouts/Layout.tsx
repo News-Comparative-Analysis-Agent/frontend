@@ -13,7 +13,7 @@ const Layout = ({ children, variant, activeStep, hideFooter, headerExtra }: Layo
   return (
     <div className={`flex flex-col ${hideFooter ? 'h-screen overflow-hidden' : 'min-h-screen bg-background'}`}>
       <Header variant={variant} activeStep={activeStep} headerExtra={headerExtra} />
-      <main className={`flex-1 relative flex flex-col ${hideFooter ? 'overflow-hidden' : ''}`}>
+      <main className={`flex-1 relative flex flex-col min-h-0 ${hideFooter ? 'overflow-hidden' : ''}`}>
         {children}
       </main>
       {!hideFooter && <Footer />}
