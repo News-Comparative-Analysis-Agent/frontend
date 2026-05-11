@@ -125,8 +125,8 @@ const DraftingPage = () => {
       <main className="flex-1 flex overflow-hidden min-h-0 relative">
         {/* 💡 기사 비교 가이드 배너 (팝업창이 왼쪽 50%를 가리므로, 오른쪽 50% 영역의 중앙인 75% 지점으로 배치) */}
         {showGuide && isCrossCheckMode && selectedQuote && (
-          <div className="absolute top-6 left-[75%] -translate-x-1/2 z-[100] animate-bounce-subtle pointer-events-none">
-            <div className="bg-slate-900/95 backdrop-blur-md text-white px-8 py-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col gap-3 border border-white/20 pointer-events-auto min-w-[450px]">
+          <div className="fixed top-28 inset-x-0 z-[100] animate-bounce-subtle pointer-events-none flex justify-center">
+            <div className="bg-slate-900/95 backdrop-blur-md text-white px-8 py-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col gap-3 border border-white/20 pointer-events-auto w-[90%] max-w-[450px]">
               <div className="flex items-center gap-5">
                 <div className="size-10 rounded-full bg-primary/20 text-primary flex items-center justify-center shadow-inner">
                   <span className="material-symbols-outlined text-[24px]">lightbulb</span>
