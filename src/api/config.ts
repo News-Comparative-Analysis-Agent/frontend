@@ -5,4 +5,5 @@
 export const API_BASE_URL =
   (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:8000';
 
-export const REQUEST_TIMEOUT_MS = 10_000; // 10초
+export const API_TIMEOUT = 60000 // 60s (로컬 LLM 지연 고려)
+export const REQUEST_TIMEOUT_MS = API_TIMEOUT;
