@@ -50,8 +50,8 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
         </div>
       </div>
 
-      {/* 이슈 타임라인 영역 - 하단 논조 카드와 동일한 420px 너비 적용 */}
-      <div className="w-full md:w-[380px] lg:w-[420px] shrink-0 bg-white border border-slate-100 rounded-[32px] p-6 shadow-premium">
+      {/* 이슈 타임라인 영역 - 하단 논조 카드와 균형을 맞추기 위해 너비 조정 */}
+      <div className="w-full md:w-[320px] lg:w-[360px] shrink-0 bg-white border border-slate-100 rounded-[32px] p-6 shadow-premium">
         <div className="flex items-center gap-3 mb-8">
           <div className="flex items-center justify-center size-8 bg-primary rounded-full shadow-sm shadow-primary/20">
             <span className="material-symbols-outlined text-[18px] text-white">calendar_today</span>

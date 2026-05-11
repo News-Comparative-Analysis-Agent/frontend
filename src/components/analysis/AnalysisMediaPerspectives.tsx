@@ -61,7 +61,7 @@ const AnalysisMediaPerspectives = ({
       <div className="relative group">
         <div className="flex gap-6 overflow-x-auto pb-8 pt-0 no-scrollbar scroll-smooth">
           {flattenedOpinions.filter(o => activeMedia === 'all' || o.media === activeMedia).map((o, idx) => (
-            <div key={`${o.media}-${idx}`} className="min-w-[380px] w-[380px] md:min-w-[420px] md:w-[420px] flex-shrink-0">
+            <div key={`${o.media}-${idx}`} className="min-w-[340px] w-[340px] md:min-w-[380px] md:w-[380px] flex-shrink-0">
               <OpinionCard 
                 media={o.media}
                 color={o.color}

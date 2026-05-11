@@ -28,7 +28,7 @@ const AnalysisHeader = ({ title, issueImage, mediaRatio, handleImageLoad }: Anal
       </div>
 
       {/* 타이틀 영역 */}
-      <div className="relative z-10 flex flex-col gap-2 w-[55%] px-10 py-6 h-full justify-center">
+      <div className="relative z-10 flex flex-col gap-2 w-[70%] px-10 py-6 h-full justify-center">
         <SectionHeader 
           title={title} 
           badge="현재 단계 : 심층 분석"
