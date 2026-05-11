@@ -345,7 +345,7 @@ const SearchResultsPage = () => {
                                       <div 
                                         key={article.id}
                                         className="group/item flex gap-3 p-3 transition-colors items-center relative cursor-pointer hover:bg-slate-50"
-                                        onClick={() => window.open(article.url, '_blank')}
+                                        onClick={() => window.open(article.link, '_blank')}
                                         title="기사 원문 보기"
                                       >
                                         <div className="flex-1 min-w-0 flex flex-col gap-1 text-left">
