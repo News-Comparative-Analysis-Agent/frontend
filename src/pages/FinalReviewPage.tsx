@@ -131,12 +131,7 @@ const FinalReviewPage = () => {
                 {resolvedTitle}
               </h2>
               
-              {reviewData?.description && (
-                <div className="text-primary font-medium text-lg md:text-xl mb-8 leading-snug break-keep flex items-start gap-1">
-                  <span className="shrink-0">[기고]</span>
-                  <span>{reviewData.description}</span>
-                </div>
-              )}
+              {/* 이슈 요약 섹션 제거됨 */}
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-8 text-slate-800 text-[13px] font-light">
                 <div className="flex items-center gap-2">

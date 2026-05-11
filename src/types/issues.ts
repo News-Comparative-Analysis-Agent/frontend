@@ -1,3 +1,8 @@
+export interface ArticleBasicInfo {
+  title: string;
+  publisher: string;
+}
+
 export interface DailyIssue {
   id: number;
   name: string;
@@ -7,6 +12,7 @@ export interface DailyIssue {
   created_at: string;
   image_urls: string[];
   issue_type: 'politics' | 'editorial';
+  articles?: ArticleBasicInfo[];
   // 차트아웃 관련 필드 (선택적)
   is_chart_out?: boolean;
   peak_rank?: number | null;

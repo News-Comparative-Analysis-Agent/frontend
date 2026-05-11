@@ -254,14 +254,10 @@ const PopularIssuesSection = ({
                                 {issue.name}
                               </h6>
                               <div className="flex flex-col gap-1 mt-0.5 pt-1.5 border-t border-slate-50">
-                                {[
-                                  { title: `${issue.name} 관련 긴급 뉴스...`, press: '연합뉴스' },
-                                  { title: `실시간 이슈 리포트: ${issue.name}`, press: 'KBS' },
-                                  { title: `주요 언론사별 분석 데이터 요약`, press: 'MBC' }
-                                ].map((art, artIdx) => (
+                                {(issue.articles || []).slice(0, 3).map((art, artIdx) => (
                                   <div key={artIdx} className="flex items-center gap-2 group/art overflow-hidden py-0.5">
                                     <span className="shrink-0 text-[9px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 group-hover/art:border-primary/20 group-hover/art:text-primary transition-colors">
-                                      {art.press}
+                                      {art.publisher}
                                     </span>
                                     <p className="text-[11px] text-slate-600 font-medium truncate group-hover/art:text-primary transition-colors">
                                       {art.title}
