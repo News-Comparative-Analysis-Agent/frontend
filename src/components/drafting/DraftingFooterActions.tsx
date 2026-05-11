@@ -37,7 +37,6 @@ const DraftingFooterActions = ({ lastSaved, isSaving, saveDraft, onFinalReview, 
   }, [lastSaved, prevLastSaved]);
 
   return (
-<<<<<<< Updated upstream
     <footer className="h-16 md:h-20 border-t border-slate-200 bg-white px-4 md:px-8 flex items-center justify-between z-30 shrink-0 shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.03)] overflow-hidden">
       {showToast && (
         <Toast 
@@ -78,11 +77,6 @@ const DraftingFooterActions = ({ lastSaved, isSaving, saveDraft, onFinalReview, 
           className="h-9 md:h-12 px-6 md:px-10 text-[12px] md:text-base font-bold shadow-lg hover:shadow-primary/20 transition-all"
         >
           <span>검토 이동</span>
-        </Button>
-      </div>
-    </footer>
-        >
-          <span className="font-bold">검토 이동</span>
         </Button>
       </div>
     </footer>
