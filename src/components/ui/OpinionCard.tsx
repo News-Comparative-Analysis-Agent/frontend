@@ -15,6 +15,9 @@ interface OpinionCardProps {
  * StanceBadge와 연동되어 일관된 디자인을 유지합니다.
  */
 const OpinionCard = ({ media, color = 'slate', title, analysisTitle, description, sources }: OpinionCardProps) => {
+  const [isExpanded, setIsExpanded] = React.useState(false)
+  const isLongText = description.length > 180
+
   const innerBoxStyles = {
     indigo: 'bg-indigo-50/40 border-indigo-100',
     violet: 'bg-violet-50/40 border-violet-100',
@@ -30,8 +33,20 @@ const OpinionCard = ({ media, color = 'slate', title, analysisTitle, description
       </StanceBadge>
       <h4 className="text-[15.5px] font-semibold text-slate-800 leading-[1.4] mt-0.5 mb-2.5" dangerouslySetInnerHTML={{ __html: title }}></h4>
       <div className={`inner-analysis-box ${innerBoxStyles[color]}`}>
-        <div className="font-bold text-slate-800 text-[14px] mb-2">{analysisTitle}</div>
-        <p className="text-[13.5px] text-slate-600 leading-relaxed font-normal">{description}</p>
+        <div className="flex items-center justify-between mb-2">
+          <div className="font-bold text-slate-800 text-[14px]">{analysisTitle}</div>
+          {isLongText && (
+            <button 
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full hover:bg-primary/20 transition-colors"
+            >
+              {isExpanded ? '접기' : '전체보기'}
+            </button>
+          )}
+        </div>
+        <div className={`text-[14px] text-slate-700 leading-[1.8] font-normal transition-all duration-300 ${!isExpanded && isLongText ? 'line-clamp-4' : ''}`}>
+          {description}
+        </div>
       </div>
       <details className="notion-toggle w-full">
         <summary className="notion-toggle-header">

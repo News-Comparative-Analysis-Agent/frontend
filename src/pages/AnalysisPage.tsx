@@ -83,7 +83,7 @@ const AnalysisPage = () => {
             handleImageLoad={handleImageLoad}
           />
 
-          {/* 2. 이슈 배경 상세 및 매체 비율 */}
+          {/* 2. 이슈 상세 분석 및 매체 비율 */}
           <AnalysisBackground 
             description={viewModel.description}
             background={viewModel.background}
