@@ -87,10 +87,10 @@ const PopularIssuesSection = ({
         >
           <div className="flex flex-col mb-0 w-full">
             {/* 헤더: 타이틀(좌) + 달력(중) + 검색바(우) */}
-        <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between w-full mb-6 lg:mb-2 mt-2 gap-6 md:gap-0 min-h-[100px]">
+        <div className="relative flex flex-col md:flex-row items-start md:items-center w-full mb-4 lg:mb-1 mt-1 gap-6 md:gap-0 min-h-[80px]">
           
-          {/* [좌측 정렬 영역] 타이틀 + 안내문구 */}
-          <div className="flex flex-col justify-center z-10 w-full md:w-1/2 lg:w-1/3 gap-1.5 lg:gap-2 text-left pl-1 py-1">
+          {/* [좌측 영역] 타이틀 + 안내문구 */}
+          <div className="flex flex-col justify-center z-10 w-full md:w-auto md:flex-1 gap-1.5 lg:gap-2 text-left pl-1 py-1">
             <h2 className="text-slate-800 text-[17px] lg:text-[18px] xl:text-[19px] font-bold tracking-tight whitespace-nowrap">
               언론사 공통으로 다루는 인기 뉴스에요
             </h2>
@@ -103,60 +103,56 @@ const PopularIssuesSection = ({
             </div>
           </div>
 
-          {/* [가운데/우측 영역] 달력 + 검색바 */}
-          <div className="flex flex-1 items-center justify-between gap-4 w-full">
+          {/* [가운데 영역] 달력 (절대 중앙 정렬) */}
+          <div className="flex justify-center w-full md:w-auto md:absolute md:left-1/2 md:-translate-x-1/2 z-20">
+            <CompactHeaderCalendar 
+              selectedDate={selectedDate}
+              onDateChange={onDateChange}
+              isWhite={true}
+            />
+          </div>
+
+          {/* [우측 영역] 검색바 */}
+          <div className="hidden lg:flex flex-col items-end justify-center gap-1 md:flex-1 shrink-0 z-10">
+            <span className="hidden xl:block text-[12px] font-bold text-primary/60 px-1 uppercase tracking-wider">찾는 뉴스가 있으신가요?</span>
             
-            {/* 콤팩트 달력 영역 */}
-            <div className="flex-1 flex justify-center min-w-0">
-              <CompactHeaderCalendar 
-                selectedDate={selectedDate}
-                onDateChange={onDateChange}
-                isWhite={true}
+            <div className="w-full max-w-[320px] md:max-w-none md:w-[240px] xl:w-[280px] shrink-0 relative group">
+              <input
+                className="w-full pl-9 pr-12 py-2.5 xl:py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/30 transition-all bg-white shadow-sm placeholder:text-slate-400 font-medium text-[12px] text-slate-700"
+                placeholder="원하는 기사를 검색해보세요!"
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
               />
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-slate-400">search</span>
+              <button
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-[10px] font-black text-primary hover:bg-primary/5 rounded-lg transition-colors border border-primary/20"
+                onClick={handleInternalSearch}
+              >
+                GO
+              </button>
             </div>
 
-            {/* 검색바 영역 */}
-            <div className="hidden lg:flex flex-col items-end justify-center gap-1 shrink-0">
-              <span className="hidden xl:block text-[12px] font-bold text-primary/60 px-1 uppercase tracking-wider">찾는 뉴스가 있으신가요?</span>
-              
-              <div className="w-full max-w-[320px] md:max-w-none md:w-[240px] xl:w-[280px] shrink-0 relative group">
-                <input
-                  className="w-full pl-9 pr-12 py-2.5 xl:py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/30 transition-all bg-white shadow-sm placeholder:text-slate-400 font-medium text-[12px] text-slate-700"
-                  placeholder="원하는 기사를 검색해보세요!"
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-slate-400">search</span>
-                <button
-                  className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-[10px] font-black text-primary hover:bg-primary/5 rounded-lg transition-colors border border-primary/20"
-                  onClick={handleInternalSearch}
-                >
-                  GO
-                </button>
-              </div>
-
-              {/* 검색 히스토리 (md 이상에서 우측 정렬 노출) */}
-              <div className="hidden md:flex items-center gap-1.5 overflow-hidden max-w-[240px] xl:max-w-[280px] px-1 h-3.5 mt-0.5">
-                <span className="text-[9px] font-bold text-slate-400 shrink-0">RECENT</span>
-                <div className="flex gap-1 overflow-x-auto no-scrollbar">
-                  {recentSearches.map((term, i) => (
-                    <div
-                      key={i}
-                      onClick={() => handleHistoryClick(term)}
-                      className="flex items-center gap-1 px-1.5 py-0 bg-slate-50 border border-slate-100 rounded-md cursor-pointer hover:border-primary/20 group transition-all shrink-0"
+            {/* 검색 히스토리 */}
+            <div className="hidden md:flex items-center gap-1.5 overflow-hidden max-w-[240px] xl:max-w-[280px] px-1 h-3.5 mt-0.5">
+              <span className="text-[9px] font-semibold text-slate-400 shrink-0">RECENT</span>
+              <div className="flex gap-1 overflow-x-auto no-scrollbar">
+                {recentSearches.map((term, i) => (
+                  <div
+                    key={i}
+                    onClick={() => handleHistoryClick(term)}
+                    className="flex items-center gap-1 px-1.5 py-0 bg-slate-50 border border-slate-100 rounded-md cursor-pointer hover:border-primary/20 group transition-all shrink-0"
+                  >
+                    <span className="text-[9px] font-medium text-slate-500 group-hover:text-primary whitespace-nowrap">{term} Term</span>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); removeSearch(e, term); }}
+                      className="text-slate-300 hover:text-rose-400 flex items-center"
                     >
-                      <span className="text-[9px] font-medium text-slate-500 group-hover:text-primary whitespace-nowrap">{term}</span>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); removeSearch(e, term); }}
-                        className="text-slate-300 hover:text-rose-400 flex items-center"
-                      >
-                        <span className="material-symbols-outlined text-[10px]">close</span>
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                      <span className="material-symbols-outlined text-[10px]">close</span>
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

@@ -30,6 +30,7 @@
   html {
     /* 원활한 소수 화면 너비 강제 - 다양한 해상도/배율에서 레이아웃 깨짐 방지 */
     min-width: 360px;
+    scrollbar-gutter: stable;
   }
 
   body {

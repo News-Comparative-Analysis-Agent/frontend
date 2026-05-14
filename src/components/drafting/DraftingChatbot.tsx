@@ -45,20 +45,20 @@ const DraftingChatbot = ({
     <>
       <div 
         id="sidebar-resize-handle"
-        className={`w-1 cursor-col-resize border-l border-slate-200 hover:bg-primary z-40 relative ${isResizing ? 'bg-primary' : ''} ${!isOpen ? 'hidden' : ''}`}
+        className={`w-1 cursor-col-resize hover:bg-primary z-40 relative ${isResizing ? 'bg-primary' : ''} ${!isOpen ? 'hidden' : 'border-l border-slate-200'}`}
         onMouseDown={onMouseDown}
       />
 
       <aside 
         id="chatbot-sidebar"
-        className={`border-l border-slate-200 flex flex-col bg-white shrink-0 overflow-hidden ${isResizing ? '' : 'transition-all duration-300'} ${!isOpen ? '!w-0 !border-none' : ''}`}
+        className={`flex flex-col bg-white shrink-0 overflow-hidden ${isResizing ? '' : 'transition-all duration-300'} ${isOpen ? 'border-l border-slate-200 shadow-xl' : 'w-0 border-none'}`}
         style={{ width: isOpen ? `${width}px` : '0px' }}
       >
         <div className="flex-1 flex flex-col overflow-hidden text-left">
-          <div className="p-4 border-b border-slate-100 bg-white flex items-center justify-between">
+          <div className="py-2.5 px-4 border-b border-slate-100 bg-white flex items-center justify-between">
             <h3 className="font-bold text-[14.5px] tracking-tight flex items-center gap-2.5 text-slate-800">
               <div className="size-8 rounded-full bg-primary text-white flex items-center justify-center shadow-sm">
-                <span className="material-symbols-outlined icon-md">forum</span>
+                <span className="material-symbols-outlined icon-md">smart_toy</span>
               </div>
               AI ChatBot
             </h3>
@@ -237,10 +237,10 @@ const DraftingChatbot = ({
             <div ref={chatEndRef} />
           </div>
 
-          <div className="p-3 border-t border-slate-100 bg-white">
+          <div className="p-2 border-t border-slate-100 bg-white">
             <div className="relative">
               <input 
-                className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 pr-12 text-[14px] outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary transition-all shadow-sm placeholder:text-slate-400 disabled:opacity-50" 
+                className="w-full bg-white border border-slate-200 rounded-xl py-2 px-4 pr-12 text-[14px] outline-none focus:ring-4 focus:ring-primary/15 focus:border-primary transition-all shadow-sm placeholder:text-slate-400 disabled:opacity-50" 
                 placeholder={isChatLoading ? "AI가 생각 중입니다..." : "AI와 대화하여 기사 작성..."}
                 type="text" 
                 value={inputMessage}

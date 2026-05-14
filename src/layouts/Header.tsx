@@ -68,22 +68,22 @@ const Header = ({ variant = 'primary', activeStep, headerExtra }: HeaderProps) =
         )}
       </div>
 
-      <nav className="hidden md:flex flex-1 justify-center items-center min-w-0 px-2">
+      <nav className="hidden md:flex flex-1 items-center justify-center min-w-0 px-2">
         {activeIssueType === 'politics' && activeStep ? (
           null
         ) : activeStep ? (
           <StepNavigation steps={[...STEPS]} activeStep={activeStep} />
         ) : (
-          <div className="flex items-center gap-2 lg:gap-4 w-full justify-center">
-            {/* 메인 페이지 전용 전역 탭 */}
-            <div className={`flex items-center gap-0.5 p-1 rounded-xl border transition-all ${
-              isWhite ? 'bg-slate-100/50 border-slate-200' : 'bg-white/10 border-white/10'
+          <div className="flex items-center justify-center w-full">
+            {/* 메인 페이지 전용 전역 탭 - 달력과 동일한 260px 고정 너비 적용 */}
+            <div className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-0.5 p-1 rounded-xl border transition-all w-[260px] ${
+              isWhite ? 'bg-slate-100/50 border-slate-200 shadow-inner' : 'bg-white/10 border-white/10'
             }`}>
               <button
                 onClick={() => setActiveIssueType('politics')}
-                className={`px-3 lg:px-6 py-1.5 rounded-lg text-[12px] lg:text-[13px] font-medium transition-all flex items-center gap-1.5 lg:gap-2 ${
+                className={`flex-1 py-1.5 rounded-lg text-[12px] lg:text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 lg:gap-2 ${
                   activeIssueType === 'politics' 
-                    ? (isWhite ? 'bg-white text-slate-900 shadow-sm' : 'bg-white text-slate-900 shadow-lg scale-105')
+                    ? (isWhite ? 'bg-white text-primary shadow-md' : 'bg-white text-slate-900 shadow-lg scale-105')
                     : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
                 }`}
               >
@@ -92,9 +92,9 @@ const Header = ({ variant = 'primary', activeStep, headerExtra }: HeaderProps) =
               </button>
               <button
                 onClick={() => setActiveIssueType('editorial')}
-                className={`px-3 lg:px-6 py-1.5 rounded-lg text-[12px] lg:text-[13px] font-medium transition-all flex items-center gap-1.5 lg:gap-2 ${
+                className={`flex-1 py-1.5 rounded-lg text-[12px] lg:text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 lg:gap-2 ${
                   activeIssueType === 'editorial' 
-                    ? (isWhite ? 'bg-white text-slate-900 shadow-sm' : 'bg-white text-slate-900 shadow-lg scale-105')
+                    ? (isWhite ? 'bg-white text-primary shadow-md' : 'bg-white text-slate-900 shadow-lg scale-105')
                     : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
                 }`}
               >

@@ -48,13 +48,13 @@ const DraftingLeftSidebar = ({
   return (
     <aside 
       id="left-sidebar"
-      className={`border-r border-slate-200 flex flex-col bg-slate-50/50 shrink-0 overflow-hidden transition-all duration-300 relative group min-h-0 ${
-        isOpen ? 'w-72' : '!w-0 !border-none'
+      className={`flex flex-col bg-slate-50/50 shrink-0 overflow-hidden transition-all duration-300 relative group min-h-0 ${
+        isOpen ? 'w-72 border-r border-slate-200' : 'w-0 border-none'
       }`}
     >
       <div className="flex-1 flex flex-col overflow-hidden">
         <div 
-          className="p-4 border-b bg-white border-slate-200 flex items-center justify-between overflow-hidden shrink-0"
+          className="py-2.5 px-4 border-b bg-white border-slate-200 flex items-center justify-between overflow-hidden shrink-0"
         >
           <div className="flex items-center gap-2.5 overflow-hidden">
             <div className="size-8 rounded-full flex items-center justify-center bg-primary text-white shadow-md shrink-0">
@@ -64,9 +64,6 @@ const DraftingLeftSidebar = ({
               <h2 className="font-bold text-[14.5px] tracking-tight text-slate-800 whitespace-nowrap">
                 Cross-Check
               </h2>
-              <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed font-medium">
-                원문 기사를 비교하며<br />초안의 팩트를 체크해보세요
-              </p>
             </div>
           </div>
           

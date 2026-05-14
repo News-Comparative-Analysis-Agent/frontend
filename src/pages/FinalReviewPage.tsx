@@ -183,7 +183,7 @@ const FinalReviewPage = () => {
 
         <aside className="w-full md:w-[320px] lg:w-[420px] border-t md:border-t-0 md:border-l border-slate-200 bg-slate-50 shadow-[-10px_0_30px_-15px_rgba(0,0,0,0.05)] shrink-0 md:h-full overflow-y-auto custom-scrollbar select-none text-left z-10">
           {/* 고정 타이틀 바 */}
-          <div className="sticky top-0 z-30 bg-white px-4 py-6 mb-2">
+          <div className="sticky top-0 z-30 bg-white px-4 py-4 mb-2">
               <div className="flex items-center gap-2 relative">
                 <h2 className="text-[22px] font-bold text-slate-800 tracking-tight leading-none">
                   최종 검토 결과
@@ -340,8 +340,7 @@ const FinalReviewPage = () => {
         <div className="flex items-center gap-3 flex-1 min-w-0 mr-4">
           <div className="size-2.5 rounded-full bg-slate-300 shrink-0"></div>
           <div className="flex flex-col min-w-0 text-left">
-            <p className="text-[13px] md:text-[15px] font-bold text-slate-800 tracking-tight leading-tight">최종 검토 중</p>
-            <p className="hidden sm:block text-[11px] md:text-[12px] text-slate-500 font-medium tracking-tight mt-0.5 truncate">발행 시 실제 뉴스 사이트에 적용될 레이아웃입니다.</p>
+            <p className="hidden sm:block text-[13px] md:text-[15px] text-slate-600 font-medium tracking-tight truncate">발행 시 실제 뉴스 사이트에 적용될 레이아웃입니다.</p>
           </div>
         </div>
         <div className="flex items-center gap-2 md:gap-3 shrink-0">

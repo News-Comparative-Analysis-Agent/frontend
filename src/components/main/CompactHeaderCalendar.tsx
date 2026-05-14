@@ -15,17 +15,26 @@ const CompactHeaderCalendar: React.FC<CompactHeaderCalendarProps> = ({ selectedD
   const month = selectedDate.getMonth() + 1;
   const day = selectedDate.getDate();
 
-  // 외부 클릭 시 닫기
+  // [페이지 스크롤 제어 및 외부 클릭 감지]
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setActivePicker(null);
       }
     };
+
     if (activePicker) {
       document.addEventListener('mousedown', handleClickOutside);
+      // 피커가 열려있을 때 페이지 스크롤 방지
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
   }, [activePicker]);
 
   const handleValueChange = (mode: 'year' | 'month' | 'day', value: number) => {
@@ -77,23 +86,27 @@ const CompactHeaderCalendar: React.FC<CompactHeaderCalendarProps> = ({ selectedD
             }}
             transition={{ type: 'spring', damping: 30, stiffness: 400 }}
             className={`
-              absolute top-0 left-0 right-0 overflow-hidden rounded-xl border
-              ${isWhite ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-800 border-white/20 text-white'}
-              ${isActive ? 'border-primary ring-4 ring-primary/10 shadow-2xl' : 'hover:border-primary/50 hover:bg-primary/5 shadow-sm'}
+              absolute top-0 left-0 right-0 overflow-hidden rounded-lg transition-all border
+              ${isWhite 
+                ? (isActive ? 'bg-white shadow-md border-primary/30' : 'bg-white border-slate-200 text-slate-700 hover:border-primary/40 hover:bg-slate-50/50 shadow-sm') 
+                : 'bg-slate-800 border-white/20 text-white'
+              }
               cursor-pointer select-none
             `}
             onClick={() => !isActive && setActivePicker(mode)}
           >
-            <div className="h-[42px] flex items-center justify-center font-bold text-[17px] shrink-0">
-              {isActive ? <span className="text-primary font-black scale-110">{value}</span> : value}
+            <div className={`h-[42px] flex items-center justify-center font-bold text-[16px] shrink-0 transition-colors duration-200 ${
+              isActive ? 'text-primary font-black' : 'text-slate-700'
+            }`}>
+              {value}
             </div>
 
             {isActive && (
               <div 
                 ref={scrollRef}
-                className="h-[158px] overflow-y-auto no-scrollbar snap-y snap-mandatory flex flex-col items-center pb-10"
+                className="h-[158px] overflow-y-auto no-scrollbar snap-y snap-mandatory flex flex-col items-center"
               >
-                <div className="h-[59px] shrink-0" />
+                <div className="h-6 shrink-0" />
                 {items.map((item) => (
                   <div
                     key={`${mode}-${item}`}
@@ -102,21 +115,21 @@ const CompactHeaderCalendar: React.FC<CompactHeaderCalendarProps> = ({ selectedD
                       e.stopPropagation();
                       handleValueChange(mode, item);
                     }}
-                    className={`h-10 flex items-center justify-center shrink-0 snap-center w-full transition-colors ${
-                      value === item ? 'bg-primary/5 text-primary text-[20px] font-black' : 'text-slate-400 text-[16px] font-medium hover:text-slate-700 hover:bg-slate-50/50'
+                    className={`h-8 flex items-center justify-center shrink-0 snap-center w-full transition-colors ${
+                      value === item ? 'bg-primary/5 text-primary text-[17px] font-black' : 'text-slate-400 text-[14px] font-medium hover:text-slate-700 hover:bg-slate-50/50'
                     }`}
                   >
                     {item}
                   </div>
                 ))}
-                <div className="h-[59px] shrink-0" />
+                <div className="h-6 shrink-0" />
               </div>
             )}
 
             {isActive && (
               <>
-                <div className={`absolute top-[42px] left-0 right-0 h-10 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none z-10`} />
-                <div className={`absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10`} />
+                <div className={`absolute top-[42px] left-0 right-0 h-6 bg-gradient-to-b ${isWhite ? 'from-white via-white/80' : 'from-slate-800 via-slate-800/80'} to-transparent pointer-events-none z-10`} />
+                <div className={`absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t ${isWhite ? 'from-white via-white/80' : 'from-slate-800 via-slate-800/80'} to-transparent pointer-events-none z-10`} />
               </>
             )}
           </motion.div>
@@ -129,20 +142,19 @@ const CompactHeaderCalendar: React.FC<CompactHeaderCalendarProps> = ({ selectedD
     );
   };
 
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
+  const years = [2026];
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   return (
-    <div ref={containerRef} className={`flex items-start p-1.5 rounded-2xl border transition-all ${
-      isWhite ? 'bg-white/80 border-slate-200 shadow-sm' : 'bg-white/10 border-white/10'
+    <div ref={containerRef} className={`flex items-start p-1 rounded-xl border transition-all w-[260px] justify-between ${
+      isWhite ? 'bg-slate-100/50 border-slate-200 shadow-inner' : 'bg-white/10 border-white/10'
     }`}>
-      <div className="flex items-center gap-4 px-2">
-        <ExpandingBox mode="year" value={year} label="년" width="w-[72px]" items={years} />
-        <ExpandingBox mode="month" value={month} label="월" width="w-[52px]" items={months} />
-        <ExpandingBox mode="day" value={day} label="일" width="w-[52px]" items={days} />
+      <div className="flex items-center justify-between w-full px-1">
+        <ExpandingBox mode="year" value={year} label="년" width="w-[64px]" items={years} />
+        <ExpandingBox mode="month" value={month} label="월" width="w-[44px]" items={months} />
+        <ExpandingBox mode="day" value={day} label="일" width="w-[44px]" items={days} />
       </div>
     </div>
   );

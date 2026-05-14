@@ -270,7 +270,7 @@ const DraftingPage = () => {
             className="fixed top-1/2 -translate-y-1/2 right-0 z-40 bg-white pl-2.5 pr-1 py-5 rounded-l-2xl shadow-[-10px_0_30px_rgba(0,0,0,0.05)] text-primary hover:bg-orange-50 hover:pl-4 transition-all duration-300 group flex flex-col items-center gap-1.5"
             title="AI 챗봇 열기"
           >
-            <span className="material-symbols-outlined text-[22px]">chat_bubble</span>
+            <span className="material-symbols-outlined text-[22px]">smart_toy</span>
             <span className="[writing-mode:vertical-lr] text-[10px] font-black tracking-widest text-slate-400 group-hover:text-primary">AI CHAT</span>
           </button>
         )}
