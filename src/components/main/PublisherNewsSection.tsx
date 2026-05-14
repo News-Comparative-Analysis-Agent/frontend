@@ -20,16 +20,41 @@ const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168
 
 const PUBLISHER_LOGOS: Record<string, string> = {
   '경향신문': 'https://upload.wikimedia.org/wikipedia/commons/b/b2/Kyunghyang_Shinmun_logo.png',
-  '국민일보': 'https://upload.wikimedia.org/wikipedia/ko/6/60/Kookmin_Ilbo_logo.png',
-  '동아일보': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Dong-a_Ilbo_logo.svg/512px-Dong-a_Ilbo_logo.svg.png',
-  '조선일보': 'https://upload.wikimedia.org/wikipedia/ko/archive/5/5a/20121112023528%21Chosun_Ilbo_logo.png',
-  '중앙일보': 'https://static.joongang.co.kr/logo/joongang_logo.png',
+  '국민일보': 'https://news.kmib.co.kr/images/v2/logo_kmib.png',
+  '동아일보': 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Dong-A_Ilbo_logo.png',
+  '조선일보': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Chosun_Ilbo_logo.png/512px-Chosun_Ilbo_logo.png',
+  '중앙일보': 'https://upload.wikimedia.org/wikipedia/commons/2/2e/JoongAng_Ilbo_logo.png',
   '한겨레': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/The_Hankyoreh_logo.svg/512px-The_Hankyoreh_logo.svg.png',
-  '한국일보': 'https://www.hankookilbo.com/Common/Img/logo.png',
+  '한국일보': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Hankook_Ilbo_logo.svg/512px-Hankook_Ilbo_logo.svg.png',
   'JTBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/JTBC_logo.svg/512px-JTBC_logo.svg.png',
   'MBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/MBC_Logo_2005.svg/512px-MBC_Logo_2005.svg.png',
   'YTN': 'https://upload.wikimedia.org/wikipedia/commons/4/4b/YTN_Logo.svg',
 }
+
+// 로고 에러 상태 관리
+const PublisherLogo = ({ name }: { name: string }) => {
+  const [error, setError] = useState(false);
+  const logoUrl = PUBLISHER_LOGOS[name];
+
+  if (!logoUrl || error) {
+    return (
+      <div className="size-5 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
+        <span className="text-[10px] font-bold text-slate-400">{name[0]}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="size-5 rounded-full bg-white flex items-center justify-center overflow-hidden border border-slate-100">
+      <img 
+        src={logoUrl} 
+        alt="" 
+        className="w-full h-full object-contain p-0.5" 
+        onError={() => setError(true)}
+      />
+    </div>
+  );
+};
 
 const PublisherNewsSection = ({
   loading, error, newsData, activeIssueType, allPublishers, selectedMedia, selectedDate, onDateChange, handleMediaChange, filteredPublishers, onOpenFilter
@@ -140,13 +165,7 @@ const PublisherNewsSection = ({
                         onClick={() => toggleExpand(publisher)}
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          <div className="size-5 rounded-full bg-slate-100 flex-shrink-0 overflow-hidden border border-slate-100 flex items-center justify-center">
-                            {PUBLISHER_LOGOS[publisher] ? (
-                              <img src={PUBLISHER_LOGOS[publisher]} alt="" className="w-full h-full object-contain" />
-                            ) : (
-                              <span className="text-[10px] font-bold text-slate-400">{publisher[0]}</span>
-                            )}
-                          </div>
+                          <PublisherLogo name={publisher} />
                           <h4 className="text-[14px] font-semibold text-slate-800 truncate leading-none group-hover/header:text-primary transition-colors">
                             {publisher}
                           </h4>
