@@ -6,4 +6,4 @@ import { apiGet } from './fetchWithTimeout';
  * 언론사별 인기 뉴스를 가져오는 기능을 담당합니다.
  */
 export const fetchTopNewsByPublisher = () =>
-  apiGet<{ data: Record<string, Record<string, NewsArticle[]>> }>('/articles/grouped?days=7', '뉴스 데이터를 불러오는 데 실패했습니다');
+  apiGet<{ data: Record<string, Record<string, NewsArticle[]>> }>('/articles/grouped?days=30', '뉴스 데이터를 불러오는 데 실패했습니다');
