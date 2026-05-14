@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface CompactHeaderCalendarProps {
   selectedDate: Date;
@@ -7,78 +8,144 @@ interface CompactHeaderCalendarProps {
 }
 
 const CompactHeaderCalendar: React.FC<CompactHeaderCalendarProps> = ({ selectedDate, onDateChange, isWhite = false }) => {
-  const days = [];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const [activePicker, setActivePicker] = useState<'year' | 'month' | 'day' | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    days.push(date);
-  }
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth() + 1;
+  const day = selectedDate.getDate();
 
-  const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
+  // 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setActivePicker(null);
+      }
+    };
+    if (activePicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activePicker]);
 
-  const isSameDay = (d1: Date, d2: Date) =>
-    d1.getDate() === d2.getDate() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getFullYear() === d2.getFullYear();
+  const handleValueChange = (mode: 'year' | 'month' | 'day', value: number) => {
+    const newDate = new Date(selectedDate);
+    if (mode === 'year') newDate.setFullYear(value);
+    if (mode === 'month') newDate.setMonth(value - 1);
+    if (mode === 'day') newDate.setDate(value);
+    onDateChange(newDate);
+    setActivePicker(null);
+  };
 
-  const currentMonth = selectedDate.getMonth() + 1;
+  const ExpandingBox = ({ 
+    mode, 
+    value, 
+    label, 
+    width, 
+    items 
+  }: { 
+    mode: 'year' | 'month' | 'day', 
+    value: number, 
+    label: string, 
+    width: string,
+    items: number[]
+  }) => {
+    const isActive = activePicker === mode;
+    const scrollRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <div className={`flex items-center p-1.5 rounded-2xl border ${
-      isWhite ? 'bg-slate-100/50 border-slate-200' : 'bg-white/10 border-white/10'
-    }`}>
-      {/* 월(Month) 표시 영역 */}
-      <div className={`flex flex-col items-center justify-center pl-3 pr-4 mr-1.5 border-r ${isWhite ? 'border-slate-300/50' : 'border-white/20'}`}>
-        <span className={`text-[22px] lg:text-[28px] font-extrabold leading-none tracking-tight ${isWhite ? 'text-slate-800' : 'text-white'}`}>
-          {currentMonth}
-        </span>
-        <span className={`text-[9px] lg:text-[10px] font-bold tracking-[0.1em] mt-0.5 ${isWhite ? 'text-slate-500' : 'text-white/60'}`}>
-          월
+    // [최초 개방 시에만 딱 한 번 실행되는 스크롤 이동]
+    useEffect(() => {
+      if (isActive && scrollRef.current) {
+        const target = scrollRef.current;
+        // 마이크로태스크 큐를 사용하여 렌더링 후 정교하게 위치 포착
+        requestAnimationFrame(() => {
+          const activeItem = target.querySelector(`[data-value="${value}"]`);
+          if (activeItem) {
+            activeItem.scrollIntoView({ behavior: 'auto', block: 'center' });
+          }
+        });
+      }
+    }, [isActive]); // 오직 isActive가 변경될 때만 실행 (열릴 때 1회)
+
+    return (
+      <div className="flex items-center gap-2">
+        <div className={`relative ${width} h-[42px]`}>
+          <motion.div 
+            animate={{ 
+              height: isActive ? 200 : 42,
+              zIndex: isActive ? 100 : 1
+            }}
+            transition={{ type: 'spring', damping: 30, stiffness: 400 }}
+            className={`
+              absolute top-0 left-0 right-0 overflow-hidden rounded-xl border
+              ${isWhite ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-800 border-white/20 text-white'}
+              ${isActive ? 'border-primary ring-4 ring-primary/10 shadow-2xl' : 'hover:border-primary/50 hover:bg-primary/5 shadow-sm'}
+              cursor-pointer select-none
+            `}
+            onClick={() => !isActive && setActivePicker(mode)}
+          >
+            <div className="h-[42px] flex items-center justify-center font-bold text-[17px] shrink-0">
+              {isActive ? <span className="text-primary font-black scale-110">{value}</span> : value}
+            </div>
+
+            {isActive && (
+              <div 
+                ref={scrollRef}
+                className="h-[158px] overflow-y-auto no-scrollbar snap-y snap-mandatory flex flex-col items-center pb-10"
+              >
+                <div className="h-[59px] shrink-0" />
+                {items.map((item) => (
+                  <div
+                    key={`${mode}-${item}`}
+                    data-value={item}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleValueChange(mode, item);
+                    }}
+                    className={`h-10 flex items-center justify-center shrink-0 snap-center w-full transition-colors ${
+                      value === item ? 'bg-primary/5 text-primary text-[20px] font-black' : 'text-slate-400 text-[16px] font-medium hover:text-slate-700 hover:bg-slate-50/50'
+                    }`}
+                  >
+                    {item}
+                  </div>
+                ))}
+                <div className="h-[59px] shrink-0" />
+              </div>
+            )}
+
+            {isActive && (
+              <>
+                <div className={`absolute top-[42px] left-0 right-0 h-10 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none z-10`} />
+                <div className={`absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10`} />
+              </>
+            )}
+          </motion.div>
+        </div>
+        
+        <span className={`text-[14px] font-bold whitespace-nowrap shrink-0 ${isWhite ? 'text-slate-600' : 'text-white/70'}`}>
+          {label}
         </span>
       </div>
+    );
+  };
 
-      <div className="flex gap-0.5 lg:gap-1">
-        {days.map((date, idx) => {
-          const active = isSameDay(date, selectedDate);
-          const day = date.getDay();
-          const isSun = day === 0;
-          const isSat = day === 6;
-          
-          return (
-            <button
-              key={idx}
-              onClick={() => onDateChange(date)}
-              className={`
-                flex flex-col items-center justify-center w-[36px] h-[46px] lg:w-[46px] lg:h-[56px] rounded-xl transition-all
-                ${active 
-                  ? (isWhite ? 'bg-white shadow-sm border border-slate-200 text-primary' : 'bg-white shadow-sm border border-white/20 text-primary scale-105')
-                  : (isWhite ? 'hover:bg-white/50 text-slate-500' : 'hover:bg-white/10 text-white/60')
-                }
-              `}
-            >
-              <span className={`text-[10px] lg:text-[11px] font-medium leading-none mb-1 ${
-                active ? (isWhite ? 'text-primary' : 'text-primary') : 
-                isSun ? (isWhite ? 'text-rose-500' : 'text-rose-400') : 
-                isSat ? (isWhite ? 'text-blue-500' : 'text-blue-400') : 
-                (isWhite ? 'text-slate-400' : 'text-white/60')
-              }`}>
-                {daysOfWeek[day]}
-              </span>
-              <span className={`text-[14px] lg:text-[18px] font-bold leading-none ${
-                active ? (isWhite ? 'text-slate-900' : 'text-primary') : 
-                (isWhite ? 'text-slate-700' : 'text-white/80')
-              }`}>
-                {date.getDate()}
-              </span>
-            </button>
-          );
-        })}
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+  const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  return (
+    <div ref={containerRef} className={`flex items-start p-1.5 rounded-2xl border transition-all ${
+      isWhite ? 'bg-white/80 border-slate-200 shadow-sm' : 'bg-white/10 border-white/10'
+    }`}>
+      <div className="flex items-center gap-4 px-2">
+        <ExpandingBox mode="year" value={year} label="년" width="w-[72px]" items={years} />
+        <ExpandingBox mode="month" value={month} label="월" width="w-[52px]" items={months} />
+        <ExpandingBox mode="day" value={day} label="일" width="w-[52px]" items={days} />
       </div>
     </div>
   );
 };
 
-export default CompactHeaderCalendar;
+export default React.memo(CompactHeaderCalendar);

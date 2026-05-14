@@ -103,20 +103,20 @@ const PopularIssuesSection = ({
             </div>
           </div>
 
-          {/* [우측 정렬 영역] 달력 + 검색바 (세로로 쌓일 때도 우측 정렬 유지) */}
-          <div className="flex flex-col items-center md:items-end lg:contents w-full md:w-1/2 lg:w-auto gap-4 md:gap-2 lg:gap-0">
+          {/* [가운데/우측 영역] 달력 + 검색바 */}
+          <div className="flex flex-1 items-center justify-between gap-4 w-full">
             
             {/* 콤팩트 달력 영역 */}
-            <div className="w-full lg:w-auto lg:absolute lg:left-[51.5%] lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 flex justify-center md:justify-end lg:justify-center z-0">
-              <div className="bg-slate-50/50 border border-slate-200/60 rounded-2xl px-2 py-1 shadow-sm backdrop-blur-[2px] transition-all hover:bg-white hover:border-primary/20 hover:shadow-md group">
-                <CompactHeaderCalendar 
-                  selectedDate={selectedDate}
-                  onDateChange={onDateChange}
-                  isWhite={true}
-                />
-              </div>
-            </div>  {/* 검색바 영역: 무조건 우측 정렬 유지 */}
-            <div className="w-full lg:w-1/3 flex flex-col items-center md:items-end justify-center gap-1 z-10">
+            <div className="flex-1 flex justify-center min-w-0">
+              <CompactHeaderCalendar 
+                selectedDate={selectedDate}
+                onDateChange={onDateChange}
+                isWhite={true}
+              />
+            </div>
+
+            {/* 검색바 영역 */}
+            <div className="hidden lg:flex flex-col items-end justify-center gap-1 shrink-0">
               <span className="hidden xl:block text-[12px] font-bold text-primary/60 px-1 uppercase tracking-wider">찾는 뉴스가 있으신가요?</span>
               
               <div className="w-full max-w-[320px] md:max-w-none md:w-[240px] xl:w-[280px] shrink-0 relative group">
