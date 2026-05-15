@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { useUserStore } from '../stores/useUserStore'
 import StepNavigation from '../components/ui/StepNavigation'
 import UserAvatar from '../components/ui/UserAvatar'
@@ -19,12 +19,19 @@ const STEPS = [
 
 const Header = ({ variant = 'primary', activeStep, headerExtra }: HeaderProps) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
-  const { user, isLoggedIn, logout } = useUserStore()
+  const { user, isLoggedIn, logout, setLoginModalOpen } = useUserStore()
   const { activeIssueType, setActiveIssueType } = useIssueStore()
 
   const issueId = searchParams.get('id') || '1'
   const isWhite = variant === 'white'
+  const isMyPage = location.pathname.startsWith('/mypage')
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  }
 
   const handleBack = () => {
     if (!activeStep || activeStep === 1) {
@@ -49,7 +56,7 @@ const Header = ({ variant = 'primary', activeStep, headerExtra }: HeaderProps) =
             <span className="material-symbols-outlined text-xl md:text-2xl font-bold">center_focus_strong</span>
           </div>
           <div className="hidden sm:block">
-            <h1 className={`${isWhite ? 'text-slate-900' : 'text-white'} text-base md:text-lg font-bold leading-tight tracking-tight whitespace-nowrap`}>FOC-US</h1>
+            <h1 className={`${isWhite ? 'text-slate-900' : 'text-white'} text-base md:text-lg font-bold leading-tight tracking-tight whitespace-nowrap`}>FOCUS</h1>
           </div>
         </div>
         
@@ -69,47 +76,50 @@ const Header = ({ variant = 'primary', activeStep, headerExtra }: HeaderProps) =
       </div>
 
       <nav className="hidden md:flex flex-1 items-center justify-center min-w-0 px-2">
-        {activeIssueType === 'politics' && activeStep ? (
-          null
-        ) : activeStep ? (
-          <StepNavigation steps={[...STEPS]} activeStep={activeStep} />
+        {activeStep ? (
+          // activeStep이 있는 페이지에서는 사설/컬럼 모드일 때만 StepNavigation 표시
+          activeIssueType !== 'politics' && (
+            <StepNavigation steps={[...STEPS]} activeStep={activeStep} />
+          )
         ) : (
-          <div className="flex items-center justify-center w-full">
-            {/* 메인 페이지 전용 전역 탭 - 달력과 동일한 260px 고정 너비 적용 */}
-            <div className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-0.5 p-1 rounded-xl border transition-all w-[260px] ${
-              isWhite ? 'bg-slate-100/50 border-slate-200 shadow-inner' : 'bg-white/10 border-white/10'
-            }`}>
-              <button
-                onClick={() => setActiveIssueType('politics')}
-                className={`flex-1 py-1.5 rounded-lg text-[12px] lg:text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 lg:gap-2 ${
-                  activeIssueType === 'politics' 
-                    ? (isWhite ? 'bg-white text-primary shadow-md' : 'bg-white text-slate-900 shadow-lg scale-105')
-                    : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px] lg:text-[18px]">whatshot</span>
-                최신 이슈
-              </button>
-              <button
-                onClick={() => setActiveIssueType('editorial')}
-                className={`flex-1 py-1.5 rounded-lg text-[12px] lg:text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 lg:gap-2 ${
-                  activeIssueType === 'editorial' 
-                    ? (isWhite ? 'bg-white text-primary shadow-md' : 'bg-white text-slate-900 shadow-lg scale-105')
-                    : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px] lg:text-[18px]">auto_stories</span>
-                사설/컬럼
-              </button>
-            </div>
-
-            {/* 캘린더 등 추가 헤더 요소 영역 */}
-            {headerExtra && (
-              <div className="hidden lg:flex items-center">
-                {headerExtra}
+          !isMyPage && (
+            <div className="flex items-center justify-center w-full">
+              {/* 메인 페이지 전용 전역 탭 - 달력과 동일한 260px 고정 너비 적용 */}
+              <div className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-0.5 p-1 rounded-xl border transition-all w-[260px] ${
+                isWhite ? 'bg-slate-100/50 border-slate-200 shadow-inner' : 'bg-white/10 border-white/10'
+              }`}>
+                <button
+                  onClick={() => setActiveIssueType('politics')}
+                  className={`flex-1 py-1.5 rounded-lg text-[12px] lg:text-[13px] font-semibold transition-all flex items-center justify-center gap-1.5 lg:gap-2 ${
+                    activeIssueType === 'politics' 
+                      ? (isWhite ? 'bg-white text-primary shadow-md' : 'bg-white text-slate-900 shadow-lg scale-105')
+                      : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[16px] lg:text-[18px]" style={{ fontVariationSettings: "'wght' 300" }}>whatshot</span>
+                  최신 이슈
+                </button>
+                <button
+                  onClick={() => setActiveIssueType('editorial')}
+                  className={`flex-1 py-1.5 rounded-lg text-[12px] lg:text-[13px] font-semibold transition-all flex items-center justify-center gap-1.5 lg:gap-2 ${
+                    activeIssueType === 'editorial' 
+                      ? (isWhite ? 'bg-white text-primary shadow-md' : 'bg-white text-slate-900 shadow-lg scale-105')
+                      : (isWhite ? 'text-slate-500 hover:text-slate-700' : 'text-white/60 hover:text-white hover:bg-white/5')
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[16px] lg:text-[18px]" style={{ fontVariationSettings: "'wght' 300" }}>auto_stories</span>
+                  사설/컬럼
+                </button>
               </div>
-            )}
-          </div>
+
+              {/* 캘린더 등 추가 헤더 요소 영역 */}
+              {headerExtra && (
+                <div className="hidden lg:flex items-center">
+                  {headerExtra}
+                </div>
+              )}
+            </div>
+          )
         )}
       </nav>
 
@@ -117,10 +127,7 @@ const Header = ({ variant = 'primary', activeStep, headerExtra }: HeaderProps) =
         {isLoggedIn ? (
           <div className="flex items-center gap-2 sm:gap-4">
             <button 
-              onClick={() => {
-                logout();
-                navigate('/login');
-              }}
+              onClick={handleLogout}
               className={`text-[10px] md:text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-all ${
                 isWhite 
                   ? 'border-slate-200 text-slate-500 hover:bg-slate-50' 
@@ -146,7 +153,7 @@ const Header = ({ variant = 'primary', activeStep, headerExtra }: HeaderProps) =
         ) : (
           <div className="flex items-center gap-2 md:gap-3">
             <button 
-              onClick={() => navigate('/login')}
+              onClick={() => setLoginModalOpen(true)}
               className={`text-xs md:text-sm font-bold px-5 py-2.5 rounded-xl transition-all ${
                 isWhite 
                   ? 'text-white bg-slate-900 hover:bg-slate-800 shadow-md shadow-slate-900/10' 

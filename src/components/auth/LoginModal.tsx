@@ -1,16 +1,12 @@
 import React from 'react'
 import { useUserStore } from '../../stores/useUserStore'
 
-interface LoginModalProps {
-  isOpen: boolean
-}
-
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen }) => {
-  const login = useUserStore((state) => state.login)
+const LoginModal: React.FC = () => {
+  const { isLoginModalOpen, setLoginModalOpen, login } = useUserStore()
 
   // 배경 스크롤 차단 로직 추가
   React.useEffect(() => {
-    if (isOpen) {
+    if (isLoginModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -18,9 +14,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen }) => {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen]);
+  }, [isLoginModalOpen]);
 
-  if (!isOpen) return null
+  if (!isLoginModalOpen) return null
 
   const handleSocialLogin = (provider: 'google' | 'kakao') => {
     console.log(`${provider} 로그인 시도...`);
@@ -49,16 +45,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen }) => {
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-6 animate-in fade-in duration-500">
       {/* 화이트 블러 백드롭 */}
-      <div className="absolute inset-0 bg-white/40 backdrop-blur-md transition-all duration-700" />
+      <div 
+        className="absolute inset-0 bg-white/40 backdrop-blur-md transition-all duration-700" 
+      />
       
       {/* 모달 컨텐츠 */}
-      <div className="relative w-full max-w-[400px] bg-white rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-slate-100 p-10 md:p-12 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500">
+      <div className="relative w-full max-w-[400px] bg-white rounded-[40px] shadow-[0_20px_50px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.05)] border border-slate-200/60 p-10 md:p-12 animate-in zoom-in-95 slide-in-from-bottom-10 duration-500">
         <div className="flex flex-col items-center mb-12 text-center">
-          <div className="size-16 bg-primary/10 text-primary flex items-center justify-center mb-5 rounded-2xl shadow-sm rotate-3">
-            <span className="material-symbols-outlined text-[42px] font-bold">hub</span>
+          <div className="size-16 bg-primary/10 text-primary flex items-center justify-center mb-5 rounded-2xl shadow-sm">
+            <span className="material-symbols-outlined text-[42px] font-bold">center_focus_strong</span>
           </div>
-          <h1 className="text-slate-900 text-3xl font-bold tracking-tight mb-2">FOC-US</h1>
-          <p className="text-slate-500 text-[15px] font-medium leading-relaxed">
+          <h1 className="text-slate-900 text-3xl font-bold tracking-tight mb-2">FOCUS</h1>
+          <p className="text-slate-600 text-[15px] font-normal leading-relaxed">
             뉴스 분석의 새로운 기준<br/>
             지금 바로 시작해 보세요.
           </p>
@@ -67,7 +65,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen }) => {
         <div className="space-y-12">
           <div className="text-center space-y-3">
             <h2 className="text-slate-800 text-lg font-bold">간편 로그인으로 시작하기</h2>
-            <p className="text-slate-400 text-sm font-medium">별도의 가입 없이 3초 만에 시작하세요</p>
+            <p className="text-slate-500 text-sm font-normal">별도의 가입 없이 3초 만에 시작하세요</p>
           </div>
 
           <div className="space-y-8">
@@ -98,7 +96,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen }) => {
                     ></path>
                   </svg>
                 </div>
-                <span className="text-xs font-bold text-slate-400 group-hover:text-slate-600 transition-colors uppercase tracking-widest">Google</span>
+                <span className="text-xs font-medium text-slate-500 group-hover:text-slate-700 transition-colors uppercase tracking-widest">Google</span>
               </button>
 
               {/* 카카오 로그인 */}
@@ -112,7 +110,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen }) => {
                     <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.707 4.8 4.315 6.091l-1.098 4.047c-.053.195.059.398.248.455.062.019.127.022.191.009.053-.01.1-.035.138-.073l4.787-3.172c.46.04.928.06 1.419.06 4.97 0 9-3.185 9-7.115S16.97 3 12 3z"></path>
                   </svg>
                 </div>
-                <span className="text-xs font-bold text-slate-400 group-hover:text-slate-600 transition-colors uppercase tracking-widest">Kakao</span>
+                <span className="text-xs font-medium text-slate-500 group-hover:text-slate-700 transition-colors uppercase tracking-widest">Kakao</span>
               </button>
             </div>
 
@@ -120,7 +118,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen }) => {
             <div className="pt-2">
               <button 
                 onClick={handleDevLogin}
-                className="w-full py-4 rounded-2xl bg-slate-50 border border-slate-100 text-slate-500 text-sm font-bold hover:bg-primary/5 hover:text-primary hover:border-primary/20 transition-all shadow-sm flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-2xl bg-slate-50 border border-slate-100 text-slate-600 text-sm font-medium hover:bg-primary/5 hover:text-primary hover:border-primary/20 transition-all shadow-sm flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined text-[20px]">fast_forward</span>
                 개발자 모드: 로그인 건너뛰기
@@ -130,9 +128,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen }) => {
         </div>
 
         <div className="mt-16 pt-8 border-t border-slate-50">
-          <div className="flex items-center justify-center gap-2 opacity-30">
+          <div className="flex items-center justify-center gap-2 opacity-40">
             <span className="size-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none">
+            <span className="text-[10px] text-slate-600 font-medium uppercase tracking-widest leading-none">
               System Secure Connection
             </span>
           </div>
