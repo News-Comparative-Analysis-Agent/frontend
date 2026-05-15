@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import Layout from '../layouts/Layout'
 import Button from '../components/ui/Button'
@@ -8,6 +8,7 @@ import Loader from '../components/ui/Loader'
 import { postNlpSearch } from '../api/search'
 import { NlpSearchData, NlpSearchArticle } from '../types/models/search'
 import { motion, AnimatePresence } from 'framer-motion'
+import { PUBLISHER_LOGOS } from '../utils/publisherLogos'
 
 const SearchResultsPage = () => {
   const navigate = useNavigate()
@@ -19,22 +20,8 @@ const SearchResultsPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [searchData, setSearchData] = useState<NlpSearchData | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [hoveredCitation, setHoveredCitation] = useState<string | null>(null)
-  const [publisherPage, setPublisherPage] = useState(1)
   const [sliderIndex, setSliderIndex] = useState(0)
   const itemsPerPage = 10
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const container = scrollRef.current;
-      const cardWidth = container.offsetWidth / 5; // Exactly 1/5 of container
-      scrollRef.current.scrollBy({
-        left: direction === 'left' ? -cardWidth : cardWidth,
-        behavior: 'smooth'
-      });
-    }
-  };
 
   // 기사 매칭 고도화 헬퍼 함수
   const getArticleById = (refId: string) => {
@@ -275,18 +262,6 @@ const SearchResultsPage = () => {
                     setSliderIndex(prev => Math.max(prev - 1, 0));
                   };
 
-                  const PUBLISHER_LOGOS: Record<string, string> = {
-                    '경향신문': 'https://upload.wikimedia.org/wikipedia/commons/b/b2/Kyunghyang_Shinmun_logo.png',
-                    '국민일보': 'https://upload.wikimedia.org/wikipedia/ko/6/60/Kookmin_Ilbo_logo.png',
-                    '동아일보': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Dong-a_Ilbo_logo.svg/512px-Dong-a_Ilbo_logo.svg.png',
-                    '조선일보': 'https://upload.wikimedia.org/wikipedia/ko/archive/5/5a/20121112023528%21Chosun_Ilbo_logo.png',
-                    '중앙일보': 'https://static.joongang.co.kr/logo/joongang_logo.png',
-                    '한겨레': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/The_Hankyoreh_logo.svg/512px-The_Hankyoreh_logo.svg.png',
-                    '한국일보': 'https://www.hankookilbo.com/Common/Img/logo.png',
-                    'JTBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/JTBC_logo.svg/512px-JTBC_logo.svg.png',
-                    'MBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/MBC_Logo_2005.svg/512px-MBC_Logo_2005.svg.png',
-                    'YTN': 'https://upload.wikimedia.org/wikipedia/commons/4/4b/YTN_Logo.svg',
-                  };
 
                   return (
                     <div className="relative">

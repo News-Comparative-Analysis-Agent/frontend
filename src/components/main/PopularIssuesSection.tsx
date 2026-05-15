@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { DailyIssuesResponse } from '../../types/issues'
 import CompactHeaderCalendar from './CompactHeaderCalendar'
+import { toDateKey } from '../../utils/dateUtils'
 
 interface PopularIssuesSectionProps {
   loading: boolean
@@ -76,6 +77,24 @@ const PopularIssuesSection = ({
     exit: { opacity: 0, scale: 1.02, filter: 'blur(2px)' },
     transition: { duration: 0.10, ease: 'easeOut' as const }
   };
+
+  const ITEMS_PER_PAGE = 10;
+
+  // 선택된 날짜 + 이슈 타입 기준으로 표시할 이슈 목록 계산
+  const { filteredIssues, currentIssues, totalPages, startIndex } = useMemo(() => {
+    if (!dailyIssues) return { filteredIssues: [], currentIssues: [], totalPages: 0, startIndex: 0 };
+    const dateStr = toDateKey(selectedDate);
+    const issuesForDate = dailyIssues.data?.[dateStr] || [];
+    const filtered = issuesForDate.filter(issue => issue.issue_type === activeIssueType);
+    const total = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return {
+      filteredIssues: filtered,
+      currentIssues: filtered.slice(start, start + ITEMS_PER_PAGE),
+      totalPages: total,
+      startIndex: start,
+    };
+  }, [dailyIssues, selectedDate, activeIssueType, currentPage]);
 
   return (
     <div className="w-full h-full min-w-0 md:border-r border-slate-100 md:pr-2 flex flex-col text-left self-stretch overflow-hidden">
@@ -174,149 +193,128 @@ const PopularIssuesSection = ({
               <span className="material-symbols-outlined text-5xl">wifi_off</span>
               <p className="text-sm font-medium">이슈 데이터를 불러올 수 없습니다.</p>
             </div>
+          ) : filteredIssues.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-3">
+              <span className="material-symbols-outlined text-4xl">event_busy</span>
+              <p className="text-sm font-medium">선택한 날짜에 대한 이슈가 없습니다.</p>
+            </div>
           ) : (
-            (() => {
-              const year = selectedDate.getFullYear();
-              const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-              const day = String(selectedDate.getDate()).padStart(2, '0');
-              const dateStr = `${year}-${month}-${day}`;
-              
-              const issuesForDate = dailyIssues?.data?.[dateStr] || [];
-              const filteredIssues = issuesForDate.filter(issue => issue.issue_type === activeIssueType);
-              
-              if (filteredIssues.length === 0) {
-                return (
-                  <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-3">
-                    <span className="material-symbols-outlined text-4xl">event_busy</span>
-                    <p className="text-sm font-medium">선택한 날짜에 대한 이슈가 없습니다.</p>
-                  </div>
-                );
-              }
+            <div className="flex flex-col justify-between min-h-[600px]">
+              <div>
+                {/* 상단 주황색 포인트 구분선 */}
+                <div className="border-t-[3px] border-primary w-full mb-4"></div>
 
-              const ITEMS_PER_PAGE = 10;
-              const totalPages = Math.ceil(filteredIssues.length / ITEMS_PER_PAGE);
-              const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-              const currentIssues = filteredIssues.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-              return (
-                <div className="flex flex-col justify-between min-h-[600px]">
-                  <div>
-                    {/* 상단 주황색 포인트 구분선 */}
-                    <div className="border-t-[3px] border-primary w-full mb-4"></div>
-
-                    {/* 모든 이슈 통합 그리드 */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-x-5 gap-y-10 -mx-1">
-                      {currentIssues.map((issue, idx) => {
-                        const globalRank = startIndex + idx + 1;
-                        return (
-                          <div 
-                            key={issue.id} 
-                            className="group cursor-pointer flex flex-col gap-3 transition-all duration-300"
-                            onClick={() => onNavigateToAnalysis(issue.id)}
-                          >
-                            <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-sm border border-slate-200/50 bg-slate-50 group-hover:shadow-md group-hover:border-primary/20 transition-all">
-                              <img 
-                                alt={issue.name} 
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                                src={(issue.image_urls && issue.image_urls.length > 0) ? issue.image_urls[0] : DEFAULT_IMAGE}
-                                onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
-                              />
-                              {activeIssueType === 'politics' && (
-                                <div className="absolute top-0 left-0 p-3 z-20">
-                                  <span 
-                                    className="font-black text-white leading-none select-none tracking-tighter text-[32px] xl:text-[40px]" 
-                                    style={{ 
-                                      WebkitTextStroke: '1.5px rgba(255, 255, 255, 0.9)',
-                                      filter: 'drop-shadow(0px 3px 5px rgba(0,0,0,0.5))',
-                                      opacity: 0.85
-                                    }}
-                                  >
-                                    {globalRank}
-                                  </span>
-                                </div>
-                              )}
-                              {activeIssueType === 'editorial' && (
-                                <div className="absolute top-2 right-2 z-20">
-                                  <div className="flex items-center gap-1 bg-white text-primary px-1.5 py-0.5 rounded-md shadow-md border border-slate-100 opacity-95 group-hover:opacity-100 transition-opacity">
-                                    <span className="material-symbols-outlined text-[13px] font-bold">verified</span>
-                                    <span className="text-[10px] font-bold whitespace-nowrap tracking-tight">초안 완료</span>
-                                  </div>
-                                </div>
-                              )}
+                {/* 모든 이슈 통합 그리드 */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-x-5 gap-y-10 -mx-1">
+                  {currentIssues.map((issue, idx) => {
+                    const globalRank = startIndex + idx + 1;
+                    return (
+                      <div
+                        key={issue.id}
+                        className="group cursor-pointer flex flex-col gap-3 transition-all duration-300"
+                        onClick={() => onNavigateToAnalysis(issue.id)}
+                      >
+                        <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-sm border border-slate-200/50 bg-slate-50 group-hover:shadow-md group-hover:border-primary/20 transition-all">
+                          <img
+                            alt={issue.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            src={(issue.image_urls && issue.image_urls.length > 0) ? issue.image_urls[0] : DEFAULT_IMAGE}
+                            onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_IMAGE }}
+                          />
+                          {activeIssueType === 'politics' && (
+                            <div className="absolute top-0 left-0 p-3 z-20">
+                              <span
+                                className="font-black text-white leading-none select-none tracking-tighter text-[32px] xl:text-[40px]"
+                                style={{
+                                  WebkitTextStroke: '1.5px rgba(255, 255, 255, 0.9)',
+                                  filter: 'drop-shadow(0px 3px 5px rgba(0,0,0,0.5))',
+                                  opacity: 0.85
+                                }}
+                              >
+                                {globalRank}
+                              </span>
                             </div>
-
-                            <div className="flex flex-col gap-1 px-1">
-                              <h6 className="text-[14px] xl:text-[15px] font-semibold text-slate-800 leading-tight group-hover:text-primary transition-colors line-clamp-2 min-h-[2.2rem]">
-                                {issue.name}
-                              </h6>
-                              <div className="flex flex-col gap-1 mt-0.5 pt-1.5 border-t border-slate-50">
-                                {(issue.articles || []).slice(0, 3).map((art, artIdx) => (
-                                  <div key={artIdx} className="flex items-center gap-2 group/art overflow-hidden py-0.5">
-                                    <span className="shrink-0 text-[9px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 group-hover/art:border-primary/20 group-hover/art:text-primary transition-colors">
-                                      {art.publisher}
-                                    </span>
-                                    <p className="text-[11px] text-slate-600 font-medium truncate group-hover/art:text-primary transition-colors">
-                                      {art.title}
-                                    </p>
-                                  </div>
-                                ))}
-                                <div className="flex items-center justify-between mt-0.5">
-                                  <span className="text-[10px] text-slate-400 font-bold">기사 {issue.article_count || 0}건</span>
-                                  <span className="material-symbols-outlined text-[14px] text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
-                                </div>
+                          )}
+                          {activeIssueType === 'editorial' && (
+                            <div className="absolute top-2 right-2 z-20">
+                              <div className="flex items-center gap-1 bg-white text-primary px-1.5 py-0.5 rounded-md shadow-md border border-slate-100 opacity-95 group-hover:opacity-100 transition-opacity">
+                                <span className="material-symbols-outlined text-[13px] font-bold">verified</span>
+                                <span className="text-[10px] font-bold whitespace-nowrap tracking-tight">초안 완료</span>
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                          )}
+                        </div>
 
-                  {totalPages > 1 && (
-                    <div className="flex justify-center items-center gap-1 mt-12 pb-4">
-                      <button
-                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                        disabled={currentPage === 1}
-                        className="size-8 flex items-center justify-center rounded-full hover:bg-slate-100 disabled:opacity-30 transition-colors text-slate-500"
-                      >
-                        <span className="material-symbols-outlined text-[20px]">chevron_left</span>
-                      </button>
-                      
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
-                          if (
-                            pageNum === 1 || pageNum === totalPages || 
-                            (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-                          ) {
-                            return (
-                              <button
-                                key={pageNum}
-                                onClick={() => setCurrentPage(pageNum)}
-                                className={`size-8 flex items-center justify-center rounded-full text-[13px] font-bold transition-all ${
-                                  currentPage === pageNum ? 'bg-primary text-white shadow-sm' : 'hover:bg-slate-100 text-slate-500'
-                                }`}
-                              >
-                                {pageNum}
-                              </button>
-                            );
-                          } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
-                            return <span key={pageNum} className="text-slate-300 px-1 text-[12px]">...</span>;
-                          }
-                          return null;
-                        })}
+                        <div className="flex flex-col gap-1 px-1">
+                          <h6 className="text-[14px] xl:text-[15px] font-semibold text-slate-800 leading-tight group-hover:text-primary transition-colors line-clamp-2 min-h-[2.2rem]">
+                            {issue.name}
+                          </h6>
+                          <div className="flex flex-col gap-1 mt-0.5 pt-1.5 border-t border-slate-50">
+                            {(issue.articles || []).slice(0, 3).map((art, artIdx) => (
+                              <div key={artIdx} className="flex items-center gap-2 group/art overflow-hidden py-0.5">
+                                <span className="shrink-0 text-[9px] font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 group-hover/art:border-primary/20 group-hover/art:text-primary transition-colors">
+                                  {art.publisher}
+                                </span>
+                                <p className="text-[11px] text-slate-600 font-medium truncate group-hover/art:text-primary transition-colors">
+                                  {art.title}
+                                </p>
+                              </div>
+                            ))}
+                            <div className="flex items-center justify-between mt-0.5">
+                              <span className="text-[10px] text-slate-400 font-bold">기사 {issue.article_count || 0}건</span>
+                              <span className="material-symbols-outlined text-[14px] text-slate-300 group-hover:text-primary transition-colors">arrow_forward</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <button
-                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                        disabled={currentPage === totalPages}
-                        className="size-8 flex items-center justify-center rounded-full hover:bg-slate-100 disabled:opacity-30 transition-colors text-slate-500"
-                      >
-                        <span className="material-symbols-outlined text-[20px]">chevron_right</span>
-                      </button>
-                    </div>
-                  )}
+                    );
+                  })}
                 </div>
-              );
-            })()
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-1 mt-12 pb-4">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="size-8 flex items-center justify-center rounded-full hover:bg-slate-100 disabled:opacity-30 transition-colors text-slate-500"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                      if (
+                        pageNum === 1 || pageNum === totalPages ||
+                        (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                      ) {
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`size-8 flex items-center justify-center rounded-full text-[13px] font-bold transition-all ${
+                              currentPage === pageNum ? 'bg-primary text-white shadow-sm' : 'hover:bg-slate-100 text-slate-500'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
+                        return <span key={pageNum} className="text-slate-300 px-1 text-[12px]">...</span>;
+                      }
+                      return null;
+                    })}
+                  </div>
+                  <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="size-8 flex items-center justify-center rounded-full hover:bg-slate-100 disabled:opacity-30 transition-colors text-slate-500"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                  </button>
+                </div>
+              )}
+            </div>
           )}
           </div>
         </div>

@@ -142,7 +142,8 @@ const CompactHeaderCalendar: React.FC<CompactHeaderCalendarProps> = ({ selectedD
     );
   };
 
-  const years = [2026];
+  const currentYear = new Date().getFullYear();
+  const years = [currentYear - 1, currentYear, currentYear + 1];
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);

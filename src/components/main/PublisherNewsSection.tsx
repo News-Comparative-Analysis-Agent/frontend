@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { NewsArticle } from '../../types'
 import { motion, AnimatePresence } from 'framer-motion'
+import { toDateKey } from '../../utils/dateUtils'
+import { PUBLISHER_LOGOS } from '../../utils/publisherLogos'
 
 interface PublisherNewsSectionProps {
   loading: boolean
@@ -18,18 +20,6 @@ interface PublisherNewsSectionProps {
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop'
 
-const PUBLISHER_LOGOS: Record<string, string> = {
-  '경향신문': 'https://upload.wikimedia.org/wikipedia/commons/b/b2/Kyunghyang_Shinmun_logo.png',
-  '국민일보': 'https://news.kmib.co.kr/images/v2/logo_kmib.png',
-  '동아일보': 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Dong-A_Ilbo_logo.png',
-  '조선일보': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Chosun_Ilbo_logo.png/512px-Chosun_Ilbo_logo.png',
-  '중앙일보': 'https://upload.wikimedia.org/wikipedia/commons/2/2e/JoongAng_Ilbo_logo.png',
-  '한겨레': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/The_Hankyoreh_logo.svg/512px-The_Hankyoreh_logo.svg.png',
-  '한국일보': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Hankook_Ilbo_logo.svg/512px-Hankook_Ilbo_logo.svg.png',
-  'JTBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/JTBC_logo.svg/512px-JTBC_logo.svg.png',
-  'MBC': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/MBC_Logo_2005.svg/512px-MBC_Logo_2005.svg.png',
-  'YTN': 'https://upload.wikimedia.org/wikipedia/commons/4/4b/YTN_Logo.svg',
-}
 
 // 로고 에러 상태 관리
 const PublisherLogo = ({ name }: { name: string }) => {
@@ -144,10 +134,7 @@ const PublisherNewsSection = ({
             <div className="flex flex-col">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-5">
                 {currentPublishers.map((publisher) => {
-                  const year = selectedDate.getFullYear();
-                  const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-                  const day = String(selectedDate.getDate()).padStart(2, '0');
-                  const dateStr = `${year}-${month}-${day}`;
+                  const dateStr = toDateKey(selectedDate);
                   
                   const allArticles = newsData[dateStr]?.[publisher] || [];
                   const articles = allArticles.filter(a => !a.issue_type || a.issue_type === activeIssueType);

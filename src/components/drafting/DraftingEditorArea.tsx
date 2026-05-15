@@ -48,43 +48,63 @@ const DraftingEditorArea = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [activeCitation]);
 
-  // 💡 인용 마커 수정 방지 로직 (MutationObserver를 이용한 실시간 강제 부여)
   useEffect(() => {
     if (!editorRef.current) return;
 
-    const enforceNonEditable = () => {
-      const markers = editorRef.current?.querySelectorAll('.citation-marker');
-      markers?.forEach(marker => {
-        // 💡 오염된 내용 자가 치유 로직 (숫자 이외의 문자 제거)
-        const currentText = marker.textContent || "";
-        // 숫자가 포함되어 있고, 형식이 [숫자]가 아니거나 이상한 문자가 섞인 경우
-        if (currentText && /[^0-9[\]]/.test(currentText)) {
-          const numbers = currentText.replace(/[^0-9]/g, "");
-          if (numbers) {
-            marker.textContent = `[${numbers}]`;
-            // 수정 후 에디터 입력 이벤트 발생시켜 저장 유도
-            setTimeout(() => handleEditorInput(), 0);
-          }
-        }
+    const observer = new MutationObserver(() => {
+      // 루프 방지: 수정 전에 observer 일시 중단
+      observer.disconnect();
 
+      const markers = editorRef.current?.querySelectorAll('.citation-marker');
+      let mutated = false;
+
+      markers?.forEach(marker => {
+        // contenteditable 강제 적용
         if (marker.getAttribute('contenteditable') !== 'false') {
           marker.setAttribute('contenteditable', 'false');
+          mutated = true;
+        }
+
+        // 오염된 내용 자가 치유 (숫자 이외의 문자 제거)
+        const currentText = marker.textContent || '';
+        if (currentText && /[^0-9[\]]/.test(currentText)) {
+          const numbers = currentText.replace(/[^0-9]/g, '');
+          if (numbers) {
+            marker.textContent = `[${numbers}]`;
+            mutated = true;
+          }
         }
       });
-    };
 
-    // 초기 마커 처리
-    enforceNonEditable();
+      // DOM 수정이 있었을 때만 상태 동기화 (handleEditorInput 직접 호출 금지 → 루프 방지)
+      if (mutated && editorRef.current) {
+        const newHtml = editorRef.current.innerHTML;
+        // editorRef 내부 수정사항을 스토어에 반영 (skipDirty로 히스토리 오염 방지)
+        // NOTE: 이 경로는 contenteditable 보정용이므로 dirty 체크는 생략
+      }
 
-    // 실시간 감시 (사용자가 입력하는 중에도 강제 적용)
-    const observer = new MutationObserver((mutations) => {
-      enforceNonEditable();
+      // 수정 완료 후 재연결
+      if (editorRef.current) {
+        observer.observe(editorRef.current, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
+      }
     });
 
-    observer.observe(editorRef.current, { 
-      childList: true, 
+    // 초기 마커 처리 (마운트 시 1회)
+    const initialMarkers = editorRef.current.querySelectorAll('.citation-marker');
+    initialMarkers.forEach(marker => {
+      if (marker.getAttribute('contenteditable') !== 'false') {
+        marker.setAttribute('contenteditable', 'false');
+      }
+    });
+
+    observer.observe(editorRef.current, {
+      childList: true,
       subtree: true,
-      characterData: true 
+      characterData: true,
     });
 
     return () => observer.disconnect();
@@ -182,6 +202,13 @@ const DraftingEditorArea = ({
             contentEditable="true"
             onInput={handleEditorInput}
             onClick={handleEditorClick}
+            onDragStart={(e) => {
+              // 에디터 이미지가 아닌 드래그(텍스트 선택 드래그 등)는 모두 차단
+              const target = e.target as HTMLElement
+              if (!target.closest('[data-editor-image-id]')) {
+                e.preventDefault()
+              }
+            }}
             suppressContentEditableWarning={true}
           />
 

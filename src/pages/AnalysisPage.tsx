@@ -61,8 +61,7 @@ const AnalysisPage = () => {
 
   return (
     <Layout variant="white" activeStep={2} hideFooter>
-      <div className="analysis-global-loader"></div>
-      
+
       {/* 브레드크럼 상단바 */}
       <div className="bg-white border-b border-slate-50 px-4 md:px-8 py-3 shrink-0">
         <div className="flex items-center gap-2 text-[12px] font-medium text-slate-400 text-left">

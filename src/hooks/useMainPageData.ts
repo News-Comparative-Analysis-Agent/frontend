@@ -4,6 +4,7 @@ import { fetchTopNewsByPublisher } from '../api/news'
 import { fetchDailyIssues, fetchTodayStats } from '../api/issues'
 import { NewsArticle } from '../types'
 import { DailyIssuesResponse, DailyStats } from '../types/issues'
+import { toDateKey } from '../utils/dateUtils'
 
 // 12개 핵심 언론사 설정 (가나다 순)
 export const PRESS_NAMES = [
@@ -94,10 +95,7 @@ export const useMainPageData = () => {
 
   // 통합 인기 1위 이미지 자동 로테이션 타이머
   useEffect(() => {
-    const year = selectedDate.getFullYear();
-    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    const day = String(selectedDate.getDate()).padStart(2, '0');
-    const dateStr = `${year}-${month}-${day}`;
+    const dateStr = toDateKey(selectedDate);
     
     const issuesForDate = dailyIssues?.data?.[dateStr] || [];
     
