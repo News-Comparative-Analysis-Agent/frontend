@@ -16,25 +16,25 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
           <div className="flex items-center justify-center size-8 bg-primary rounded-full shadow-sm shadow-primary/20">
             <span className="material-symbols-outlined text-[18px] text-white">subject</span>
           </div>
-          <h3 className="text-[17px] font-bold text-slate-800">이슈 상세 분석</h3>
+          <h3 className="text-[17px] font-semibold text-slate-900">이슈 상세 분석</h3>
         </div>
         
         <div className="pr-2 pt-1 space-y-8">
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center gap-2">
               <div className="size-2 bg-primary/50 rounded-full"></div>
-              <h4 className="text-[14px] font-bold text-slate-800">이슈 설명</h4>
+              <h4 className="text-[14px] font-semibold text-slate-900">이슈 설명</h4>
             </div>
-            <p className="text-[14px] text-slate-500 leading-relaxed font-medium pl-3.5 border-l border-slate-100">{description}</p>
+            <p className="text-[14px] text-slate-700 leading-relaxed font-normal pl-3.5 border-l border-slate-100">{description}</p>
           </div>
 
           {background && (
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-2">
                 <div className="size-2 bg-primary/50 rounded-full"></div>
-                <h4 className="text-[14px] font-bold text-slate-800">이슈 배경</h4>
+                <h4 className="text-[14px] font-semibold text-slate-900">이슈 배경</h4>
               </div>
-              <p className="text-[14px] text-slate-500 leading-relaxed font-medium pl-3.5 border-l border-slate-100">{background}</p>
+              <p className="text-[14px] text-slate-700 leading-relaxed font-normal pl-3.5 border-l border-slate-100">{background}</p>
             </div>
           )}
 
@@ -42,9 +42,9 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-2">
                 <div className="size-2 bg-primary/50 rounded-full"></div>
-                <h4 className="text-[14px] font-bold text-slate-800">주요 쟁점</h4>
+                <h4 className="text-[14px] font-semibold text-slate-900">주요 쟁점</h4>
               </div>
-              <p className="text-[14px] text-slate-500 leading-relaxed font-medium pl-3.5 border-l border-slate-100">{coreContentions}</p>
+              <p className="text-[14px] text-slate-700 leading-relaxed font-normal pl-3.5 border-l border-slate-100">{coreContentions}</p>
             </div>
           )}
         </div>
