@@ -4,13 +4,12 @@ import Layout from '../layouts/Layout'
 import { useMainPageData } from '../hooks/useMainPageData'
 import { useUserStore } from '../stores/useUserStore'
 import { useIssueStore } from '../stores/useIssueStore'
-import LoginModal from '../components/auth/LoginModal'
 import MainHero from '../components/main/MainHero'
-import MainSearchHeader from '../components/main/MainSearchHeader'
 import PublisherNewsSection from '../components/main/PublisherNewsSection'
 import PopularIssuesSection from '../components/main/PopularIssuesSection'
 import PublisherSidebar from '../components/main/PublisherSidebar'
 import CompactHeaderCalendar from '../components/main/CompactHeaderCalendar'
+import { toDateKey } from '../utils/dateUtils'
 
 /**
  * 메인 페이지 (MainPage)
@@ -87,16 +86,12 @@ const MainPage = () => {
   // OAuth 리다이렉트 후 토큰 감지 및 자동 로그인 처리
   useEffect(() => {
     const token = searchParams.get('access_token') || searchParams.get('token');
-    
+
     if (token && !isLoggedIn) {
-      const mockUser = {
-        nickname: '영호',
-        email: 'ajk6068@gmail.com',
-        id: 1,
-        created_at: '2026-03-03T14:07:55.116938'
-      };
-      login(mockUser, token);
-      
+      // 토큰을 먼저 저장하고, 사용자 정보는 API에서 가져와야 합니다.
+      // TODO: GET /api/users/me 등 사용자 정보 조회 API 연동 필요
+      login(null, token);
+
       const newParams = new URLSearchParams(searchParams);
       newParams.delete('access_token');
       newParams.delete('token');
@@ -104,13 +99,12 @@ const MainPage = () => {
     }
   }, [searchParams, isLoggedIn, login, setSearchParams]);
 
-  const dateKey = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+  const dateKey = toDateKey(selectedDate)
 
   return (
     <Layout>
       <div className="relative overflow-x-hidden">
-        {/* 로그인 모달: 비로그인 시 강제 노출 */}
-        <LoginModal isOpen={!isLoggedIn} />
+        {/* 로그인 모달은 이제 전역(App.tsx)에서 관리됩니다. */}
 
         {/* 우측 스티키 내비게이션 (Scroll Spy) */}
         <aside className="hidden xl:block fixed right-2 2xl:right-4 top-1/2 -translate-y-1/2 z-30">
@@ -151,7 +145,7 @@ const MainPage = () => {
           handleMediaChange={handleMediaChange}
         />
 
-        <div className={`transition-all duration-1000 ${!isLoggedIn ? 'blur-md pointer-events-none' : 'animate-page-in'}`}>
+        <div className="animate-page-in">
           <div className="flex flex-col">
             <MainHero 
               activeIssueType={activeIssueType} 
