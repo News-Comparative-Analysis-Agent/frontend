@@ -33,7 +33,7 @@ export const useDraftingPage = () => {
   const [draftImages, setDraftImages] = useState<DraftImage[]>([])
   const editorRef = useRef<HTMLDivElement>(null)
   const loadingRef = useRef<string | null>(null)
-  const historyTimeoutRef = useRef<any>(null)
+  const historyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // 수동 입력 시: 상태는 즉시 업데이트, 히스토리는 1초간 멈췄을 때만 기록 (단축키용)
   const handleEditorInput = useCallback(() => {
@@ -255,7 +255,14 @@ export const useDraftingPage = () => {
     await saveDraft()
   }, [saveDraft])
 
-  // --- 키보드 단축키 (Undo/Save) ---
+  // --- historyTimeoutRef 언마운트 cleanup ---
+  useEffect(() => {
+    return () => {
+      if (historyTimeoutRef.current) clearTimeout(historyTimeoutRef.current);
+    };
+  }, []);
+
+  // --- 키보드 단축키 (Undo/Redo/Save) ---
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!e.ctrlKey && !e.metaKey) return;
@@ -286,7 +293,7 @@ export const useDraftingPage = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [undo, temporarySave]);
+  }, [undo, redo, temporarySave]);
 
   // --- 저장 관련 ---
   const formatLastSaved = () => {

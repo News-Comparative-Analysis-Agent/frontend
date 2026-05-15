@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import Layout from '../layouts/Layout'
 import Breadcrumb from '../components/ui/Breadcrumb'
 import { useDraftingPage } from '../hooks/useDraftingPage'
+import { SidebarQuote } from '../types/analysis'
 
 // 하위 컴포넌트 임포트
 import DraftingLeftSidebar from '../components/drafting/DraftingLeftSidebar'
@@ -47,7 +48,7 @@ const DraftingPage = () => {
   
   // 크로스체크 모드 및 선택된 기사 상태 (2단계)
   const [isCrossCheckMode, setIsCrossCheckMode] = useState(false)
-  const [selectedQuote, setSelectedQuote] = useState<any>(null)
+  const [selectedQuote, setSelectedQuote] = useState<SidebarQuote | null>(null)
 
   // 윈도우 너비 감지 (배너 위치 계산용)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)

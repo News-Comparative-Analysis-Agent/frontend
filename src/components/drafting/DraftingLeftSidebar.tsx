@@ -109,9 +109,12 @@ const DraftingLeftSidebar = ({
                       <span>{isSelected ? '교차 검증 중' : '원문 비교하기'}</span>
                     </div>
                   </div>
-                  <h4 className={`text-[13.5px] leading-relaxed font-bold transition-colors line-clamp-3 text-left ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
+                  <p
+                    className={`text-[12px] leading-relaxed line-clamp-3 text-left transition-colors ${isSelected ? 'text-slate-800' : 'text-slate-600'}`}
+                    style={{ fontStyle: 'italic', transform: 'skewX(-10deg)', transformOrigin: 'left bottom', display: 'block' }}
+                  >
                     {quote.text}
-                  </h4>
+                  </p>
                 </div>
               );
             })}

@@ -9,6 +9,9 @@ interface DropIndicatorState {
 
 const INITIAL_DROP_INDICATOR: DropIndicatorState = { index: -1, rect: null, position: 'top', range: null }
 
+// 에디터 내 삽입된 이미지에 부여할 고유 ID 카운터
+let editorImageCounter = 0
+
 /**
  * 에디터 영역의 이미지 드래그 앤 드롭을 관리하는 훅입니다.
  */
@@ -27,14 +30,33 @@ export const useEditorDragDrop = (
     e.preventDefault()
     const url = e.dataTransfer.getData('text/plain')
     const media = e.dataTransfer.getData('source')
+    const sourceImageId = e.dataTransfer.getData('editor-image-id')
+
+    // 이미지 드래그가 아니면 (텍스트 드래그 등) 완전히 무시
+    if (!media && !sourceImageId) {
+      setDropIndicator(INITIAL_DROP_INDICATOR)
+      return
+    }
     const { range, index } = dropIndicator
 
     setDropIndicator(INITIAL_DROP_INDICATOR)
 
     if (url && editorRef.current) {
+      // 새 이미지 래퍼 생성
+      const newImageId = `editor-img-${++editorImageCounter}`
       const wrapper = document.createElement('div')
       wrapper.className = 'my-8 flex flex-col gap-2 relative group'
       wrapper.contentEditable = 'false'
+      wrapper.setAttribute('draggable', 'true')
+      wrapper.setAttribute('data-editor-image-id', newImageId)
+      // 에디터 내 이미지 드래그 시 고유 ID를 dataTransfer에 설정
+      wrapper.addEventListener('dragstart', (ev: DragEvent) => {
+        if (ev.dataTransfer) {
+          ev.dataTransfer.setData('text/plain', url)
+          ev.dataTransfer.setData('source', media)
+          ev.dataTransfer.setData('editor-image-id', newImageId)
+        }
+      })
 
       const imgContainer = document.createElement('div')
       imgContainer.className = 'relative'
@@ -62,33 +84,40 @@ export const useEditorDragDrop = (
       wrapper.appendChild(imgContainer)
       wrapper.appendChild(caption)
 
+      // 원본 요소 제거 헬퍼 (에디터 내 이미지 이동 시에만 실행)
+      const removeSource = () => {
+        if (!sourceImageId) return
+        const oldEl = editorRef.current?.querySelector(`[data-editor-image-id="${sourceImageId}"]`)
+        oldEl?.remove()
+      }
+
       // 💡 문장 사이 (Range) 삽입 로직
       if (range) {
         try {
           const container = range.startContainer;
           const offset = range.startOffset;
           
-          // 텍스트 노드인 경우 문단 분할 시도
           if (container.nodeType === Node.TEXT_NODE) {
             const parent = container.parentElement;
             if (parent && parent.closest('.drafting-editor')) {
-              // 부모 블록(보통 <p>)을 찾음
               const block = parent.closest('p, h4, div:not(.group)') as HTMLElement;
               if (block && editorRef.current.contains(block)) {
-                // 새로운 블록 생성
                 const newBlock = block.cloneNode(false) as HTMLElement;
                 
-                // 💡 extractContents를 사용하여 마우스 위치부터 블록 끝까지의 모든 노드를 한 번에 추출
                 const splitRange = document.createRange();
                 splitRange.setStart(container, offset);
-                splitRange.setEndAfter(block.lastChild as Node);
+                if (block.lastChild) {
+                  splitRange.setEndAfter(block.lastChild);
+                } else {
+                  splitRange.setEnd(block, 0);
+                }
                 
                 const fragment = splitRange.extractContents();
                 newBlock.appendChild(fragment);
                 
-                // 현재 블록 뒤에 이미지와 새 블록 삽입
                 block.parentNode?.insertBefore(wrapper, block.nextSibling);
                 wrapper.parentNode?.insertBefore(newBlock, wrapper.nextSibling);
+                removeSource();
                 onEditorInput();
                 return;
               }
@@ -109,6 +138,7 @@ export const useEditorDragDrop = (
         p.innerHTML = '<br>'
         editorRef.current.appendChild(p)
       }
+      removeSource();
       onEditorInput()
     }
   }, [dropIndicator, editorRef, onEditorInput])
@@ -116,6 +146,11 @@ export const useEditorDragDrop = (
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     if (!editorRef.current) return
+
+    // 이미지 드래그(썸네일/에디터 이미지)가 아니면 인디케이터 표시 안 함
+    const types = e.dataTransfer.types
+    const isImageDrag = types.includes('source') || types.includes('editor-image-id')
+    if (!isImageDrag) return
 
     // 💡 0. 자동 스크롤(Auto-scroll) 처리
     const scrollContainer = editorRef.current.closest('section');
@@ -136,9 +171,19 @@ export const useEditorDragDrop = (
       }
     }
 
-    // 💡 1. Caret 기반 정밀 위치 탐색 시도
-    // @ts-ignore
-    const range = document.caretRangeFromPoint(e.clientX, e.clientY);
+    // 💡 1. Caret 기반 정밀 위치 탐색 시도 (크로스브라우저 호환)
+    // Firefox/Safari는 caretPositionFromPoint(표준), Chrome은 caretRangeFromPoint 사용
+    let range: Range | null = null;
+    if ('caretPositionFromPoint' in document) {
+      const pos = (document as any).caretPositionFromPoint(e.clientX, e.clientY);
+      if (pos) {
+        range = document.createRange();
+        range.setStart(pos.offsetNode, pos.offset);
+        range.collapse(true);
+      }
+    } else if ('caretRangeFromPoint' in document) {
+      range = (document as any).caretRangeFromPoint(e.clientX, e.clientY);
+    }
     if (range && editorRef.current.contains(range.startContainer)) {
       const container = range.startContainer;
       
