@@ -323,7 +323,7 @@ details[open] .source-arrow {
 }
 
 .media-badge {
-  @apply px-6 py-2 rounded-2xl font-bold text-[18px] mb-6 inline-flex items-center justify-center w-full mx-auto text-center;
+  @apply px-6 py-1.5 rounded-2xl font-bold text-[17px] mb-6 inline-flex items-center justify-center w-full mx-auto text-center border transition-all cursor-default;
 }
 
 .inner-analysis-box {
