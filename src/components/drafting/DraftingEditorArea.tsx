@@ -311,12 +311,12 @@ const DraftingEditorArea = ({
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-bold text-[14.5px] tracking-tight flex items-center gap-2.5 text-slate-800">
                 <div className="size-8 rounded-full bg-primary text-white flex items-center justify-center shadow-sm">
-                  <span className="material-symbols-outlined icon-md">perm_media</span>
+                  <span className="material-symbols-outlined icon-md" style={{ fontVariationSettings: "'wght' 300" }}>description</span>
                 </div>
                 관련 뉴스 미디어
               </h3>
             </div>
-            <div className="bg-orange-50/50 border border-dashed border-orange-200 rounded-lg p-2.5 mb-4 flex items-center justify-center gap-2">
+            <div className="bg-orange-50/50 border border-dashed border-orange-200 p-2.5 mb-4 flex items-center justify-center gap-2">
               <span className="material-symbols-outlined text-primary icon-md">drag_pan</span>
               <p className="text-[11px] font-bold text-primary">이미지를 본문에 드래그하여 삽입하세요</p>
             </div>
@@ -329,7 +329,7 @@ const DraftingEditorArea = ({
                 draggable="true"
                 onDragStart={(e) => handleDragStart(e, item.url, item.publisher)}
               >
-                <div className="aspect-video rounded-lg overflow-hidden border border-slate-200 bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
+                <div className="aspect-video overflow-hidden border border-slate-200 bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
                   <img alt={item.publisher} className="w-full h-full object-cover" src={item.url} />
                 </div>
                 <span className="text-[10px] font-medium text-slate-500 text-center truncate px-1" title={item.title}>

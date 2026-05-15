@@ -63,7 +63,7 @@ export const useEditorDragDrop = (
 
       const img = document.createElement('img')
       img.src = url
-      img.className = 'w-full rounded-xl shadow-lg border border-slate-200'
+      img.className = 'w-full shadow-lg border border-slate-200'
 
       const deleteBtn = document.createElement('button')
       deleteBtn.className = 'editor-delete-btn absolute top-3 right-3 size-8 bg-black/60 hover:bg-red-500 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg z-10'
