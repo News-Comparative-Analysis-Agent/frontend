@@ -115,7 +115,7 @@ const MainHero = ({ activeIssueType, stats, dailyStats }: MainHeroProps) => {
                       <span className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[38px] xl:text-[52px] font-black select-none -z-10 ${idx === 0 ? 'text-primary/10' : 'text-white/10'}`}>
                         {step.num}
                       </span>
-                      <span className={`font-black tracking-tighter leading-none transition-all duration-500 ${idx === 0 ? 'text-primary text-[16px] xl:text-[22px]' : 'text-white/90 text-[20px] xl:text-[26px]'}`}>
+                      <span className={`font-bold tracking-tighter leading-none transition-all duration-500 ${idx === 0 ? 'text-[18px] xl:text-[24px] text-primary' : 'text-[22px] xl:text-[28px] text-white/90'}`}>
                         {step.num}
                       </span>
                     </div>
