@@ -133,9 +133,10 @@ export const useDraftChat = ({
       }
     } catch (error) {
       console.error('Chat error:', error)
+      const msg = error instanceof Error ? error.message : '죄송합니다. 서버와 통신 중 오류가 발생했습니다.';
       setMessages(prev => [...prev, {
         role: 'ai',
-        content: '죄송합니다. 서버와 통신 중 오류가 발생했습니다.',
+        content: msg,
       }])
     } finally {
       setIsChatLoading(false)
