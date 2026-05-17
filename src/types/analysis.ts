@@ -152,3 +152,14 @@ export interface IssueTimelineResponse {
   target_issue_name: string;
   timeline: TimelineEvent[];
 }
+
+/** AI 챗봇 메시지 타입 (useDraftChat, DraftingChatbot 공용) */
+export interface ChatMessage {
+  role: 'user' | 'ai';
+  content: string;
+  modifiedContent?: string;
+  originalContent?: string; // 제안 당시의 원본 본문 (대조용)
+  isApplied?: boolean;
+  isCancelled?: boolean; // 제안 취소 여부
+}
+

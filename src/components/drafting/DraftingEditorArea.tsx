@@ -51,55 +51,54 @@ const DraftingEditorArea = ({
   useEffect(() => {
     if (!editorRef.current) return;
 
-    const observer = new MutationObserver(() => {
-      // 루프 방지: 수정 전에 observer 일시 중단
-      observer.disconnect();
+    // 💡 재진입 방지 플래그: 이미 보정 작업 중이면 새로운 mutation 이벤트를 무시합니다.
+    // 이 플래그가 없으면 DOM 수정 → 새 mutation 발생 → 또 수정 의 무한 루프 위험이 있습니다.
+    let isProcessing = false;
 
+    const processMarkers = () => {
       const markers = editorRef.current?.querySelectorAll('.citation-marker');
-      let mutated = false;
-
       markers?.forEach(marker => {
-        // contenteditable 강제 적용
+        // contenteditable 강제 고정
         if (marker.getAttribute('contenteditable') !== 'false') {
           marker.setAttribute('contenteditable', 'false');
-          mutated = true;
         }
 
-        // 오염된 내용 자가 치유 (숫자 이외의 문자 제거)
+        // 오염된 텍스트 자가 치유 (숫자·대괄호 이외의 문자 제거)
         const currentText = marker.textContent || '';
         if (currentText && /[^0-9[\]]/.test(currentText)) {
           const numbers = currentText.replace(/[^0-9]/g, '');
           if (numbers) {
             marker.textContent = `[${numbers}]`;
-            mutated = true;
           }
         }
       });
+    };
 
-      // DOM 수정이 있었을 때만 상태 동기화 (handleEditorInput 직접 호출 금지 → 루프 방지)
-      if (mutated && editorRef.current) {
-        const newHtml = editorRef.current.innerHTML;
-        // editorRef 내부 수정사항을 스토어에 반영 (skipDirty로 히스토리 오염 방지)
-        // NOTE: 이 경로는 contenteditable 보정용이므로 dirty 체크는 생략
-      }
+    const observer = new MutationObserver(() => {
+      // 이미 처리 중이면 즉시 종료 (무한 루프 차단)
+      if (isProcessing) return;
+      isProcessing = true;
 
-      // 수정 완료 후 재연결
+      // 관찰 일시 중단 후 보정 작업 수행
+      observer.disconnect();
+      processMarkers();
+
+      // 보정 완료 후 재연결
       if (editorRef.current) {
         observer.observe(editorRef.current, {
           childList: true,
           subtree: true,
+          // characterData는 citation-marker 내부 텍스트 오염만 감지하면 충분
+          // (subtree: true와 함께 쓰면 모든 텍스트 변경을 감지하므로 범위 유지)
           characterData: true,
         });
       }
+
+      isProcessing = false;
     });
 
-    // 초기 마커 처리 (마운트 시 1회)
-    const initialMarkers = editorRef.current.querySelectorAll('.citation-marker');
-    initialMarkers.forEach(marker => {
-      if (marker.getAttribute('contenteditable') !== 'false') {
-        marker.setAttribute('contenteditable', 'false');
-      }
-    });
+    // 초기 마커 처리 (마운트 시 1회, observer 등록 전에 실행)
+    processMarkers();
 
     observer.observe(editorRef.current, {
       childList: true,
@@ -108,7 +107,7 @@ const DraftingEditorArea = ({
     });
 
     return () => observer.disconnect();
-  }, []); // 컴포넌트 마운트 시 한 번만 등록
+  }, []); // editorRef는 안정적인 ref이므로 의존성 불필요
 
   const handleEditorClick = (e: React.MouseEvent) => {
     if (isPreviewMode) return;

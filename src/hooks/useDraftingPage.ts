@@ -33,6 +33,7 @@ export const useDraftingPage = () => {
   const [draftImages, setDraftImages] = useState<DraftImage[]>([])
   const editorRef = useRef<HTMLDivElement>(null)
   const loadingRef = useRef<string | null>(null)
+  const hasLoadedRef = useRef(false) // 이슈별 로딩 완료 여부 추적
   const historyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // 수동 입력 시: 상태는 즉시 업데이트, 히스토리는 1초간 멈췄을 때만 기록 (단축키용)
@@ -195,18 +196,20 @@ export const useDraftingPage = () => {
       setContent('')
       setSidebarQuotes([])
       loadingRef.current = null
+      hasLoadedRef.current = false // 이슈 바뀌면 로딩 플래그 초기화
     }
   }, [issueId, currentIssueId, setIssueId, setTitle, setContent, setSidebarQuotes])
 
-  // --- 빈 상태일 때 초안 로드 ---
+  // --- 빈 상태일 때 초안 로드 (이슈당 1회만 실행) ---
   useEffect(() => {
-    if (issueId === currentIssueId && (!content || !title || sidebarQuotes.length === 0)) {
+    if (issueId === currentIssueId && !hasLoadedRef.current) {
+      hasLoadedRef.current = true
       loadDraft()
     }
     if (issueId === currentIssueId && draftImages.length === 0) {
       loadImages()
     }
-  }, [issueId, currentIssueId, content, title, sidebarQuotes, draftImages.length, loadDraft, loadImages])
+  }, [issueId, currentIssueId, draftImages.length, loadDraft, loadImages])
 
   // --- 💡 고도화된 반응형 사이드바 자동 수납 (사용자 수동 조작 보호 버전) ---
   const prevWidthRef = useRef(window.innerWidth);

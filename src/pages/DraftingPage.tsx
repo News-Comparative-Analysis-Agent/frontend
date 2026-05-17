@@ -55,41 +55,38 @@ const DraftingPage = () => {
 
   // 팝업 감시를 위한 Ref
   const popupRef = useRef<Window | null>(null)
-  const popupTimerRef = useRef<any>(null)
+  const popupTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // --- 사이드바 축소 시 보여줄 고유 언론사 목록 추출 ---
   const uniqueMediaList = Array.from(new Map(sidebarQuotes.map(q => [q.media, q])).values());
 
+  // 팝업 타이머 정리 헬퍼 (중복 등록 방지)
+  const clearPopupTimer = () => {
+    if (popupTimerRef.current !== null) {
+      clearInterval(popupTimerRef.current)
+      popupTimerRef.current = null
+    }
+  }
+
   const openArticlePopup = (url: string) => {
     if (!url) return;
-    
-    // 기존 타이머가 있다면 제거
-    if (popupTimerRef.current) {
-      clearInterval(popupTimerRef.current);
-    }
-    
-    // 💡 사용자의 현재 화면 해상도를 감지하여 정확히 절반(50%) 너비로 설정하되,
-    // 윈도우(OS)의 투명 테두리(Invisible Borders)가 차지하는 면적을 감안하여 살짝 적게(49.5%) 줍니다.
+    clearPopupTimer()
     const screenWidth = window.screen.availWidth;
     const screenHeight = window.screen.availHeight;
-    const popupWidth = Math.floor(screenWidth * 0.495); // 절반보다 약간 작게
-    
+    const popupWidth = Math.floor(screenWidth * 0.495);
     try {
-      window.moveTo(screenWidth - popupWidth, 0); // 화면 우측으로 배치
+      window.moveTo(screenWidth - popupWidth, 0);
       window.resizeTo(popupWidth, screenHeight);
     } catch (e) {
       console.warn("Main window control limited by browser policy");
     }
-    
     const features = `width=${popupWidth},height=${screenHeight},left=0,top=0,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`;
     const popup = window.open(url, 'CrossCheckArticle', features);
     popupRef.current = popup;
-
-    // 팝업 닫힘 감지 타이머 시작
     if (popup) {
       popupTimerRef.current = setInterval(() => {
         if (popup.closed) {
-          if (popupTimerRef.current) clearInterval(popupTimerRef.current);
+          clearPopupTimer()
           setSelectedQuote(null);
           setIsCrossCheckMode(false);
           popupRef.current = null;
@@ -98,12 +95,29 @@ const DraftingPage = () => {
     }
   };
 
+  const handleSelectQuote = (quote: SidebarQuote | null) => {
+    setSelectedQuote(quote)
+    if (quote) {
+      setIsCrossCheckMode(true)
+      if (!isGuideHiddenLocally) {
+        setShowGuide(true)
+      }
+      if (quote.links?.[0]) {
+        openArticlePopup(quote.links[0])
+      }
+    } else {
+      setIsCrossCheckMode(false)
+      setShowGuide(false)
+    }
+  }
+
+
   // 언마운트 및 리사이즈 이벤트 정리
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth)
     window.addEventListener('resize', handleResize)
     return () => {
-      if (popupTimerRef.current) clearInterval(popupTimerRef.current)
+      clearPopupTimer() // 헬퍼 함수로 확실하게 정리
       window.removeEventListener('resize', handleResize)
     }
   }, []);
@@ -181,12 +195,8 @@ const DraftingPage = () => {
           isCrossCheckMode={isCrossCheckMode}
           setIsCrossCheckMode={setIsCrossCheckMode}
           selectedQuote={selectedQuote}
-          setSelectedQuote={(quote) => {
-            setSelectedQuote(quote)
-            if (quote && !isGuideHiddenLocally) {
-              setShowGuide(true) // 기사 선택 시 가이드 표시 (숨기기 설정 안 했을 때만)
-            }
-          }}
+          setSelectedQuote={handleSelectQuote}
+          onOpenPopup={openArticlePopup}
           setComparisonLayout={setComparisonLayout}
         />
 
@@ -208,10 +218,8 @@ const DraftingPage = () => {
                 <button
                   key={media.id}
                   onClick={() => {
-                    setSelectedQuote(media);
-                    setIsCrossCheckMode(true);
+                    handleSelectQuote(media);
                     setIsRightSidebarOpen(false); // 💡 아이콘 클릭 시 우측 챗봇도 자동으로 닫기
-                    openArticlePopup(media.links?.[0]);
                   }}
                   className={`${windowWidth < 1100 ? 'h-7 px-2.5 text-[10px]' : 'h-9 px-4 text-[12px]'} rounded-full flex items-center justify-center font-black border-2 transition-all duration-300 hover:scale-105 active:scale-95 shadow-sm whitespace-nowrap ${
                     selectedQuote?.media === media.media 

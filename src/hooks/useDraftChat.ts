@@ -1,15 +1,9 @@
 import { useState, useRef, useEffect, useCallback, RefObject } from 'react'
 import { chatWithAI } from '../api/drafting'
 import { applyMediaBolding } from '../utils/mediaBolding'
+import { generateFullDiffHtml } from '../utils/diffUtils'
+import { ChatMessage } from '../types/analysis'
 
-interface ChatMessage {
-  role: 'user' | 'ai'
-  content: string
-  modifiedContent?: string
-  originalContent?: string // 💡 제안 당시의 원본 본문 (대조용)
-  isApplied?: boolean
-  isCancelled?: boolean // 💡 사용자가 제안을 명시적으로 취소했는지 여부
-}
 
 const INITIAL_MESSAGE: ChatMessage = {
   role: 'ai',
@@ -104,7 +98,6 @@ export const useDraftChat = ({
 
       // 💡 [2단계 확장] 본문 실시간 프리뷰 주입 (실제 본문 보존)
       if (aiModifiedContent) {
-        import('../utils/diffUtils').then(({ generateFullDiffHtml }) => {
           // AI가 제안한 내용에도 언론사 이름이 있다면 볼드 처리 적용
           const boldedModifiedContent = applyMediaBolding(aiModifiedContent, mediaNames);
           
@@ -122,7 +115,6 @@ export const useDraftChat = ({
             originalContent: realTimeContent,
             isApplied: false
           }])
-        }).catch(err => console.error('Diff Preview Error:', err));
       } else {
         const boldedMsgContent = applyMediaBolding(aiMsgContent || '응답을 생성했습니다.', mediaNames);
         setMessages(prev => [...prev, {
