@@ -1,15 +1,8 @@
-import React, { RefObject, useEffect } from 'react'
+import React, { RefObject } from 'react'
 import Loader from '../ui/Loader'
 import { getDiffWithContext } from '../../utils/diffUtils'
+import { ChatMessage } from '../../types/analysis'
 
-interface ChatMessage {
-  role: 'user' | 'ai';
-  content: string;
-  modifiedContent?: string;
-  originalContent?: string; // 💡 제안 당시의 원본 본문 (대조용)
-  isApplied?: boolean;
-  isCancelled?: boolean; // 💡 제안 취소 여부 추가
-}
 
 interface DraftingChatbotProps {
   isOpen: boolean
@@ -121,10 +114,6 @@ const DraftingChatbot = ({
                             
                             <div className="text-[13.5px] leading-[1.9] text-slate-600 font-medium whitespace-pre-wrap">
                               {(() => {
-                                // 💡 [디버깅] 대조 데이터 상태 체크
-                                console.log('[DIFF_CHECK] Original:', msg.originalContent ? 'OK' : 'EMPTY');
-                                console.log('[DIFF_CHECK] Modified:', msg.modifiedContent ? 'OK' : 'EMPTY');
-
                                 if (!msg.originalContent || !msg.modifiedContent) {
                                   return <div className="text-slate-400 italic py-2 text-center">대조할 데이터가 없습니다. 새로운 요청을 보내주세요!</div>;
                                 }

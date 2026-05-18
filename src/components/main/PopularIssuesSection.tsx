@@ -123,7 +123,7 @@ const PopularIssuesSection = ({
           </div>
 
           {/* [가운데 영역] 달력 (절대 중앙 정렬) */}
-          <div className="flex justify-center w-full md:w-auto md:absolute md:left-1/2 md:-translate-x-1/2 z-20">
+          <div className="flex justify-center w-full md:w-auto md:absolute md:left-1/2 md:-translate-x-1/2 z-[100]">
             <CompactHeaderCalendar 
               selectedDate={selectedDate}
               onDateChange={onDateChange}
