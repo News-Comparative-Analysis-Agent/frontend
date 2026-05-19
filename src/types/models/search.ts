@@ -21,6 +21,14 @@ export interface NlpSearchStructured {
   topics: NlpSearchTopic[];
 }
 
+export interface MatchedIssue {
+  id: number;
+  name: string;
+  description: string;
+  issue_type: string;
+  created_at: string;
+}
+
 export interface NlpSearchData {
   original_query: string;
   generated_keywords: string[];
@@ -29,6 +37,7 @@ export interface NlpSearchData {
   total_results: number;
   articles: NlpSearchArticle[];
   by_source: Record<string, number>;
+  matched_issues?: MatchedIssue[];
 }
 
 export interface NlpSearchResponse {
