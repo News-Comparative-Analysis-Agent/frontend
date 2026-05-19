@@ -52,29 +52,12 @@ const SearchResultsPage = () => {
     const fetchData = async () => {
       if (!query) return
 
-      // sessionStorage 캐시 확인
-      const cacheKey = `nlp_search_${query}`
-      try {
-        const cached = sessionStorage.getItem(cacheKey)
-        if (cached) {
-          setSearchData(JSON.parse(cached))
-          return
-        }
-      } catch (e) {
-        console.warn('sessionStorage read error:', e)
-      }
-
       setLoading(true)
       setError(null)
       try {
         const response = await postNlpSearch(query)
         if (response.success) {
           setSearchData(response.data)
-          try {
-            sessionStorage.setItem(cacheKey, JSON.stringify(response.data))
-          } catch (e) {
-            console.warn('sessionStorage write error:', e)
-          }
         } else {
           setError(response.message || '검색 결과를 가져오는 데 실패했습니다.')
         }
