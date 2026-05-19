@@ -2,9 +2,10 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDraftStore } from '../stores/useDraftStore'
 import { fetchIssueDraft, fetchDraftImages, fetchDraftCitations } from '../api/issues'
-import { PreGeneratedDraft, SidebarQuote, DraftImage, CitationItem } from '../types/analysis'
+import { SidebarQuote, DraftImage } from '../types/analysis'
 import { buildMediaColorMap } from '../utils/mediaColors'
 import { buildDraftHtml, sanitizeDraftHtml } from '../utils/buildDraftHtml'
+import { Editor } from '@tiptap/core'
 
 import { useUnsavedChangesGuard } from './useUnsavedChangesGuard'
 import { usePanelResize } from './usePanelResize'
@@ -31,37 +32,27 @@ export const useDraftingPage = () => {
   const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true)
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true)
   const [draftImages, setDraftImages] = useState<DraftImage[]>([])
-  const editorRef = useRef<HTMLDivElement>(null)
+  // Tiptap editor 인스턴스 (DraftingEditorArea에서 onEditorReady로 전달받음)
+  const editorRef = useRef<Editor | null>(null)
   const loadingRef = useRef<string | null>(null)
-  const hasLoadedRef = useRef(false) // 이슈별 로딩 완료 여부 추적
+  const hasLoadedRef = useRef(false)
   const historyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // 수동 입력 시: 상태는 즉시 업데이트, 히스토리는 1초간 멈췄을 때만 기록 (단축키용)
-  const handleEditorInput = useCallback(() => {
-    if (editorRef.current) {
-      const newHtml = editorRef.current.innerHTML;
-      
-      if (isPreviewMode) {
-        if (newHtml !== previewContent) {
-          setPreviewContent(newHtml);
-        }
-      } else {
-        if (newHtml !== content) {
-          // 💡 입력 시작 시점에 이전 상태를 한 번 기록 (연속 입력은 하나의 히스토리로 취급)
-          if (!historyTimeoutRef.current) {
-            pushHistory(content);
-          }
-          
-          setContent(newHtml);
-          
-          if (historyTimeoutRef.current) clearTimeout(historyTimeoutRef.current)
-          historyTimeoutRef.current = setTimeout(() => {
-            historyTimeoutRef.current = null; // 1.2초 후 타이머 해제
-          }, 1200)
-        }
-      }
+  // Tiptap onUpdate에서 호출: HTML 문자열로 상태 업데이트
+  const handleEditorInput = useCallback((newHtml: string) => {
+    if (isPreviewMode) return // 프리뷰 모드 중 유저 입력 무시
+    if (newHtml !== content) {
+      if (!historyTimeoutRef.current) pushHistory(content)
+      setContent(newHtml)
+      if (historyTimeoutRef.current) clearTimeout(historyTimeoutRef.current)
+      historyTimeoutRef.current = setTimeout(() => { historyTimeoutRef.current = null }, 1200)
     }
-  }, [setContent, setPreviewContent, content, previewContent, isPreviewMode, pushHistory])
+  }, [setContent, content, isPreviewMode, pushHistory])
+
+  // DraftingEditorArea에서 Tiptap editor 인스턴스를 받아 ref에 저장
+  const handleEditorReady = useCallback((editor: Editor) => {
+    editorRef.current = editor
+  }, [])
 
   const {
     messages, inputMessage, setInputMessage, isChatLoading,
@@ -69,19 +60,19 @@ export const useDraftingPage = () => {
   } = useDraftChat({ 
     issueId, 
     content, 
-    editorRef: editorRef as React.RefObject<HTMLDivElement>, 
+    editorRef,
     setContent,
-    previewContent, // 💡 임시 저장소 전달
-    setPreviewContent, // 💡 임시 저장소 제어 함수 전달
+    previewContent,
+    setPreviewContent,
     setPreviewMode,
     pushHistory,
     undo,
-    mediaNames: sidebarQuotes.map(q => q.media) // 💡 언론사 목록 전달
+    mediaNames: sidebarQuotes.map(q => q.media)
   })
 
   const {
     dropIndicator, handleDragStart, handleDrop, handleDragOver, handleDragLeave
-  } = useEditorDragDrop(editorRef as React.RefObject<HTMLDivElement>, handleEditorInput)
+  } = useEditorDragDrop(editorRef, handleEditorInput)
 
   // --- 초안 로딩 ---
   const loadDraft = useCallback(async () => {
@@ -242,16 +233,7 @@ export const useDraftingPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [setIsLeftSidebarOpen, setIsRightSidebarOpen]);
 
-  // --- 에디터 DOM 동기화 ---
-  useEffect(() => {
-    if (editorRef.current) {
-      // 💡 프리뷰 모드면 previewContent를, 아니면 일반 content를 보여줌
-      const displayContent = isPreviewMode ? (previewContent || '') : (content || '');
-      if (editorRef.current.innerHTML !== displayContent) {
-        editorRef.current.innerHTML = displayContent;
-      }
-    }
-  }, [content, previewContent, isPreviewMode])
+  // Tiptap이 콘텐츠 동기화를 직접 수행하므로 이전 innerHTML 동기화 useEffect 제거
 
   const temporarySave = useCallback(async () => {
     console.log('--- [저장 버튼 트리거] ---')
@@ -351,6 +333,7 @@ export const useDraftingPage = () => {
     editorRef,
     chatEndRef,
     handleEditorInput,
+    handleEditorReady,
     handleMouseDown,
     handleDragStart,
     handleDragOver,
@@ -358,7 +341,7 @@ export const useDraftingPage = () => {
     handleDrop,
     handleSendMessage,
     applySuggestion,
-    cancelSuggestion, // 💡 신규 추가
+    cancelSuggestion,
     undoSuggestion,
     undo,
     redo,

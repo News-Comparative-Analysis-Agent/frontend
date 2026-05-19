@@ -3,7 +3,7 @@ import { chatWithAI } from '../api/drafting'
 import { applyMediaBolding } from '../utils/mediaBolding'
 import { generateFullDiffHtml } from '../utils/diffUtils'
 import { ChatMessage } from '../types/analysis'
-
+import { Editor } from '@tiptap/core'
 
 const INITIAL_MESSAGE: ChatMessage = {
   role: 'ai',
@@ -13,14 +13,14 @@ const INITIAL_MESSAGE: ChatMessage = {
 interface UseDraftChatOptions {
   issueId: string
   content: string
-  editorRef: RefObject<HTMLDivElement>
+  editorRef: RefObject<Editor | null>
   setContent: (content: string, skipDirty?: boolean) => void
   previewContent: string | null
   setPreviewContent: (content: string | null) => void
   setPreviewMode: (val: boolean) => void
   pushHistory: () => void
   undo: () => void
-  mediaNames?: string[] // 💡 추가
+  mediaNames?: string[]
 }
 
 /**
@@ -62,8 +62,8 @@ export const useDraftChat = ({
     setMessages(currentMessages)
     setIsChatLoading(true)
 
-    // 실시간 에디터 내용 확보 (AI 요청 전 최신 상태 확보)
-    const realTimeContent = editorRef.current?.innerHTML || realContent;
+    // 실시간 에디터 내용 확보 (Tiptap editor.getHTML() 사용)
+    const realTimeContent = editorRef.current?.getHTML() || realContent;
 
     try {
 
@@ -135,48 +135,43 @@ export const useDraftChat = ({
     }
   }, [inputMessage, isChatLoading, realContent, issueId, messages, editorRef, mediaNames])
 
-  // AI의 수정 제안을 수동으로 에디터에 반영 (지능형 태그 세척 포함)
   const applySuggestion = useCallback((index: number) => {
     const msg = messages[index];
     if (msg?.role === 'ai') {
-      pushHistory(); // Undo 스냅샷 저장
+      pushHistory();
 
-      // 💡 [지능형 태그 세척] 사용자가 하이라이트 상태에서 수정한 내용을 반영하기 위해 에디터에서 직접 읽어옴
+      // Tiptap editor에서 현재 HTML 가져오기
+      const currentHtml = editorRef.current?.getHTML() || '';
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = currentHtml;
+
+      // 1. 빨간색 하이라이트(삭제 예정) 요소들 제거
+      const removedSpans = tempDiv.querySelectorAll('.bg-rose-100');
+      removedSpans.forEach(span => span.remove());
+
+      // 2. 초록색 하이라이트(추가) 태그 제거 (글자만 남김)
+      const addedSpans = tempDiv.querySelectorAll('.bg-emerald-100');
+      addedSpans.forEach(span => {
+        const text = span.textContent || '';
+        span.replaceWith(text);
+      });
+
+      const cleanedHtml = tempDiv.innerHTML;
+      const reBoldedHtml = applyMediaBolding(cleanedHtml, mediaNames);
+
+      // Tiptap에 수정된 콘텐츠 설정
       if (editorRef.current) {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = editorRef.current.innerHTML;
-
-        // 1. 빨간색 하이라이트(삭제 예정) 요소들 제거
-        const removedSpans = tempDiv.querySelectorAll('.bg-rose-100');
-        removedSpans.forEach(span => span.remove());
-
-        // 2. 초록색 하이라이트(추가) 태그 제거 (글자만 남김)
-        const addedSpans = tempDiv.querySelectorAll('.bg-emerald-100');
-        addedSpans.forEach(span => {
-          const text = span.textContent || '';
-          span.replaceWith(text);
-        });
-
-        // 3. 태그 세척 과정에서 사라졌을 수 있는 언론사 볼드 처리 재적용
-        const cleanedHtml = tempDiv.innerHTML;
-        const reBoldedHtml = applyMediaBolding(cleanedHtml, mediaNames);
-
-        // 4. 최종 정제된 내용을 본문에 주입 및 프리뷰 종료
-        setContent(reBoldedHtml);
-        setPreviewContent(null);
-        setPreviewMode(false);
-      } else if (msg.modifiedContent) {
-        setContent(msg.modifiedContent);
-        setPreviewContent(null);
-        setPreviewMode(false);
+        editorRef.current.commands.setContent(reBoldedHtml);
       }
+      setContent(reBoldedHtml);
+      setPreviewContent(null);
+      setPreviewMode(false);
 
-      // 해당 메시지의 반영 상태 업데이트
       const newMessages = [...messages];
       newMessages[index] = { ...msg, isApplied: true };
       setMessages(newMessages);
     }
-  }, [messages, setContent, setPreviewContent, setPreviewMode, pushHistory, editorRef]);
+  }, [messages, setContent, setPreviewContent, setPreviewMode, pushHistory, editorRef, mediaNames]);
 
   // 프리뷰 상태를 취소하고 원래 본문으로 복구 (카드는 유지)
   const cancelSuggestion = useCallback((index: number) => {

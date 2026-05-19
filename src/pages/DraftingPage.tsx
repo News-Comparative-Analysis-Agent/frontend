@@ -30,7 +30,7 @@ const DraftingPage = () => {
     chatbotWidth, isResizing,
     messages, inputMessage, setInputMessage, isChatLoading,
     dropIndicator, editorRef, chatEndRef,
-    handleEditorInput, handleMouseDown,
+    handleEditorInput, handleEditorReady, handleMouseDown,
     handleDragStart, handleDragOver, handleDragLeave, handleDrop,
     handleSendMessage,
     applySuggestion,
@@ -235,14 +235,14 @@ const DraftingPage = () => {
           </div>
         )}
 
-        {/* 2. 중앙 에디터 영역: 제목 및 본문 편집 (좌우 버튼 공간 확보를 위해 조건부 여백 유지) */}
+        {/* 2. 중앙 에디터 영역 */}
         <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${!isLeftSidebarOpen ? (windowWidth < 1100 ? 'pl-4' : 'pl-12 md:pl-0') : ''} ${!isRightSidebarOpen ? (windowWidth < 1100 ? 'pr-4' : 'pr-12 md:pr-0') : ''}`}>
           <DraftingEditorArea 
             title={title}
             setTitle={setTitle}
             content={content}
-            editorRef={editorRef}
-            handleEditorInput={handleEditorInput}
+            onContentChange={handleEditorInput}
+            onEditorReady={handleEditorReady}
             handleDragOver={handleDragOver}
             handleDragLeave={handleDragLeave}
             handleDrop={handleDrop}
