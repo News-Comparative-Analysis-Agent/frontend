@@ -71,24 +71,22 @@ const DraftingEditorArea = ({
     if (editor) onEditorReady(editor)
   }, [editor, onEditorReady])
 
-  // 외부(undo/redo, AI제안, 초안 로드) 에 의한 content 변경 시 에디터 동기화
-  useEffect(() => {
-    if (!editor || isPreviewMode) return
-    if (content !== editor.getHTML()) {
-      editor.commands.setContent(content)
-    }
-  }, [content, editor, isPreviewMode])
-
+  // 에디터 컨텐츠 및 편집 가능 여부 동기화 (AI 프리뷰 및 외부 변경 대응)
   useEffect(() => {
     if (!editor) return
-    if (isPreviewMode && previewContent) {
-      editor.commands.setContent(previewContent)
+
+    if (isPreviewMode && previewContent !== null) {
+      if (previewContent !== editor.getHTML()) {
+        editor.commands.setContent(previewContent)
+      }
       editor.setEditable(false)
     } else {
-      editor.commands.setContent(content)
+      if (content !== editor.getHTML()) {
+        editor.commands.setContent(content)
+      }
       editor.setEditable(true)
     }
-  }, [isPreviewMode, previewContent, content])
+  }, [editor, isPreviewMode, previewContent, content])
 
   // 팝오버 외부 클릭 닫기
   useEffect(() => {
@@ -102,31 +100,43 @@ const DraftingEditorArea = ({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [activeCitation])
 
-  // 인용 마커 클릭 감지 (이벤트 위임)
-  const handleEditorClick = (e: React.MouseEvent) => {
-    if (isPreviewMode) return
-    const target = e.target as HTMLElement
-    const marker = target.closest('.citation-marker')
-    if (marker) {
-      const id = marker.getAttribute('data-id')
-      const citation = citations.find(c => c.id.toString() === id)
-      if (citation && editorWrapperRef.current) {
-        const wrapperRect = editorWrapperRef.current.getBoundingClientRect()
-        const leftPos = Math.min(e.clientX - wrapperRect.left, wrapperRect.width - 410)
-        const topPos = e.clientY - wrapperRect.top + 15
-        setPopoverPos({ top: topPos, left: Math.max(10, leftPos) })
-        setActiveCitation(citation)
-        setArticleContent(null)
-        if (citation.article_id) {
-          setIsLoadingArticle(true)
-          fetchArticleBody(citation.article_id)
-            .then(res => setArticleContent(res.raw_content))
-            .catch(() => setArticleContent(null))
-            .finally(() => setIsLoadingArticle(false))
+  // 인용 마커 클릭 감지 (이벤트 위임 - ProseMirror 이벤트 전파 차단을 우회하기 위해 캡처링 단계의 네이티브 이벤트 리스너 등록)
+  useEffect(() => {
+    const handleNativeClick = (e: MouseEvent) => {
+      if (isPreviewMode) return
+      const target = e.target as HTMLElement
+      
+      // 클릭한 대상이 에디터 영역 내부인지 검사
+      const wrapper = editorWrapperRef.current
+      if (!wrapper || !wrapper.contains(target)) return
+
+      const marker = target.closest('.citation-marker')
+      if (marker) {
+        const id = marker.getAttribute('data-id')
+        const citation = citations.find(c => c.id.toString() === id)
+        if (citation) {
+          const wrapperRect = wrapper.getBoundingClientRect()
+          const leftPos = Math.min(e.clientX - wrapperRect.left, wrapperRect.width - 410)
+          const topPos = e.clientY - wrapperRect.top + 15
+          setPopoverPos({ top: topPos, left: Math.max(10, leftPos) })
+          setActiveCitation(citation)
+          setArticleContent(null)
+          if (citation.article_id) {
+            setIsLoadingArticle(true)
+            fetchArticleBody(citation.article_id)
+              .then(res => setArticleContent(res.raw_content))
+              .catch(() => setArticleContent(null))
+              .finally(() => setIsLoadingArticle(false))
+          }
         }
       }
     }
-  }
+
+    document.addEventListener('click', handleNativeClick, true) // capturing phase
+    return () => {
+      document.removeEventListener('click', handleNativeClick, true)
+    }
+  }, [citations, isPreviewMode])
 
   // 드롭 인디케이터 좌표 계산
   const getIndicatorTop = () => {
@@ -169,7 +179,7 @@ const DraftingEditorArea = ({
         </div>
 
         {/* Tiptap 에디터 */}
-        <div className="relative" ref={editorWrapperRef} onClick={handleEditorClick}>
+        <div className="relative" ref={editorWrapperRef}>
           <EditorContent editor={editor} />
 
           {/* 인용 출처 팝오버 */}
