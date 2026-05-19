@@ -67,10 +67,14 @@ const FinalReviewPage = () => {
     doc.querySelectorAll('.citation-marker').forEach(el => el.remove())
     
     // 2. 하이라이트 태그 및 굵은 글씨(strong, b) 태그 제거 (텍스트는 유지)
-    // - span[class*="hl-"]: 배경색 하이라이트
-    // - strong, b: 굵은 글씨 강조 (언론사명 등)
+    // 2. 하이라이트 태그 및 굵은 글씨(strong, b) 태그 제거 (텍스트는 유지)
+    // 단, 이미지 블록([data-editor-image-id="tiptap"]) 내부의 구조(사진 및 출처 굵기 등)는 붕괴되지 않도록 보호합니다.
     const decorators = doc.querySelectorAll('span[class*="hl-"], span[class*="text-highlight-"], strong, b')
     decorators.forEach(el => {
+      // 이미지 블록의 자식 요소이면 데코레이터 제거 대상에서 제외
+      if (el.closest('[data-editor-image-id]')) {
+        return;
+      }
       el.replaceWith(...Array.from(el.childNodes))
     })
     
@@ -80,7 +84,10 @@ const FinalReviewPage = () => {
       resolvedTitle: title || draftFromApi?.title || reviewData?.name || '제목 없음',
       resolvedBody: cleanedBody,
       textLength: stripHtml(cleanedBody).length,
-      safeContent: DOMPurify.sanitize(cleanedBody),
+      safeContent: DOMPurify.sanitize(cleanedBody, {
+        ADD_TAGS: ['span', 'h4', 'div', 'br', 'p', 'img'],
+        ADD_ATTR: ['class', 'data-id', 'src', 'alt', 'data-editor-image-id', 'style']
+      }),
     }
   }, [title, content, draftFromApi, reviewData?.name])
 

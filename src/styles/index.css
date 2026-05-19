@@ -515,6 +515,31 @@ details[open] .source-arrow {
   display: none !important;
 }
 
+/* ── 최종 검토 페이지 이미지 스타일 ── */
+.review-clean-mode [data-editor-image-id="tiptap"] {
+  margin: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.review-clean-mode [data-editor-image-id="tiptap"] img {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+.review-clean-mode [data-editor-image-id="tiptap"] p {
+  font-size: 12.5px;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  text-align: center;
+}
+
 /* ── Tiptap 에디터 스타일 ── */
 .tiptap-editor {
   white-space: pre-wrap;
