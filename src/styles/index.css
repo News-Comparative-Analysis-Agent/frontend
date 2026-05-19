@@ -461,9 +461,17 @@ details[open] .source-arrow {
 
 /* ── 아티클 본문 가독성 강화 ── */
 .article-content p {
-  margin-bottom: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 0;
   word-break: keep-all;
   overflow-wrap: break-word;
+}
+
+.article-content h1, .article-content h2, .article-content h3, .article-content h4 {
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
 }
 
 .article-content img {
@@ -546,7 +554,6 @@ details[open] .source-arrow {
 }
 
 .tiptap-editor p {
-  margin-bottom: 1.25rem;
   line-height: 1.9;
 }
 

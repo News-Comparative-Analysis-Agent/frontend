@@ -6,6 +6,9 @@ import { useDraftStore } from '../stores/useDraftStore'
 import { useUserStore } from '../stores/useUserStore'
 import DOMPurify from 'dompurify'
 import { fetchFinalReview, parsePreGeneratedDraft, type FinalReviewResponse } from '../api/finalReview'
+import { fetchIssueDraft, fetchDraftCitations } from '../api/issues'
+import { sanitizeDraftHtml, buildDraftHtml } from '../utils/buildDraftHtml'
+import { buildMediaColorMap } from '../utils/mediaColors'
 
 /** HTML 태그를 제거하고 순수 텍스트만 반환 */
 const stripHtml = (html: string): string => {
@@ -24,7 +27,7 @@ const FinalReviewPage = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const issueId = searchParams.get('id') || '1'
-  const { title, content } = useDraftStore()
+  const { title, content, setTitle, setContent } = useDraftStore()
   const { user } = useUserStore()
   const articleContentRef = useRef<HTMLDivElement | null>(null)
   const [reviewData, setReviewData] = useState<FinalReviewResponse | null>(null)
@@ -49,6 +52,44 @@ const FinalReviewPage = () => {
     loadFinalReview()
     return () => { cancelled = true }
   }, [issueId])
+
+  // ── 새로고침 시 Zustand 스토어 유실 대응: 임시 저장된 초안 데이터 로드 ──
+  useEffect(() => {
+    if (!content && issueId) {
+      const restoreDraft = async () => {
+        try {
+          const citData = await fetchDraftCitations(issueId)
+          if (citData && citData.article_body) {
+            const data = await fetchIssueDraft(issueId)
+            const cards = data.claim_cards ?? []
+            const allMedia = Array.from(new Set(cards.map(c => c.press))).filter(Boolean)
+            
+            const safeHtml = sanitizeDraftHtml(citData.article_body, allMedia)
+            setTitle(citData.title || data.name || '')
+            setContent(safeHtml, true)
+          } else {
+            // fallback: 일반 초안 데이터 불러오기
+            const data = await fetchIssueDraft(issueId)
+            if (data.pre_generated_draft) {
+              let draft = data.pre_generated_draft
+              if (typeof draft === 'string') {
+                try {
+                  draft = JSON.parse(draft)
+                } catch {}
+              }
+              setTitle(draft.title || data.name || '')
+              const mediaColorMap = buildMediaColorMap(Array.from(new Set((data.claim_cards ?? []).map(c => c.press))))
+              const safeHtml = buildDraftHtml(draft, mediaColorMap)
+              setContent(safeHtml, true)
+            }
+          }
+        } catch (e) {
+          console.error('검토 페이지에서 초안 복원 실패:', e)
+        }
+      }
+      restoreDraft()
+    }
+  }, [content, issueId, setTitle, setContent])
 
   // ── 파생 데이터 (메모이제이션) ──
   const draftFromApi = useMemo(
@@ -180,7 +221,7 @@ const FinalReviewPage = () => {
               <article className="article-content font-light review-clean-mode">
                 <div
                   ref={articleContentRef}
-                  className="space-y-8 text-[18px] leading-[1.9] text-slate-800"
+                  className="text-[18px] leading-[1.9] text-slate-800"
                   dangerouslySetInnerHTML={{ __html: safeContent }}
                 />
               </article>

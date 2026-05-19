@@ -37,21 +37,10 @@ export const sanitizeDraftHtml = (content: string, mediaNames: string[] = []): s
   if (hasBlockTags) {
     finalHtml = html.replace(/\n/g, '<br />');
   } else {
-    // 먼저 모든 \r\n을 \n으로 통일
+    // 먼저 모든 \r\n을 \n으로 통일하고, 모든 \n을 <br />로 변환하여 하나의 p 태그로 묶습니다.
     const normalized = html.replace(/\r\n/g, '\n');
-    // 2개 이상의 연속된 개행은 문단 구분으로 취급
-    const blocks = normalized.split(/\n{2,}/);
-    
-    finalHtml = blocks
-      .map(block => {
-        const trimmed = block.trim();
-        if (!trimmed) return '';
-        // 문단 내부의 단일 줄바꿈(\n)은 <br />로 변환
-        const lineWithBrs = trimmed.replace(/\n/g, '<br />');
-        return `<p>${lineWithBrs}</p>`;
-      })
-      .filter(p => p)
-      .join('');
+    const lineWithBrs = normalized.replace(/\n/g, '<br />');
+    finalHtml = `<p>${lineWithBrs}</p>`;
   }
 
   const sanitize = (DOMPurify.sanitize || (DOMPurify as any).default?.sanitize);
@@ -81,19 +70,19 @@ export const buildDraftHtml = (
   // 1. 도입부 (있을 경우만)
   const intro = draft.intro || draft.introduction || ''
   if (intro) {
-    html += `<p class="mb-5 font-medium text-slate-800">${intro}</p>`;
+    html += `<p>${intro}</p>`;
   }
 
   // 2. 언론사 공방 요약 (있을 경우만)
   if (draft.conflict_summary) {
-    html += `<p class="mb-5 text-slate-700">${draft.conflict_summary}</p>`;
+    html += `<p>${draft.conflict_summary}</p>`;
   }
 
   // 3. 언론사별 개별 입장 (media_views)
   const rootMediaViews = draft.media_views || [];
   if (rootMediaViews.length > 0) {
     rootMediaViews.forEach((view: any) => {
-      html += `<p class="mb-4 leading-relaxed"><span class="font-bold text-slate-900">${view.press || ''}</span> ${view.narrative || ''}</p>`
+      html += `<p><strong>${view.press || ''}</strong> ${view.narrative || ''}</p>`
     });
   }
 
@@ -103,12 +92,12 @@ export const buildDraftHtml = (
     const title = section.section_title || section.contention_title || ''
     const body = section.content || section.conflict_summary || ''
     
-    if (title) html += `<h4 class="font-bold text-slate-900 mt-8 mb-4">${title}</h4>`
-    if (body) html += `<p class="mb-4">${body}</p>`
+    if (title) html += `<h4>${title}</h4>`
+    if (body) html += `<p>${body}</p>`
     
     if (section.media_views && section.media_views.length > 0) {
       section.media_views.forEach((view: any) => {
-        html += `<p class="mb-4 leading-relaxed"><span class="font-bold text-slate-900">${view.press || ''}</span> ${view.narrative || ''}</p>`
+        html += `<p><strong>${view.press || ''}</strong> ${view.narrative || ''}</p>`
       })
     }
   });
