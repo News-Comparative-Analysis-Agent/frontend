@@ -514,3 +514,47 @@ details[open] .source-arrow {
 .review-clean-mode .citation-marker {
   display: none !important;
 }
+
+/* ── Tiptap 에디터 스타일 ── */
+.tiptap-editor {
+  white-space: pre-wrap;
+}
+
+.tiptap-editor p {
+  margin-bottom: 1.25rem;
+  line-height: 1.9;
+}
+
+.tiptap-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #cbd5e1;
+  pointer-events: none;
+  height: 0;
+}
+
+.tiptap-editor > * + * {
+  margin-top: 0;
+}
+
+.tiptap-editor h1, .tiptap-editor h2, .tiptap-editor h3, .tiptap-editor h4 {
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.tiptap-editor strong {
+  font-weight: 700;
+}
+
+/* 에디터 포커스 시 아웃라인 제거 */
+.tiptap-editor:focus {
+  outline: none;
+}
+
+/* 프리뷰 모드(읽기 전용) 시 시각적 피드백 */
+.ProseMirror[contenteditable="false"] {
+  opacity: 0.85;
+  cursor: default;
+}

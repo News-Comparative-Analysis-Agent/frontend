@@ -28,15 +28,37 @@ export const sanitizeDraftHtml = (content: string, mediaNames: string[] = []): s
   // 2. 인용 마커 스타일링
   html = applyCitationMarkers(html);
   
-  // 3. 줄바꿈을 문단(<p>) 태그로 변환
-  const paragraphs = html.split('\n').filter(p => p.trim());
-  const finalHtml = paragraphs.map(p => `<p class="mb-5 leading-[1.8] text-slate-700">${p.trim().replace(/\n/g, '<br/>')}</p>`).join('');
+  // 3. 줄바꿈(\n) 처리:
+  // 본문에 블록 태그(p, div, h4 등)가 이미 정교하게 구성되어 있다면 개행을 br로 바꿉니다.
+  // 그렇지 않다면 일반적인 평문 형태이므로, \n\n을 기준으로 문단을 나누어 <p> 태그로 묶어주고 문단 내 \n은 <br/>로 만듭니다.
+  const hasBlockTags = /<(p|div|h\d|section|article)[^>]*>/i.test(html);
+  let finalHtml: string;
+
+  if (hasBlockTags) {
+    finalHtml = html.replace(/\n/g, '<br />');
+  } else {
+    // 먼저 모든 \r\n을 \n으로 통일
+    const normalized = html.replace(/\r\n/g, '\n');
+    // 2개 이상의 연속된 개행은 문단 구분으로 취급
+    const blocks = normalized.split(/\n{2,}/);
+    
+    finalHtml = blocks
+      .map(block => {
+        const trimmed = block.trim();
+        if (!trimmed) return '';
+        // 문단 내부의 단일 줄바꿈(\n)은 <br />로 변환
+        const lineWithBrs = trimmed.replace(/\n/g, '<br />');
+        return `<p>${lineWithBrs}</p>`;
+      })
+      .filter(p => p)
+      .join('');
+  }
 
   const sanitize = (DOMPurify.sanitize || (DOMPurify as any).default?.sanitize);
 
   return sanitize(finalHtml, {
-    ADD_TAGS: ['span', 'h4', 'div', 'br', 'p'],
-    ADD_ATTR: ['class', 'data-id']
+    ADD_TAGS: ['span', 'h4', 'div', 'br', 'p', 'img', 'button'],
+    ADD_ATTR: ['class', 'data-id', 'src', 'alt', 'data-editor-image-id', 'contenteditable', 'draggable', 'style', 'title']
   });
 };
 
