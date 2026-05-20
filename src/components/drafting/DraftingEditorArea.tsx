@@ -26,6 +26,66 @@ interface DraftingEditorAreaProps {
   windowWidth: number
 }
 
+// 기사 원문(fullText) 내에서 인용구(quote) 또는 에비던스(evidence)를 찾아 형광펜 하이라이팅을 입혀주는 고도화 헬퍼 함수
+const highlightMatchedText = (fullText: string, quote?: string, evidence?: string) => {
+  if (!fullText) return null;
+  
+  // 매칭 후보군 정제 (인용구 우선, 차선으로 에비던스 본문 사용)
+  const targets = [quote, evidence]
+    .map(t => t?.trim())
+    .filter((t): t is string => !!t && t.length > 3);
+  
+  if (targets.length === 0) return <span>{fullText}</span>;
+
+  let matchTarget = '';
+  let matchIndex = -1;
+
+  for (const target of targets) {
+    // 1. 대소문자 무관 단순 Substring 매칭 시도
+    const idx = fullText.toLowerCase().indexOf(target.toLowerCase());
+    if (idx !== -1) {
+      matchTarget = fullText.substring(idx, idx + target.length);
+      matchIndex = idx;
+      break;
+    }
+
+    // 2. 만약 사소한 문장 부호/공백 차이로 매칭이 실패할 경우, 단어 기반 근사 매칭 시도
+    const words = target.split(/\s+/).filter(w => w.length >= 2);
+    if (words.length >= 3) {
+      const startPhrase = words.slice(0, 3).join(' ');
+      const startIdx = fullText.toLowerCase().indexOf(startPhrase.toLowerCase());
+      if (startIdx !== -1) {
+        const endPhrase = words[words.length - 1];
+        const endIdx = fullText.toLowerCase().indexOf(endPhrase.toLowerCase(), startIdx);
+        if (endIdx !== -1 && endIdx - startIdx < target.length * 1.5) {
+          matchTarget = fullText.substring(startIdx, endIdx + endPhrase.length);
+          matchIndex = startIdx;
+          break;
+        }
+      }
+    }
+  }
+
+  // 매칭된 구절을 찾았다면 해당 구절을 <mark> 태그로 감싸 형광펜 스타일 적용
+  if (matchIndex !== -1 && matchTarget) {
+    const before = fullText.substring(0, matchIndex);
+    const matched = fullText.substring(matchIndex, matchIndex + matchTarget.length);
+    const after = fullText.substring(matchIndex + matchTarget.length);
+
+    return (
+      <>
+        {before}
+        <mark className="bg-orange-100 text-orange-950 font-extrabold px-1 py-0.5 rounded-sm inline whitespace-pre-wrap selection:bg-primary/20">
+          {matched}
+        </mark>
+        {after}
+      </>
+    );
+  }
+
+  return <span>{fullText}</span>;
+};
+
 const DraftingEditorArea = ({
   title, setTitle, content, onContentChange, onEditorReady,
   handleDragOver, handleDragLeave, handleDrop, dropIndicator, handleDragStart,
@@ -211,7 +271,13 @@ const DraftingEditorArea = ({
                       <span className="text-[12px]">기사 원문 불러오는 중...</span>
                     </div>
                   ) : articleContent ? (
-                    <span>{articleContent}</span>
+                    <div className="whitespace-pre-wrap text-left break-all text-slate-700 selection:bg-primary/20 leading-[1.8] text-[13px]">
+                      {highlightMatchedText(
+                        articleContent,
+                        activeCitation.quote,
+                        activeCitation.evidence
+                      )}
+                    </div>
                   ) : (
                     <p className="text-slate-400 italic text-center py-4">표시할 기사 내용이 없습니다.</p>
                   )}
