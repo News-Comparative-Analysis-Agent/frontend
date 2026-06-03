@@ -29,12 +29,12 @@ interface DraftingEditorAreaProps {
 // 기사 원문(fullText) 내에서 인용구(quote) 또는 에비던스(evidence)를 찾아 형광펜 하이라이팅을 입혀주는 고도화 헬퍼 함수
 const highlightMatchedText = (fullText: string, quote?: string, evidence?: string) => {
   if (!fullText) return null;
-  
+
   // 매칭 후보군 정제 (인용구 우선, 차선으로 에비던스 본문 사용)
   const targets = [quote, evidence]
     .map(t => t?.trim())
     .filter((t): t is string => !!t && t.length > 3);
-  
+
   if (targets.length === 0) return <span>{fullText}</span>;
 
   let matchTarget = '';
@@ -106,7 +106,7 @@ const DraftingEditorArea = ({
     extensions: [
       StarterKit.configure({
         dropcursor: {
-          color: '#F27F0D',
+          color: '#ffab56ff',
           width: 4,
         },
       }),
@@ -165,7 +165,7 @@ const DraftingEditorArea = ({
     const handleNativeClick = (e: MouseEvent) => {
       if (isPreviewMode) return
       const target = e.target as HTMLElement
-      
+
       // 클릭한 대상이 에디터 영역 내부인지 검사
       const wrapper = editorWrapperRef.current
       if (!wrapper || !wrapper.contains(target)) return
