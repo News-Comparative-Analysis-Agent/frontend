@@ -32,6 +32,7 @@ export const useAnalysisPageData = (issueId: string | null) => {
     const loadData = async () => {
       try {
         setLoading(true)
+        setActiveMedia('all')
         const [analysisRes, issuesRes, newsRes, timelineRes] = await Promise.all([
           fetchIssueAnalysis(issueId),
           fetchDailyIssues(),

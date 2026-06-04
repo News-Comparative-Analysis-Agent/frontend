@@ -35,6 +35,7 @@ const mapTimeline = (
     const month = dateObj.getMonth() + 1;
     const day = dateObj.getDate();
     return [{ 
+      id: currentIssueId,
       date: `${month}.${day}`, 
       content: fallbackName,
       isCurrent: true 
@@ -47,6 +48,7 @@ const mapTimeline = (
     const day = dateObj.getDate().toString().padStart(2, '0');
     
     return {
+      id: event.id,
       date: `${month}.${day}`,
       content: event.name,
       isCurrent: event.id === currentIssueId

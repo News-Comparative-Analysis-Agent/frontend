@@ -9,6 +9,7 @@ export interface SourceLink {
 }
 
 export interface TimelineItem {
+  id?: number;
   date: string;
   content: string;
   isCurrent?: boolean;
