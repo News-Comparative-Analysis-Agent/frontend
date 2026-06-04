@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { TimelineItem } from '../../types/models/analysis'
 
 interface AnalysisBackgroundProps {
@@ -9,6 +10,7 @@ interface AnalysisBackgroundProps {
 }
 
 const AnalysisBackground = ({ description, background, coreContentions, mediaRatio, timeline }: AnalysisBackgroundProps) => {
+  const navigate = useNavigate()
   return (
     <div className="flex flex-col md:flex-row gap-4 mb-2 items-stretch">
       <div className="flex-1 bg-white border border-slate-100 rounded-[32px] p-6 shadow-premium min-w-0">
@@ -64,7 +66,17 @@ const AnalysisBackground = ({ description, background, coreContentions, mediaRat
           <div className="absolute left-[12px] top-6 bottom-8 w-0.5 bg-slate-100"></div>
           
           {timeline?.map((item, idx) => (
-            <div key={idx} className="relative pl-9 group/time min-h-[85px]">
+            <div 
+              key={idx} 
+              className={`relative pl-9 group/time min-h-[85px] ${
+                !item.isCurrent && item.id ? 'cursor-pointer hover:opacity-75 transition-all' : ''
+              }`}
+              onClick={() => {
+                if (!item.isCurrent && item.id) {
+                  navigate(`/analysis?id=${item.id}`)
+                }
+              }}
+            >
               {/* Node Circle */}
               <div className={`absolute left-0 top-1.5 size-[18px] rounded-full border-[3px] border-white shadow-md z-10 transition-all duration-300 ${
                 item.isCurrent 
